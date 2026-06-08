@@ -5,3 +5,7 @@
 .vscode/
 .idea/
 *.swp
+
+# Locally-installed third-party skills (e.g. via `npx skills add`) — kept local, not published
+.claude/skills/
+skills-lock.json
