@@ -1,6 +1,6 @@
 ---
 name: discover-ai-use-cases
-description: Discover high-impact, personally-relevant AI use cases for a knowledge worker through a guided interview, then produce a dated report with a prioritized shortlist and ready-to-start plans. Use when someone wants help finding a worthwhile way to use AI in their job, asks "what could I actually use AI for", feels their AI use is stuck on Q&A/summaries/images and wants real impact, or wants to audit their workday for automation and augmentation opportunities.
+description: Discover high-impact, personally-relevant AI use cases for a knowledge worker through a guided interview, producing a dated, prioritized report. Use when someone asks what they could actually use AI for in their job, feels their AI use is stuck on Q&A/summaries/images and wants real impact, or wants to audit their workday for automation and augmentation opportunities.
 ---
 
 # Discover AI Use Cases
@@ -25,17 +25,17 @@ Capture lightweight context to steer later stages: their **role/field**, roughly
 
 Walk a typical week **chronologically and concretely** — a day-in-the-life pass. The goal is a plain list of the recurring tasks they actually do, in their words, before any judgment about AI. Ask about the last real instance, not the abstract routine ("Walk me through what you did yesterday morning" beats "What do you usually do"). Capture each task with rough **frequency** and **time per instance** — you need these for scoring later.
 
-Keep the batch small (3–5 questions), then reflect the task list back and let them correct it. Probe the gaps: handoffs, waiting, the "boring admin" people forget to mention, work done outside normal hours.
+Keep the batch small, then reflect the task list back and let them correct it. Probe the gaps: handoffs, waiting, the "boring admin" people forget to mention, work done outside normal hours.
 
 **Done when:** you have a written list of the user's recurring tasks, each with rough frequency and time-per-instance, confirmed by the user.
 
 ## 3. Hunt the signals
 
-For the tasks surfaced, find the ones carrying the **high-impact markers** — the things people most want off their plate: *repetitive, low-value/tedious, time-consuming, error-prone, mentally draining/stressful,* and *information-transforming* (moving info from one form to another: notes→summary, data→report, format→format). These markers are the signal that a task is worth automating or augmenting; a task without them is usually a "nice to have."
+For the tasks surfaced, find the ones carrying the **signal markers** — the traits people most want off their plate: *repetitive* (REP), *low-value/tedious* (TED), *time-consuming* (TIME), *error-prone* (ERR), *mentally draining/stressful* (DRAIN), and *information-transforming* (XFORM — moving info from one form to another: notes→summary, data→report, format→format). These six are the canonical vocabulary the rest of the skill tags and scores against; a task carrying none of them is usually a "nice to have."
 
 Use the elicitation techniques in [QUESTION-BANK.md § Stage 3](QUESTION-BANK.md): the **Mom Test** (ask about concrete past pain, never hypothetical futures), **5 Whys** (drill a complaint to its root), and probing for **latent** frustration the person has normalized. Stay strictly non-leading — do not suggest AI solutions yet, and do not imply the answer you want. Ask which tasks they'd most want to stop doing, and *why*.
 
-**Done when:** each candidate task is tagged with the markers it carries, and you've identified the 3–6 that carry the most.
+**Done when:** each candidate task is tagged with the signal markers it carries, and you've identified the 3–6 that carry the most.
 
 ## 4. Match to patterns
 
@@ -53,7 +53,7 @@ Apply the **honesty checks** from SCORING.md before ranking: strip any candidate
 
 ## 6. Write the report
 
-Fill [REPORT-TEMPLATE.md](REPORT-TEMPLATE.md) and save it (default `./ai-use-cases-<name-or-role>.md` unless the user names a path). Stamp it with today's date and "use-case evidence as of mid-2026; re-validate, the field moves fast." Lead with the **2–3 Quick Wins**, and for each give: the task and its markers, automation-vs-augmentation framing, the calibrated expected value, and a concrete **"start this today"** plan (the first prompt to try, the tool, or the 3 setup steps). Include the full scored table and the flagged-but-deferred items so nothing is lost.
+Fill [REPORT-TEMPLATE.md](REPORT-TEMPLATE.md) and save it (default `./ai-use-cases-<name-or-role>.md` unless the user names a path). Stamp it with today's date and "use-case evidence as of mid-2026; re-validate, the field moves fast." Lead with the **2–3 Quick Wins**, and for each give: the task and its signal markers, automation-vs-augmentation framing, the calibrated expected value, and a concrete **"start this today"** plan (the first prompt to try, the tool, or the 3 setup steps). Include the full scored table and the flagged-but-deferred items so nothing is lost.
 
 Then run the **honest-impact check**: re-read the report and confirm none of the three traps below survived. Fix any before delivering.
 

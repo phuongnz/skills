@@ -6,13 +6,13 @@ Score each candidate, then run the **honesty checks** — they are what keep thi
 
 ## Impact (score 1–5)
 
-Impact ≈ **frequency × time-per-instance × pain**. Use the markers from Stage 3.
+Impact ≈ **frequency × time-per-instance × pain**. Use the signal markers from Stage 3.
 
 | | 1 (low) | 3 (medium) | 5 (high) |
 |---|---|---|---|
 | **Frequency** | monthly or less | weekly | daily / many times a day |
 | **Time per instance** | minutes | ~30 min | hours |
-| **Pain (markers)** | 0–1 markers, mildly annoying | 2–3 markers | 4+ markers / actively dreaded or stressful |
+| **Pain (signal markers)** | 0–1 markers, mildly annoying | 2–3 markers | 4+ markers / actively dreaded or stressful |
 
 Take a holistic 1–5 (don't just average — a tiny task done constantly is high-impact; a rare task is rarely worth it). **Annualized time saved** is the sanity check: `frequency_per_year × minutes_saved_per_instance`. A 5-min task done 10×/day ≈ 200+ hours/year; a 2-hour task done quarterly ≈ 8 hours/year. Frequency usually wins.
 

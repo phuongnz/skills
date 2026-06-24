@@ -37,7 +37,7 @@ For each task, pin down: **how often** (per day/week/month) and **how long** (mi
 
 ## Stage 3 — Hunt the signals
 
-Goal: find tasks carrying the high-impact markers — *repetitive, tedious/low-value, time-consuming, error-prone, draining/stressful, information-transforming*. Still no AI talk.
+Goal: find tasks carrying the **signal markers** (defined in SKILL.md Stage 3: REP, TED, TIME, ERR, DRAIN, XFORM). Still no AI talk.
 
 Surface the pain (Mom Test — concrete and past):
 - "Of everything on that list, which would you happily never do again? Tell me about the last time you did it."
@@ -52,7 +52,7 @@ Find latent needs (normalized pain): people stop noticing chronic friction.
 - "What part of the job do you think just *has* to be tedious — that's 'how it is'?"
 - "If a sharp assistant started Monday, what's the first thing you'd hand them?"
 
-Tag each task with the markers it carries. **Information-transforming** is easy to miss and high-value — listen for "I take X and turn it into Y" (notes→summary, call→action items, spreadsheet→slides, data→narrative, one format→another).
+Tag each task with the signal markers it carries. **Information-transforming** is easy to miss and high-value — listen for "I take X and turn it into Y" (notes→summary, call→action items, spreadsheet→slides, data→narrative, one format→another).
 
 ## Stage 4 — Match (now you may discuss solutions)
 

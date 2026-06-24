@@ -14,7 +14,7 @@
 
 ### 1. {Use case name}
 - **The task:** {what it is, in the user's words} — {frequency} × {time per instance}
-- **Why it's worth it (markers):** {e.g. repetitive + information-transforming + done daily}
+- **Why it's worth it (signal markers):** {e.g. repetitive + information-transforming + done daily}
 - **Automation or augmentation:** {hand it off / AI drafts, you decide}
 - **Realistic payoff:** {calibrated range, e.g. "~15 of the 25 minutes, most days, once set up" — never a hype multiplier}
 - **Start this today:**
@@ -38,7 +38,7 @@
 
 ## Full scored shortlist
 
-| Task | Markers | Impact (1–5) | Feasibility (1–5) | Quadrant | Auto/Augment | Expected value |
+| Task | Signal markers | Impact (1–5) | Feasibility (1–5) | Quadrant | Auto/Augment | Expected value |
 |---|---|---|---|---|---|---|
 | {task} | {REP, XFORM…} | {n} | {n} | 🟢/🟡/⚪ | {a/A} | {calibrated} |
 
