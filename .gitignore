@@ -9,6 +9,9 @@
 # Local scratch / generated design docs — kept local, not published
 test/
 
+# Research backing the skills — kept local for reference, not published
+research/
+
 # Locally-installed third-party skills (e.g. via `npx skills add`) — kept local, not published
 .agents/
 .claude/skills/
