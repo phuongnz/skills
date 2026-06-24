@@ -6,6 +6,9 @@
 .idea/
 *.swp
 
+# Local scratch / generated design docs — kept local, not published
+test/
+
 # Locally-installed third-party skills (e.g. via `npx skills add`) — kept local, not published
 .agents/
 .claude/skills/
