@@ -13,27 +13,27 @@ Work the steps in order. Each ends on a completion criterion — do not advance 
 
 ## 1. Pin the use case
 
-Capture the **goal** (one sentence), every **action** the agent can take (read vs. write/irreversible), the **risk profile** (irreversibility, blast radius, compliance), expected **scale**, and **latency/cost** sensitivity. If the goal is vague, interview the user before designing — a fuzzy use case yields an abstract, useless design.
+Capture the **goal** (one sentence), every **action** the agent can take (read vs. write/irreversible), the **risk profile** (irreversibility, blast radius, compliance), expected **scale**, **latency/cost** sensitivity, and the **pricing regime** (metered API vs. flat subscription — it sets how hard the cost arm pulls, and so how aggressively to optimize before climbing). If the goal is vague, interview the user before designing — a fuzzy use case yields an abstract, useless design.
 
-**Done when:** you can state the goal in one sentence, have listed every action tagged read or write, and have captured the risk profile, expected scale, and latency/cost sensitivity.
+**Done when:** you can state the goal in one sentence, have listed every action tagged read or write, and have captured the risk profile, expected scale, latency/cost sensitivity, and pricing regime.
 
 ## 2. Climb the ladder on evidence
 
-Start at **rung 1** (single agent + typed, validated tools). Add a rung only for an *unmet need*: correctness → reflection (a **separate** critic), structure → bounded planning, adaptivity → ReAct, hard org boundaries → multi-agent. Pick the **lowest** rung that meets the need. Multi-agent is the last resort (4–220× tokens, handoff latency, hard debugging) and only for boundaries — never for parallelism alone. If multi-agent, enforce the **single-writer** rule: one coordinator owns the plan and all writes; sub-agents return intelligence and full traces, not actions.
+Start at **rung 1** (single agent + typed, validated tools). Add a rung only for an *unmet need*: correctness → reflection (a **separate** critic), structure → bounded planning, adaptivity → ReAct, hard org boundaries → multi-agent. Pick the **lowest** rung that meets the need. Before climbing, exhaust single-agent optimization — prompting, retrieval, caching, **context engineering** (curate/compact/offload), model upgrade; a window that is overflowing or rotting is a signal to **fix the context first**, not to add a rung. Multi-agent is the last resort (4–220× tokens, handoff latency, hard debugging) and only for boundaries — never for parallelism alone. If multi-agent, enforce the **single-writer** rule: one coordinator owns the plan and all writes; sub-agents return intelligence and full traces, not actions.
 
-**Done when:** the chosen rung is named with the specific need that justifies it (or rung 1 is justified as sufficient).
+**Done when:** the chosen rung is named with the specific need that justifies it (or rung 1 is justified as sufficient), and single-agent optimization — including context engineering — has been exhausted before any climb.
 
 ## 3. Lay the durable-state foundation
 
-Decide the checkpointing / durable-execution approach **first** — it is the shared substrate that memory, HITL, long runs, and replayable traces all stand on. Retrofitting it is painful.
+Decide the checkpointing / durable-execution approach **first** — it is the shared substrate that memory, HITL, long runs, and replayable traces all stand on. Retrofitting it is painful. What travels through a checkpoint or handoff is usually a **compacted** form of the context (a summary, notes file, or handoff brief), not the raw transcript — persisting context and keeping it inside its budget (step 4) are one problem seen from two ends.
 
 **Done when:** the design states how run state is persisted and resumed.
 
 ## 4. Place memory
 
-Start **in-context**; add external memory only when token cost or the context window actually bites. Default to RAG/vector; reach for a knowledge graph only when relationships or change-over-time matter. Bigger context is not a memory strategy. Buy the write path if needed — but discount vendor benchmarks.
+Start **in-context**, but treat the window as a **budget** with a sweet spot — **curate, compact** (trim/summarise), and **offload** durable facts to memory *before* reaching for a bigger window or external memory. Add external memory only when token cost or window limits actually bite. Default to RAG/vector; reach for a knowledge graph only when relationships or change-over-time matter. Bigger context is not a memory strategy (long-context models rot and hallucinate on adversarial recall). Buy the write path if needed — but discount vendor benchmarks.
 
-**Done when:** each kind of knowledge the agent needs is assigned to a layer (in-context or external) with a reason.
+**Done when:** each kind of knowledge the agent needs is assigned to a layer (in-context or external) with a reason, and the context-budget plan (curate/compact/offload) is stated.
 
 ## 5. Place human-in-the-loop
 

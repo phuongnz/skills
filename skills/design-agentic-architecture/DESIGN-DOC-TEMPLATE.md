@@ -12,6 +12,7 @@
   | {e.g. issue refund} | Write | Yes | Customer funds |
 - **Scale:** {requests/day, concurrency, conversation length}
 - **Latency / cost sensitivity:** {tight / relaxed}
+- **Pricing regime:** {metered API — tokens are a marginal bill, optimize hard before climbing / flat subscription — marginal token cost ≈ 0}
 - **Compliance constraints:** {regulated actions, if any}
 
 ## 2. Recommended pattern (ladder rung)
@@ -35,7 +36,7 @@
 | {entity relationships} | External | knowledge graph | relationships/temporal matter |
 | {stable user prefs} | External | memory layer (write path) | needs store/update/forget |
 
-- **First thing to try before adding external memory:** {keep it in-context until cost/window bites}
+- **Context-budget plan (before external memory):** {curate the window, compact history (trim/summarise), offload durable facts — keep the working set inside the window's sweet spot; add external memory only when cost/window bites}
 
 ## 5. Human-in-the-loop plan
 

@@ -8,6 +8,8 @@ The rules behind `design-agentic-architecture`, distilled from four adversariall
 
 Every design choice moves along one axis: **reliability / quality** vs. **cost / latency / non-determinism / complexity.** Every added pattern, agent, memory store, or gate must earn its place against it. **[confirmed]**
 
+**Pricing regime is a modifier on the cost arm.** That arm is denominated in a *price per token* that isn't fixed: metered API billing makes "linear in tokens" a real marginal bill — every extra rung and fuller window stings — while a flat subscription flattens it toward zero, so the same pattern is expensive on one plan and nearly free on another. It does not change *which* rung you need, only *how hard the cost arm pulls*, and therefore how aggressively you optimize before climbing.
+
 ## The complexity ladder (climb on evidence)
 
 Start at the bottom; climb only when the rung below provably fails. Each rung answers a different *need*, so jump to the rung the need points to — it is not a strict march. **[confirmed]**
@@ -21,7 +23,8 @@ Start at the bottom; climb only when the rung below provably fails. Each rung an
 | 5 | Multi-agent | Hard org boundaries or proven single-agent limits | 4–220× tokens, hard debugging |
 
 - **Reflection needs a *separate* critic** — self-critique rubber-stamps its own errors. **[confirmed]**
-- Before climbing past rung 1, exhaust single-agent optimization: prompting, retrieval, caching, bigger context, model upgrade. **[confirmed]**
+- Before climbing past rung 1, exhaust single-agent optimization: prompting, retrieval, caching, **context engineering** (curate/compact/offload), model upgrade. **[confirmed]**
+- **Context pressure is a climb signal, not a climb.** A window that is overflowing or rotting is evidence — but the first moves are to fix the context (tighten the prompt, curate the window, compact history, offload to memory); climb a rung only when the work genuinely cannot fit one coherent window. **[confirmed]**
 - Go multi-agent only for **hard boundaries** — security/compliance separation, multiple owning teams, scale past 3–5 distinct functions. Not for parallelism alone. **[confirmed]**
 
 ## Multi-agent
@@ -39,6 +42,7 @@ Durable, checkpointed state is the shared foundation: multi-agent coordination, 
 ## Memory
 
 - Two layers: **working** (context window — perfect recall, low latency, linear token cost, bounded) and **long-term external** (scales, but retrieval error + a hop). Decide which slice of knowledge lives where. **[confirmed]**
+- The working layer is a **budget**, not just a location: the window has a sweet spot — too little starves reasoning, too much rots it (stale output, dead ends, repetition) while cost grows linearly. **Context engineering** spends it deliberately — **curate** inputs, **compact** history (trim or summarise), **offload** durable facts to memory — *before* reaching for a bigger window or another agent. **[confirmed]** (Anthropic's "effective context engineering for AI agents" is the canonical treatment.) Context rot (decay as the window fills) is distinct from hallucination on adversarial recall — both are failure modes of an over-stuffed window.
 - Content types: **episodic** (what happened), **semantic** (what's true, often a knowledge graph), **procedural** (how to do things). Useful labels — but no single tidy taxonomy is canonical. **[refuted]** (the "one neat taxonomy" claim)
 - Start in-context; default RAG/vector; knowledge graph only for relationships/temporal. **[confirmed]**
 - Long-context LLMs hallucinate on adversarial recall — bigger context is not a memory strategy. **[confirmed]**
