@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!-- ===========================================================================
+     CHAPTER TEMPLATE  →  save as  .repo-atlas/chapters/NNNN-dash-case-name.html
+     ---------------------------------------------------------------------------
+     One self-contained chapter of the atlas, covering one area of the repo per
+     the spine in CHAPTERS.md. Styling comes from ../assets/style.css — write
+     only content here.
+
+     CITE OR CUT: every claim links to its evidence. Render a citation as
+     readable text that is ALSO a link into real source — the atlas sits at
+     .repo-atlas/chapters/, so the repo root is two levels up:
+        <a href="../../src/foo.ts">src/foo.ts:42</a>
+     Link commits to <remote>/commit/<sha> when the remote is a web URL.
+     Tag anything deduced rather than read as (inferred).
+
+     Fill: {{TITLE}}, {{N}} (chapter number), {{AREA}} (e.g. "Architecture"),
+     the body, an optional hands-on verification block, and related links.
+     Then add this chapter to NAV in index.html.
+     ========================================================================= -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{TITLE}}</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <article class="page">
+    <p class="eyebrow">Chapter {{N}} · {{AREA}}</p>
+    <h1>{{TITLE}}</h1>
+
+    <!-- ============ CHAPTER BODY ============ -->
+    <p>Open with what this part of the repo does and why it matters to the
+       reader's intent. Back every claim with a citation into source, like
+       <a href="../../src/example.ts">src/example.ts:42</a>, and mark anything
+       you deduced rather than read as <em>(inferred)</em>.</p>
+
+    <p>For structure, CI/CD, or an end-to-end flow, draw an ASCII diagram:</p>
+    <pre><code>  edge ──▶ router ──▶ handler ──▶ store
+                        │
+                        ▼
+                     queue</code></pre>
+
+    <!-- Optional hands-on verification — confirms the reader can act on this.
+         Best on the "Start here" chapter. Remove if not useful. -->
+    <div class="callout">
+      <p class="eyebrow">Try it</p>
+      <p>Run <code>{{COMMAND}}</code> — you should see <code>{{EXPECTED}}</code>.
+         If not, check {{LIKELY CAUSE}}.</p>
+    </div>
+    <!-- ============ /CHAPTER BODY ============ -->
+
+    <footer class="lesson-footer">
+      <p class="primary-source"><strong>Go deeper —</strong>
+        <a href="../../README.md">the repo's own docs</a> ·
+        <a href="../sources.html">sources</a>.</p>
+      <p class="ask"><strong>Unclear?</strong> Ask your guide (the agent in this
+        session) — and if something here looks wrong, the repo may have drifted:
+        refresh the atlas.</p>
+      <p>Related: <a href="0001-start-here.html">previous chapter</a> ·
+        <a href="../reference/0001-directory-map.html">directory map</a> ·
+        <a href="../glossary.html">glossary</a></p>
+    </footer>
+  </article>
+
+  <script>/* announce this page to the dashboard so it can highlight the menu (file://-safe) */
+    try { if (window.parent !== window) window.parent.postMessage({ tmnLoc: location.href }, '*'); } catch (e) {}</script>
+</body>
+</html>

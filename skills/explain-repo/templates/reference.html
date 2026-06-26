@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<!-- ===========================================================================
+     REFERENCE TEMPLATE  →  save as  reference/NNNN-dash-case-name.html
+     ---------------------------------------------------------------------------
+     The compressed essence of one or more lessons, built for quick lookup and
+     to print well: cheat sheets, syntax tables, algorithms, pose sequences.
+     Unlike lessons, these get revisited often — keep them dense and scannable.
+     Use class="page page--wide" when the content is table- or code-heavy.
+     Then add this doc to NAV.reference in index.html.
+     ========================================================================= -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{TITLE}}</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <article class="page page--wide">
+    <p class="eyebrow">Reference</p>
+    <h1>{{TITLE}}</h1>
+    <p>One line on when to reach for this sheet.</p>
+
+    <h2>Section</h2>
+    <table>
+      <tr><th>Thing</th><th>Meaning / use</th></tr>
+      <tr><td><code>example</code></td><td>What it is and when to use it.</td></tr>
+    </table>
+
+    <p style="margin-top:2.5rem"><a href="../glossary.html">Glossary</a> ·
+       <a href="../index.html">Dashboard</a></p>
+  </article>
+  <script>/* announce this page to the dashboard so it can highlight the menu (file://-safe) */
+    try { if (window.parent !== window) window.parent.postMessage({ tmnLoc: location.href }, '*'); } catch (e) {}</script>
+</body>
+</html>

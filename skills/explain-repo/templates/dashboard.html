@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<!-- ===========================================================================
+     DASHBOARD TEMPLATE  →  copy to  .repo-atlas/index.html
+     ---------------------------------------------------------------------------
+     The single hub the developer opens. The left sidebar (menu + freshness line)
+     and the content iframe are driven entirely by the NAV object below.
+
+     TO UPDATE (the only thing the agent edits after a chapter/reference is made):
+       1. Append an entry to NAV.chapters / NAV.reference.
+       2. Set `stale: true` on chapters the latest refresh marked out of date;
+          clear it once the chapter is re-investigated.
+       3. Point NAV.current at the chapter that should open by default.
+       4. Update NAV.asOf to the commit the atlas was last built against.
+     Adding a menu item = one line in NAV. Do NOT hand-edit the sidebar markup.
+
+     Paths are relative to .repo-atlas/:
+       chapters/0001-x.html, reference/0001-x.html, brief.html, glossary.html …
+     ========================================================================= -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{REPO}} — Repo Atlas</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    /* dashboard-only marker for stale chapters; everything else is in style.css */
+    .nav-link .stale { color: var(--accent); font-size: .85em; margin-left: .35rem; }
+    .freshness { font-size: .8rem; opacity: .8; margin-top: .15rem; }
+    .freshness code { font-size: .9em; }
+  </style>
+</head>
+<body class="dashboard">
+
+  <aside class="sidebar">
+    <div class="topic" id="repo"></div>
+    <p class="mission-line" id="tagline"></p>
+
+    <div class="tracker">
+      <div class="label"><span>Coverage</span><span id="tracker-count"></span></div>
+      <div class="bar"><span id="tracker-fill"></span></div>
+      <p class="freshness" id="freshness"></p>
+    </div>
+
+    <nav id="nav"></nav>
+  </aside>
+
+  <iframe class="content-frame" id="content" name="content" title="Atlas content"></iframe>
+
+  <script>
+  /* ===== EDIT THIS BLOCK ===== */
+  const NAV = {
+    repo: "{{REPO}}",
+    tagline: "{{ONE-LINE WHAT-IS-THIS}}",
+    asOf: "{{SHORT SHA}}",                       // commit the atlas was built against
+    current: "chapters/0001-start-here.html",    // page shown on open
+
+    chapters: [
+      { n: 0, href: "chapters/0001-start-here.html",   title: "Start here",             stale: false },
+      { n: 1, href: "chapters/0002-architecture.html", title: "Architecture & structure", stale: false },
+    ],
+
+    reference: [
+      // { href: "reference/0001-directory-map.html", title: "Directory map" },
+    ],
+
+    foundations: [
+      { href: "brief.html",    title: "Brief"    },
+      { href: "glossary.html", title: "Glossary" },
+      { href: "sources.html",  title: "Sources"  },
+    ],
+  };
+  /* ===== END EDIT BLOCK ===== */
+
+  (function () {
+    const frame = document.getElementById('content');
+    document.getElementById('repo').textContent = NAV.repo;
+    document.getElementById('tagline').textContent = NAV.tagline || '';
+
+    // Coverage + freshness — fresh chapters / total, plus the as-of stamp
+    const total = NAV.chapters.length;
+    const stale = NAV.chapters.filter(c => c.stale).length;
+    const fresh = total - stale;
+    document.getElementById('tracker-count').textContent = fresh + ' / ' + total;
+    document.getElementById('tracker-fill').style.width =
+      (total ? Math.round(fresh / total * 100) : 0) + '%';
+    document.getElementById('freshness').innerHTML =
+      'As-of <code>' + (NAV.asOf || '—') + '</code>' +
+      (stale ? ' · ' + stale + ' stale' : '');
+
+    function group(heading, items, render) {
+      if (!items.length) return '';
+      return '<div class="nav-group"><div class="heading">' + heading + '</div><ul>' +
+        items.map(render).join('') + '</ul></div>';
+    }
+    const esc = s => String(s).replace(/"/g, '&quot;');
+
+    let html = '';
+    html += group('Chapters', NAV.chapters, c =>
+      '<li><a class="nav-link" data-href="' + esc(c.href) + '">' +
+      '<span class="num">' + c.n + '</span>' + esc(c.title) +
+      (c.stale ? ' <span class="stale" title="out of date — needs refresh">⟳</span>' : '') + '</a></li>');
+    html += group('Reference', NAV.reference, r =>
+      '<li><a class="nav-link" data-href="' + esc(r.href) + '">' +
+      '<span class="num">◆</span>' + esc(r.title) + '</a></li>');
+    html += group('Foundations', NAV.foundations, f =>
+      '<li><a class="nav-link" data-href="' + esc(f.href) + '">' +
+      '<span class="num">§</span>' + esc(f.title) + '</a></li>');
+
+    const nav = document.getElementById('nav');
+    nav.innerHTML = html;
+
+    // Highlight the menu item matching whatever the iframe shows. On file://
+    // the parent can't read the iframe's location (separate origin), so every
+    // content page postMessages its own URL on load.
+    function setActive(loc) {
+      nav.querySelectorAll('.nav-link').forEach(a =>
+        a.classList.toggle('active', new URL(a.dataset.href, document.baseURI).href === loc));
+    }
+    window.addEventListener('message', e => {
+      if (e.data && e.data.tmnLoc) setActive(e.data.tmnLoc);
+    });
+
+    function open(href) {
+      frame.src = href;
+      setActive(new URL(href, document.baseURI).href);
+    }
+    nav.addEventListener('click', e => {
+      const a = e.target.closest('.nav-link');
+      if (a) { e.preventDefault(); open(a.dataset.href); }
+    });
+
+    open(NAV.current || (NAV.chapters[0] && NAV.chapters[0].href) || 'brief.html');
+  })();
+  </script>
+</body>
+</html>

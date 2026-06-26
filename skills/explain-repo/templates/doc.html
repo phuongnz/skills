@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<!-- ===========================================================================
+     FOUNDATION-DOC TEMPLATE  →  save as  brief.html / glossary.html /
+                                          sources.html  (.repo-atlas/ root)
+     ---------------------------------------------------------------------------
+     These are the developer-facing foundation docs. The SOURCE OF TRUTH is the
+     Markdown inside the <script type="text/markdown"> block below — this is a
+     SINGLE file, not a markdown + html pair.
+
+       • To EDIT: change only the Markdown in the block. Leave the wrapper alone.
+       • To READ as the agent: read just the Markdown block, ignore the wrapper.
+       • The browser renders it via assets/md.js — no network, works on file://.
+
+     Follow the matching FORMAT doc in the skill for the content of each:
+       brief.html     → BRIEF-FORMAT.md
+       glossary.html  → GLOSSARY-FORMAT.md
+       sources.html   → SOURCES-FORMAT.md
+
+     (Internal state — findings/, SUMMARY.md, NOTES.md — stays plain .md and is
+     NOT wrapped, since the developer navigates the atlas, not those files.)
+     ========================================================================= -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{DOC TITLE}}</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <script id="md" type="text/markdown">
+# {{Doc Title}}
+
+Replace this block with the document's Markdown, following its FORMAT doc.
+
+## Example
+- Markdown here renders to clean HTML on load.
+- **Bold**, _italic_, `code`, [links](https://example.com), lists, tables and
+  blockquotes are all supported.
+  </script>
+
+  <article class="page" id="out"></article>
+
+  <script src="assets/md.js"></script>
+  <script>TMN.render('md', 'out');</script>
+  <script>/* announce this page to the dashboard so it can highlight the menu (file://-safe) */
+    try { if (window.parent !== window) window.parent.postMessage({ tmnLoc: location.href }, '*'); } catch (e) {}</script>
+</body>
+</html>
