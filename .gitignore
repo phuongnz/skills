@@ -16,3 +16,6 @@ docs/
 .agents/
 .claude/skills/
 skills-lock.json
+
+# working folders
+/learning-space

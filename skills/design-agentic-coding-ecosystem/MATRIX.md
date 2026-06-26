@@ -1,10 +1,10 @@
 # The Decision Matrix — constraints to a starting band
 
-*Research-backed as of mid-2026. A markdown port of the bridge's decision matrix (the `agentic-coding` repo), which synthesizes two teaching repos — `teachme-agentic-architecture` (the engine / product plane) and `teachme-agentic-software-workflow` (the drive / build plane). Re-validate before relying on it; the field moves.*
+*Research-backed as of mid-2026. A self-contained decision matrix that maps a software build's constraints to a starting band for its **agentic coding ecosystem** — the coding agents, the workflow, and the tools the developer builds *with*. Re-validate before relying on it; the field moves.*
 
 ## Read it as a band, not a point
 
-A matrix that printed one fixed design would betray the one law both repos teach — **Evidence-Gated Escalation**: you don't *predict* the final architecture, you *climb on proof*. So for each constraint the matrix sets three things, not an answer:
+A matrix that printed one fixed design would betray the one law every design here keeps — **Evidence-Gated Escalation**: you don't *predict* the final design, you *climb on proof*. So for each constraint the matrix sets three things, not an answer:
 
 - **a floor** — the lightest start the constraint *permits*. Begin here.
 - **a ceiling / cap** — the hard limit it *imposes* (marked **cap ·**). Never below this, whatever else you do.
@@ -25,11 +25,11 @@ The user's constraints are in business language; the matrix decides in **native 
 
 ## Step 2 · Match the matrix
 
-Three columns = the three outputs: the **architecture** you ship (product plane), the **workflow** you drive (build plane), and the **tools**. Read the floor, obey the caps (**cap ·**), note the climb triggers (**→**).
+Three columns = the three design surfaces of the coding ecosystem: the **architecture** of the coding agents (the rung topology you run them on — from one supervised agent to a multi-agent crew), the **workflow** you drive them with, and the **tools**. None of these is the architecture of the product being built — that is the user's to build, not yours to design. Read the floor, obey the caps (**cap ·**), note the climb triggers (**→**).
 
 ### Requirements
 
-| Your reading | Architecture (rung · product plane) | Workflow (build plane) | Tools |
+| Your reading | Architecture (coding-agent rung) | Workflow (dev process) | Tools |
 |---|---|---|---|
 | **Clarity: fuzzy / exploratory** | Rung 1; reflection early. **→ ReAct (rung 4) if a static plan won't hold.** Don't bounded-plan what you can't yet decompose. | Explore-first — vibe to probe, then Explore→Plan→Code→Commit. Skip heavy spec until the shape emerges. | Light; keep the window in the *smart zone* as you probe. |
 | **Clarity: clear & stable** | Bounded planning (rung 3) becomes viable once structure is knowable. | Spec-Driven (Spec Kit / Kiro) — the spec is the source of truth. | Generated-from-spec scaffolding; living docs. |
@@ -40,23 +40,23 @@ Three columns = the three outputs: the **architecture** you ship (product plane)
 
 | Your reading | Architecture | Workflow | Tools |
 |---|---|---|---|
-| **Blast radius: high** (money · safety · irreversible) | **cap ·** HITL gate on the risky action; observability on. Start rung 1; add a critic early if it computes something. | **cap ·** spec-first; **Verify & Review never cut**. Lower autonomy — gate each phase. | Independent critic + clean-context reviewer; typed, schema-validated tool calls. |
+| **Blast radius: high** (money · safety · irreversible) | **cap ·** HITL gate on the risky change — the agent never merges money / auth / irreversible code unreviewed; observability on. Start rung 1; add a critic agent early if correctness is machine-checkable. | **cap ·** spec-first; **Verify & Review never cut**. Lower autonomy — gate each phase. | Independent critic + clean-context reviewer; typed, schema-validated tool calls. |
 | **Blast radius: low** | Rung 1; HITL optional; climb only on proof. | Vibe → EPCC; higher autonomy is fine. | Default light toolset. |
-| **Lifespan: long / maintained** | **cap ·** evaluation & observability from day one. **→ add a memory write-path when token cost bites.** | Spec-driven; living docs; Review never cut. | Durable, checkpointed state; tracing (OpenTelemetry GenAI). |
+| **Lifespan: long / maintained** | **cap ·** CI evaluation & run-trace observability from day one. **→ add a persistent project-memory file (e.g. a `CLAUDE.md`/notes doc the agent updates) when re-establishing context starts to cost too much.** | Spec-driven; living docs; Review never cut. | Durable, checkpointed state; tracing (OpenTelemetry GenAI). |
 | **Lifespan: throwaway** | Rung 1; skip memory / eval scaffolding. | Vibe coding; minimal ceremony. | Minimal; no durable state needed. |
 
 ### Budget
 
 | Your reading | Architecture | Workflow | Tools |
 |---|---|---|---|
-| **Metered API** (every token a marginal $) | Optimise the rung you're on *before* climbing; context thrift first (curate, compact, offload). Extra rungs sting. | Justify each heavy step; smaller / fewer crews; the one-sentence-diff rule earns real money. | Prompt caching; cheap models for sub-steps; RAG instead of stuffing the window. |
+| **Metered API** (every token a marginal $) | Optimise the rung you're on *before* climbing; context thrift first (curate, compact, offload). Extra rungs sting. | Justify each heavy step; smaller / fewer crews; the one-sentence-diff rule earns real money. | Prompt caching; cheap models for sub-steps; retrieval / code-search instead of stuffing the whole codebase into the window. |
 | **Flat subscription** (marginal token ≈ $0) | An extra rung, fresh-context reviewer, or fuller window is nearly free to *try* — but reliability must still earn it. **Frugality stops gating; evidence doesn't.** | Fresh-context reviewers and multi-agent crews are easy to justify here. | Fuller windows; more parallel agents — cost is no longer the gate. |
 
 ### Tech stack
 
 | Your reading | Architecture | Workflow | Tools |
 |---|---|---|---|
-| **Boundaries: answering separable from acting** | A *hypothesis* for rung 5 — **don't pre-split**. **→ Multi-agent only on a proven hard boundary or single-agent limit** (single-writer if you do). | — (unchanged) | Single-writer coordinator *if* you ever split. |
+| **Boundaries: the build splits into separable sub-tasks** | A *hypothesis* for rung 5 — **don't pre-split**. **→ Multi-agent only on a proven hard boundary or single-agent limit** (single-writer if you do). | — (unchanged) | Single-writer coordinator *if* you ever split. |
 | **Framework / latency / on-prem constraint** | Shapes the durable-state engine; a latency SLA **caps** how many rungs you can climb. | — (unchanged) | Framework often dictated — but they ship the *same primitives*, so pick by ecosystem fit, not hype. |
 
 **Tie-break:** when two readings pull different ways, the **most restrictive cap wins** — the tightest ceiling across all constraints is the one you obey. (High blast radius beats a tight budget: keep the HITL gate and pay for it.)
@@ -73,17 +73,17 @@ These caps hold no matter where the constraints land. If a cheap, fast design vi
 
 ## The climb triggers (inside the band)
 
-What moves a design up is **evidence**, and it has a fixed vocabulary. Evidence comes from Verify, Review, and production traces — the lifecycle loop. Arrows run **both ways**: the same discipline *de-escalates* when a mechanism stops earning its cost.
+What moves a design up is **evidence**, and it has a fixed vocabulary. Evidence comes from Verify, Review, and the agents' own run traces — the build's feedback loop. Arrows run **both ways**: the same discipline *de-escalates* when a mechanism stops earning its cost.
 
-| Evidence you observe | Plane | The move it authorises |
+| Evidence you observe | Surface | The move it authorises |
 |---|---|---|
-| Output is wrong in a *checkable* way | product | + rung 2 — a separate critic |
-| A static plan keeps breaking mid-task | product | + rung 4 — ReAct (think→act→observe) |
-| A proven hard boundary, or single-agent ceiling | product | + rung 5 — multi-agent (single-writer) |
-| Window fills; answers drift mid-run | both | curate / compact / offload *first* — only then a rung |
-| The critic never fires across many runs | product | − **descend**: remove the rung |
+| Agent output is wrong in a *checkable* way | architecture | + rung 2 — a separate reviewer/critic agent |
+| A static plan keeps breaking mid-task | architecture | + rung 4 — ReAct (think→act→observe) |
+| A proven hard boundary, or single-agent ceiling | architecture | + rung 5 — multi-agent crew (single-writer) |
+| Context window fills; output drifts mid-run | both | curate / compact / offload *first* — only then a rung |
+| The critic never fires across many runs | architecture | − **descend**: remove the rung |
 | Token bill outgrows the value it buys | both | optimise / descend before climbing |
-| New edge cases churn the requirements | build | heavier spec on the next loop |
+| New edge cases churn the requirements | workflow | heavier spec on the next loop |
 
 ## How this drives the three-design band
 

@@ -1,6 +1,6 @@
 # Agentic Coding Ecosystem — {Project name}
 
-*Designs reflect the state of mid-2026. Tools and prices searched {date}. Re-validate before building; the field — and pricing — moves. Costs are calibrated estimates to expose the floor→ceiling delta, **not quotes**.*
+*Designs reflect the state of mid-2026. Tools and prices searched {date}. Re-validate before building; the field — and pricing — moves. Costs are calibrated estimates to expose the floor→ceiling delta, **not quotes**. This is a design for the **agentic coding ecosystem you build *with*** — the coding agents, workflow, and tools — not for the product itself; "architecture" below always means the coding-agent topology.*
 
 ## 1. The brief
 
@@ -9,7 +9,7 @@
 - **Business stakes:** blast radius = {low / high — why} · lifespan = {throwaway / maintained}
 - **Budget:** {number or "open"} · pricing regime = {metered API / flat subscription}
 - **Tech stack:** {brownfield: existing stack + constraints to reuse | greenfield: hard constraints, or "none"}
-- **Cost inputs:** volume = {tasks/period} · context size = {tokens/call} · model tier = {…} · human-review = {volume + rate}
+- **Cost inputs:** volume = {coding tasks or PRs / period} · context size = {tokens / agent call} · model tier = {…} · human-review = {volume + rate}
 
 > Mark every assumed value with ⚠ — especially anything the user didn't state (volume, latency, review rate). Assumptions move the cost; flag them so they can be corrected.
 
@@ -29,7 +29,7 @@
 
 | | Floor | Middle | Ceiling |
 |---|---|---|---|
-| **Architecture** | rung {1} {+ posture} | rung {n} {+ what's added} | rung {n} {+ what's added} |
+| **Architecture** (coding agents) | rung {1} {+ posture} | rung {n} {+ what's added} | rung {n} {+ what's added} |
 | **Workflow** | {workflow} | {workflow} | {workflow} |
 | **Climb trigger to reach it** | — (start here) | {evidence that moves floor→middle} | {evidence that moves middle→ceiling} |
 | **Expected cost / period** | {$ range} | {$ range} | {$ range} |
@@ -42,7 +42,7 @@
 
 *The lightest start the constraints permit. Build this.*
 
-- **Architecture:** rung {1} — {single agent + tools / RAG / …}. Durable state: {…}. Memory: {in-context first / …}. HITL: {gate on {action}, or "none — low blast radius"}. Eval: {day-one if maintained / minimal}.
+- **Architecture (coding agents):** rung {1} — {single supervised agent + tools / + a reviewer agent / a multi-agent crew}. Durable state: {checkpointing / worktrees / branch-per-task / none}. Project memory: {in-context first / a `CLAUDE.md`-style file the agent updates / …}. HITL: {gate on {the risky merge — money/auth/irreversible code}, or "none — low blast radius"}. Eval: {CI from day-one if maintained / minimal}.
 - **Workflow:** spec = {low/mid} · autonomy = {…} · {named workflow}. Verify+Review: {how, never cut}.
 - **Tools (live, {date}):** {capability → tool}, … — landscape, not a ranking.
 - **Caps honoured:** {tick each binding cap — show the floor still obeys them}.
@@ -70,12 +70,12 @@
 
 | Line item | Floor | Middle | Ceiling |
 |---|---|---|---|
-| LLM tokens (or subscription) | {$} | {$} | {$} |
-| Memory / vector store | {$} | {$} | {$} |
-| Durable-state infra | {$} | {$} | {$} |
-| Observability / eval | {$} | {$} | {$} |
+| Coding-agent tokens (or tool subscription) | {$} | {$} | {$} |
+| Memory / code-index store (if any) | {$} | {$} | {$} |
+| Durable-execution / orchestration infra | {$} | {$} | {$} |
+| Observability / CI eval | {$} | {$} | {$} |
 | Human-review time | {$} | {$} | {$} |
-| Engineering / maintenance (amortized) | {$} | {$} | {$} |
+| Ecosystem setup & maintenance (amortized) | {$} | {$} | {$} |
 | **Total / period** | **{$ range}** | **{$ range}** | **{$ range}** |
 
 **What drives the delta:** {the 2–3 line items}. **Sensitivity:** {the input that most moves the total}.
@@ -84,9 +84,9 @@
 ## 6. Recommendation
 
 - **Start here:** the **Floor** — {restate it in one line}. It satisfies every binding cap at the lowest cost.
-- **First climb trigger to watch:** {the specific evidence that would move you to the middle, and where it surfaces — Verify / Review / a production trace}.
+- **First climb trigger to watch:** {the specific evidence that would move you to the middle, and where it surfaces — Verify / Review / a run trace}.
 - **De-escalation:** {a mechanism to remove if a trace shows it never earns its cost — the arrow runs both ways}.
-- **Deeper dive:** to turn the chosen design into a full architecture document, run `design-agentic-architecture` on it.
+- **Next step:** stand up the floor, instrument it (CI + run traces) so the climb triggers are observable, and move up only when the named evidence appears.
 
 ## 7. Faith & false-confidence check
 
