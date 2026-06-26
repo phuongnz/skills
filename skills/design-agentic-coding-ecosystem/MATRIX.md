@@ -55,6 +55,8 @@ Three columns = the three design surfaces of the coding ecosystem: the **archite
 | **Flat subscription** (marginal token ≈ $0) | An extra rung, fresh-context reviewer, or fuller window is nearly free to *try* — but reliability must still earn it. **Frugality stops gating; evidence doesn't.** | Fresh-context reviewers and multi-agent crews are easy to justify here. | Fuller windows; more parallel agents — cost is no longer the gate. |
 | **Mixed** (flat plan as workhorse + metered API for selective high-leverage tasks) | Run the bulk on the flat plan, where an extra rung is nearly free; reach for a metered model only where per-token spend buys real speed or autonomy on a small, high-leverage step. | Default to the flat workhorse; spend metered tokens selectively — the one-sentence-diff rule earns money on the metered slice only. | Fuller windows / parallel agents on the flat plan; caching and cheap-model thrift on the metered slice. |
 
+> **Subscription-auth note (searched 2026-06-26).** Tools like **Sandcastle** run a coding-agent CLI headless/in parallel under a Pro/Max or ChatGPT/Codex subscription (an OAuth token, not an API key), so the **flat** regime — and the flat side of **mixed** — now reaches autonomous flows that once forced a metered key. It is **still the flat regime**, not a fourth one: the ceiling is **rate-limit throttling** (rolling 5-hour + weekly caps that can stall a run), not a per-token bill. ⚠ **ToS gray zone** — vendors steer automated use toward API keys and the stance is shifting; verify before production automation.
+
 ### Tech stack
 
 | Your reading | Architecture | Workflow | Tools |
