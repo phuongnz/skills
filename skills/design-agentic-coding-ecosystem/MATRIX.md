@@ -10,6 +10,8 @@ A matrix that printed one fixed design would betray the one law every design her
 - **a ceiling / cap** — the hard limit it *imposes* (marked **cap ·**). Never below this, whatever else you do.
 - **climb triggers** — the evidence (marked **→**) that authorises moving up *inside* the band.
 
+Evidence comes in **two timings**, and the band is built from both. **A-priori** evidence is read straight from the constraints, *before a line of code* — it sets the **floor** and the **caps** (Step 2 below). **A-posteriori** evidence is produced by the running build — Verify, Review, run traces — and it is what fires the **climb triggers** that move you up *or* down later. Same currency; they differ only in *when* the justification arrives. The cheap structural rungs can be justified a-priori; the risky ones (ReAct, multi-agent) almost always need a-posteriori proof — which is why you *don't pre-split*.
+
 The matrix narrows the band; human judgement still applies within it. A decision aid, not an oracle.
 
 ## Step 1 · Translate the brief
@@ -71,9 +73,9 @@ These caps hold no matter where the constraints land. If a cheap, fast design vi
 - **A maintained product ⇒ evaluation & observability from day one** — or you can't see *why* a run broke.
 - **If you split into multiple agents, exactly one writer** owns the plan and all state changes.
 
-## The climb triggers (inside the band)
+## The climb triggers (inside the band) — a-posteriori evidence
 
-What moves a design up is **evidence**, and it has a fixed vocabulary. Evidence comes from Verify, Review, and the agents' own run traces — the build's feedback loop. Arrows run **both ways**: the same discipline *de-escalates* when a mechanism stops earning its cost.
+Step 2 set the floor and caps from **a-priori** evidence. What moves a design up or down *after* you build is **a-posteriori** evidence — produced by the running build (Verify, Review, the agents' own run traces) — and it has a fixed vocabulary. Arrows run **both ways**: the same discipline *de-escalates* when a mechanism stops earning its cost.
 
 | Evidence you observe | Surface | The move it authorises |
 |---|---|---|

@@ -31,7 +31,7 @@
 |---|---|---|---|
 | **Architecture** (coding agents) | rung {1} {+ posture} | rung {n} {+ what's added} | rung {n} {+ what's added} |
 | **Workflow** | {workflow} | {workflow} | {workflow} |
-| **Climb trigger to reach it** | — (start here) | {evidence that moves floor→middle} | {evidence that moves middle→ceiling} |
+| **Climb trigger to reach it** | — start here (what *a-priori* evidence already justifies) | {*a-posteriori* evidence: floor→middle} | {*a-posteriori* evidence: middle→ceiling} |
 | **Expected cost / period** | {$ range} | {$ range} | {$ range} |
 
 > **Start at the floor.** The middle and ceiling are priced so you can see what "more" costs — not a recommendation to build them now. You climb only when the named evidence appears.
@@ -40,7 +40,7 @@
 
 ### 🟢 Floor — {one-line identity}
 
-*The lightest start the constraints permit. Build this.*
+*The lightest start the constraints permit — everything your a-priori evidence justifies, no more. Build this.*
 
 - **Architecture (coding agents):** rung {1} — {single supervised agent + tools / + a reviewer agent / a multi-agent crew}. Durable state: {checkpointing / worktrees / branch-per-task / none}. Project memory: {in-context first / a `CLAUDE.md`-style file the agent updates / …}. HITL: {gate on {the risky merge — money/auth/irreversible code}, or "none — low blast radius"}. Eval: {CI from day-one if maintained / minimal}.
 - **Workflow:** spec = {low/mid} · autonomy = {…} · {named workflow}. Verify+Review: {how, never cut}.
@@ -50,7 +50,7 @@
 
 ### 🟡 Middle — {one-line identity}
 
-*The realistic next stop once the first evidence arrives.*
+*The realistic next stop once the first a-posteriori evidence arrives.*
 
 - **Climb trigger in:** {the named evidence — e.g. "Verify shows a checkable correctness gap → add rung 2 critic"}.
 - **Architecture / Workflow / Tools:** {the delta from the floor — what's added and why}.
@@ -83,14 +83,14 @@
 
 ## 6. Recommendation
 
-- **Start here:** the **Floor** — {restate it in one line}. It satisfies every binding cap at the lowest cost.
-- **First climb trigger to watch:** {the specific evidence that would move you to the middle, and where it surfaces — Verify / Review / a run trace}.
+- **Start here:** the **Floor** — {restate it in one line}. It is what your constraints (a-priori evidence) already justify, and it satisfies every binding cap at the lowest cost.
+- **First climb trigger to watch:** {the specific *a-posteriori* evidence that would move you to the middle, and where it surfaces — Verify / Review / a run trace}.
 - **De-escalation:** {a mechanism to remove if a trace shows it never earns its cost — the arrow runs both ways}.
 - **Next step:** stand up the floor, instrument it (CI + run traces) so the climb triggers are observable, and move up only when the named evidence appears.
 
 ## 7. Faith & false-confidence check
 
-- [ ] **Evidence-Gated Escalation kept** — recommendation starts at the floor; every climb is gated on named evidence; the output is a band, not a single point.
+- [ ] **Evidence-Gated Escalation kept** — the floor is justified by *a-priori* evidence (constraints) and nothing heavier; every climb above it names the *a-posteriori* evidence that authorises it; the output is a band, not a single point.
 - [ ] **Caps honoured on all three designs**, floor included.
 - [ ] **Cost is a dated range, not a quote** — live prices, date stamped, assumptions flagged.
 - [ ] No **rubber-stamped gate** standing in for oversight (looks like oversight, isn't).

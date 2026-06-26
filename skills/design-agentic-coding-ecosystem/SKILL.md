@@ -37,7 +37,7 @@ The brief is in business language; the matrix decides in **native sizing inputs*
 
 ## 3. Read the band
 
-For each reading, pull its **floor**, its **cap** (the ceiling it imposes), and its **climb triggers** (the evidence that authorises moving up) from [`MATRIX.md`](MATRIX.md) § Step 2, across all three columns — architecture, workflow, tools. Then resolve the **binding caps**: when two readings pull different ways, the **most restrictive cap wins** (high blast radius beats a tight budget — you keep the gate and pay for it). List the **non-negotiables** ([`MATRIX.md`](MATRIX.md) § non-negotiables) — they hold for all three designs, floor included.
+For each reading, pull its **floor**, its **cap** (the ceiling it imposes), and its **climb triggers** (the evidence that authorises moving up) from [`MATRIX.md`](MATRIX.md) § Step 2, across all three columns — architecture, workflow, tools. **Keep the two timings of evidence straight:** *a-priori* evidence — read from the constraints, before any code — sets the **floor** and the **caps**; *a-posteriori* evidence — Verify, Review, and run traces from the running build — is what fires the **climb triggers** later. Then resolve the **binding caps**: when two readings pull different ways, the **most restrictive cap wins** (high blast radius beats a tight budget — you keep the gate and pay for it). List the **non-negotiables** ([`MATRIX.md`](MATRIX.md) § non-negotiables) — they hold for all three designs, floor included.
 
 **Done when:** the floor, the set of binding caps, and the climb-trigger vocabulary are written down, and the non-negotiables that every design must honour are listed.
 
@@ -45,11 +45,11 @@ For each reading, pull its **floor**, its **cap** (the ceiling it imposes), and 
 
 Synthesize the readings into three complete designs, each spanning **architecture** (the coding-agent topology — rung · durable/checkpointed state · project memory · HITL gate · CI/eval), **workflow** (spec dial · autonomy · named dev workflow · the never-cut Verify+Review), and **tools**:
 
-- **Floor** — the lightest start the constraints *permit*. Where the user actually begins. It must still satisfy **every binding cap** (a floor that skips the HITL gate on a high-blast-radius action is not the cheap design — it is the broken one).
-- **Middle** — the realistic next stop once the first wave of evidence arrives. Name the **climb trigger** that moves the user from floor to middle.
-- **Ceiling** — the heaviest the constraints could ever justify, with the explicit evidence required to reach it. This is an **upper bound, not a recommendation to build now**.
+- **Floor** — the lightest start the constraints *permit*: everything your **a-priori** evidence (the constraints) already justifies, and nothing heavier. Where the user actually begins. It must still satisfy **every binding cap** (a floor that skips the HITL gate on a high-blast-radius action is not the cheap design — it is the broken one).
+- **Middle** — the realistic next stop once the first **a-posteriori** evidence arrives. Name the **climb trigger** (the run-time evidence) that moves the user from floor to middle.
+- **Ceiling** — the heaviest the constraints could ever justify, with the explicit **a-posteriori** evidence required to reach it. This is an **upper bound, not a recommendation to build now**.
 
-Pick the **lowest rung / lightest workflow** that meets each level's need; never add a mechanism that no evidence has yet demanded. Keep the climbs evidence-gated and note that the arrows also run *down* — de-escalate when a mechanism stops earning its cost.
+Pick the **lowest rung / lightest workflow** that meets each level's need; never add a mechanism that no evidence has yet demanded. At design time that has a sharp edge: **the floor is bounded by the a-priori evidence you hold now; everything above it is named, not built, until a-posteriori proof arrives.** Keep the climbs evidence-gated and note that the arrows also run *down* — de-escalate when a mechanism stops earning its cost.
 
 **Done when:** three designs exist, each naming a rung + workflow + tool posture; the climb trigger between consecutive designs is named; and all three honour every binding cap.
 
@@ -69,7 +69,7 @@ Apply [`COST-MODEL.md`](COST-MODEL.md) with the **live prices from step 5** and 
 
 Fill [`DESIGN-TEMPLATE.md`](DESIGN-TEMPLATE.md) and save it (default `./agentic-coding-ecosystem-design.md` unless the user names a path). Stamp it **"designs reflect the state of mid-2026; tools and prices searched <date>."** Then run the **faith check** — fix any failure before delivering:
 
-- **Evidence-Gated Escalation kept:** the recommendation starts at the **floor**; every climb is gated on named evidence; the band is a band, not a single point.
+- **Evidence-Gated Escalation kept:** the recommendation starts at the **floor**, justified by **a-priori** evidence (the constraints) and nothing heavier; every climb above it names the **a-posteriori** evidence that authorises it; the band is a band, not a single point.
 - **Caps honoured on all three designs** — including the floor.
 - **Cost is a dated range, not a quote** — prices are the live ones, the date is stamped, and assumptions are flagged.
 - **The three architecture false-confidence traps** are absent: a rubber-stamped gate *looks like* oversight; a huge context window *looks like* memory; a correct final answer *looks like* success.
