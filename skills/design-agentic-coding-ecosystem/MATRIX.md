@@ -21,7 +21,7 @@ The user's constraints are in business language; the matrix decides in **native 
 | The user brings… | Reads as (native sizing input) | Lands under |
 |---|---|---|
 | **Requirements** (clear? stable? checkable?) | **clarity** · **testability** | Requirements |
-| **Budget** (how much; metered vs. subscription) | the cost arm + **pricing regime** | Budget |
+| **Budget** (how much; metered / subscription / mix) | the cost arm + **pricing regime** | Budget |
 | **Tech-stack constraints** (framework, latency, on-prem, separability) | **boundaries** + tool/framework fit | Tech stack |
 | **Business constraints** (money, safety, compliance, SLA, longevity) | **blast radius** · **lifespan** | Business stakes |
 
@@ -53,6 +53,7 @@ Three columns = the three design surfaces of the coding ecosystem: the **archite
 |---|---|---|---|
 | **Metered API** (every token a marginal $) | Optimise the rung you're on *before* climbing; context thrift first (curate, compact, offload). Extra rungs sting. | Justify each heavy step; smaller / fewer crews; the one-sentence-diff rule earns real money. | Prompt caching; cheap models for sub-steps; retrieval / code-search instead of stuffing the whole codebase into the window. |
 | **Flat subscription** (marginal token ≈ $0) | An extra rung, fresh-context reviewer, or fuller window is nearly free to *try* — but reliability must still earn it. **Frugality stops gating; evidence doesn't.** | Fresh-context reviewers and multi-agent crews are easy to justify here. | Fuller windows; more parallel agents — cost is no longer the gate. |
+| **Mixed** (flat plan as workhorse + metered API for selective high-leverage tasks) | Run the bulk on the flat plan, where an extra rung is nearly free; reach for a metered model only where per-token spend buys real speed or autonomy on a small, high-leverage step. | Default to the flat workhorse; spend metered tokens selectively — the one-sentence-diff rule earns money on the metered slice only. | Fuller windows / parallel agents on the flat plan; caching and cheap-model thrift on the metered slice. |
 
 ### Tech stack
 

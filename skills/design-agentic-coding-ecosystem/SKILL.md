@@ -21,7 +21,7 @@ Capture the four inputs in the user's own words, then the cost inputs:
 
 - **Requirements** — the software to build, in one sentence; how **clear/stable** the requirements are; how **checkable** "done" is (machine-testable vs. subjective "feel"). This is the *build target* the agents work on, not a product you architect.
 - **Business stakes** — **blast radius** (money, safety, compliance, irreversibility, SLA) and **lifespan** (throwaway vs. maintained).
-- **Budget** — a number if they have one, and the **pricing regime**: metered API (every token a marginal $) vs. flat subscription (marginal token ≈ $0). The regime sets how hard the cost arm pulls.
+- **Budget** — a number if they have one, and the **pricing regime**: metered API (every token a marginal $), flat subscription (marginal token ≈ $0), or a **mix** — a flat plan as the workhorse for heavy-lifting coding, with metered API spent selectively on small, high-leverage tasks where paying per token buys speed and agent autonomy. The regime sets how hard the cost arm pulls; in a mix it pulls hard only on the metered slice.
 - **Tech stack** — **brownfield**: the existing stack, frameworks, latency/on-prem constraints, and what must be reused. **Greenfield**: any hard constraints, or "none."
 - **Cost inputs** (for step 6) — build **volume** (coding tasks or PRs per week/month the agents take on), rough **context size** per agent call (codebase + history loaded), **model tier** preference, and **human-review** volume if a gate is likely. It is fine to ask. If the user doesn't know a number, do **not** stall — carry a clearly-labelled assumed value (see [`COST-MODEL.md`](COST-MODEL.md) § fallback) and flag it.
 

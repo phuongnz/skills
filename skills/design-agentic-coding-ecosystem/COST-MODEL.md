@@ -10,6 +10,7 @@ The pricing regime (from the brief) decides where the math lives:
 
 - **Metered API** — every token is a marginal dollar. The token formula below is the whole game; optimise before climbing.
 - **Flat subscription** — marginal token ≈ $0. The token math becomes a **capacity check** ("does this design's volume fit inside the plan's rate limits?"), not a bill. Cost shows up as **seat fees + any overage tier + human-review time + infra** — estimate those lines and treat tokens as a throughput constraint.
+- **Mixed** — a flat plan carries the heavy-lifting coding while metered API is spent selectively on small, high-leverage tasks (where per-token cost buys speed or agent autonomy). Estimate it as **both lines summed**: the subscription as a capacity check on the bulk, **plus** the token formula applied *only to the metered slice*. Size that slice first — the fraction of calls (and tokens) that go metered — because that fraction is the only place the cost arm pulls.
 
 ## The token formula (metered regime)
 
@@ -77,6 +78,7 @@ Token cost is rarely the whole bill. Fetch live pricing for each that applies (S
 ```
 TCO_per_period =
       token_cost   (metered)   OR   subscription seats + overage   (flat)
+                               OR   subscription seats + metered-slice token_cost   (mixed)
     + memory / code-index store
     + durable-state infra
     + observability / eval

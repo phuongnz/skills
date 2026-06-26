@@ -7,7 +7,7 @@
 - **Goal (one sentence):** {the concrete outcome}
 - **Requirements:** clarity = {fuzzy / firming / clear} · testability = {machine-checkable / partial / subjective}
 - **Business stakes:** blast radius = {low / high — why} · lifespan = {throwaway / maintained}
-- **Budget:** {number or "open"} · pricing regime = {metered API / flat subscription}
+- **Budget:** {number or "open"} · pricing regime = {metered API / flat subscription / mixed — flat workhorse + selective metered slice}
 - **Tech stack:** {brownfield: existing stack + constraints to reuse | greenfield: hard constraints, or "none"}
 - **Cost inputs:** volume = {coding tasks or PRs / period} · context size = {tokens / agent call} · model tier = {…} · human-review = {volume + rate}
 
