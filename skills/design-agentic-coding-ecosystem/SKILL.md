@@ -57,7 +57,11 @@ Pick the **lowest rung / lightest workflow** that meets each level's need; never
 
 Tools and prices both age fast, so **web-search current options per capability AND their current pricing** — orchestration, durable execution / HITL, memory / code-index (project memory; a code-search index only if the design uses one), observability / evaluation, plus the **model/token prices** the cost step needs. Do not list tools or prices from memory. Present a **landscape, not a ranking** — no verified head-to-head winner exists and frameworks ship the same primitives; flag the two evidence-backed anchors (**OpenTelemetry GenAI**, **MAST**). Capturing pricing here, at call time, is what keeps step 6 close to today.
 
-**Done when:** each capability lists at least one current tool, the relevant model/token prices are captured, every item carries the date its search was run, and the no-ranking caveat is stated.
+**Do this research in a subagent — keep it out of the consulting context.** Fetched pricing pages and framework docs are token-heavy; pulling them whole into the main thread can cost tens of thousands of tokens for a handful of numbers. Dispatch the live search to a subagent and have it return only the distilled result — per capability: the current tools, their prices, and the source URL behind each — never the raw page content. Use the cheapest method that answers the question (a targeted search over a full-doc fetch); fetch a full page only when a price isn't otherwise pinnable.
+
+As you search, **keep the source URL for every claim** — each tool option and especially each price. Collect them grouped by capability/topic; they become the **Sources (searched {date})** section of the report ([`DESIGN-TEMPLATE.md`](DESIGN-TEMPLATE.md) § 8), so a reader can re-validate the prices that drive the cost step. Record sources without a stable public link (e.g. a spec version) as plain text.
+
+**Done when:** each capability lists at least one current tool, the relevant model/token prices are captured, every item carries the date its search was run, the **source URL behind each tool and price is recorded** for the Sources section, and the no-ranking caveat is stated.
 
 ## 6. Estimate cost per design
 
@@ -72,6 +76,7 @@ Fill [`DESIGN-TEMPLATE.md`](DESIGN-TEMPLATE.md) and save it (default `./agentic-
 - **Evidence-Gated Escalation kept:** the recommendation starts at the **floor**, justified by **a-priori** evidence (the constraints) and nothing heavier; every climb above it names the **a-posteriori** evidence that authorises it; the band is a band, not a single point.
 - **Caps honoured on all three designs** — including the floor.
 - **Cost is a dated range, not a quote** — prices are the live ones, the date is stamped, and assumptions are flagged.
+- **Sources are listed** — the **Sources (searched {date})** section carries the live URLs from step 5 behind the tools and prices, so the reader can re-validate.
 - **The three architecture false-confidence traps** are absent: a rubber-stamped gate *looks like* oversight; a huge context window *looks like* memory; a correct final answer *looks like* success.
 
-**Done when:** the document exists at the path, is dated, presents three designs each with a cost range and a side-by-side ladder, recommends starting at the floor, and passes every check above.
+**Done when:** the document exists at the path, is dated, presents three designs each with a cost range and a side-by-side ladder, lists its sources, recommends starting at the floor, and passes every check above.

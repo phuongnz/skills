@@ -93,6 +93,15 @@
 - [ ] **Evidence-Gated Escalation kept** — the floor is justified by *a-priori* evidence (constraints) and nothing heavier; every climb above it names the *a-posteriori* evidence that authorises it; the output is a band, not a single point.
 - [ ] **Caps honoured on all three designs**, floor included.
 - [ ] **Cost is a dated range, not a quote** — live prices, date stamped, assumptions flagged.
+- [ ] **Sources listed** — § 8 carries the live URLs behind the tools and prices, so the reader can re-validate.
 - [ ] No **rubber-stamped gate** standing in for oversight (looks like oversight, isn't).
 - [ ] No **huge context window** standing in for memory (looks like recall, hallucinates).
 - [ ] **Evaluation grades the middle**, not only the final answer (looks like success, hides failure).
+
+## 8. Sources (searched {date})
+
+The live web-search sources behind the tool landscape and the prices used above — grouped by capability/topic, with each source as a markdown link. Re-validate before building; pricing and product pages move fast. Plain-text entries are sources without a stable public link (e.g. a spec version read directly).
+
+- {capability or topic} — [{label}]({url}) · [{label}]({url})
+- {capability or topic} — [{label}]({url}) · {OpenTelemetry GenAI spec (vX.YZ)}
+- …
