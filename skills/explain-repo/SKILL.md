@@ -75,7 +75,7 @@ Read [CHAPTERS.md](./CHAPTERS.md) now — it holds the chapter spine and a per-c
 
 Turn findings into the atlas:
 
-- Write each `chapters/NNNN-*.html` from [templates/chapter.html](./templates/chapter.html), rendering citations as links into real source — readable text `src/foo.ts:42` that is also a relative `<a href="../../src/foo.ts">` (the atlas sits two levels deep). Link commits to `<remote>/commit/<sha>` when the remote is a web URL, else plain SHA.
+- Write each `chapters/NNNN-*.html` from [templates/chapter.html](./templates/chapter.html), rendering citations as links into real source — readable text `src/foo.ts:42` that is also a relative `<a href="../../src/foo.ts">` (chapters and reference docs sit two levels under the repo root; the root-level foundation docs use `../` instead). Link commits to `<remote>/commit/<sha>` when the remote is a web URL, else plain SHA.
 - Maintain `glossary.html` (repo and domain terms, per [GLOSSARY-FORMAT.md](./GLOSSARY-FORMAT.md)) and `sources.html` (the repo, its docs, stack docs, and — for public repos — the tracker and communities, per [SOURCES-FORMAT.md](./SOURCES-FORMAT.md)).
 - Add each chapter and reference to `NAV` in `index.html` (see [The Dashboard](#the-dashboard)).
 

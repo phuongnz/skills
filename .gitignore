@@ -19,3 +19,5 @@ skills-lock.json
 
 # working folders
 /working-dir
+# explain-repo atlas output — local only
+.repo-atlas/

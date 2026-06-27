@@ -10,9 +10,9 @@ It is built from [templates/doc.html](./templates/doc.html): the source of truth
 # {Repo} Sources
 
 ## The repo
-- [README](../../README.md) — the project's own entry point. Use for: stated purpose, quick start.
-- [CONTRIBUTING](../../CONTRIBUTING.md) — Use for: PR conventions, dev setup.
-- [docs/](../../docs/) — in-repo documentation. Use for: {what it actually covers}.
+- [README](../README.md) — the project's own entry point. Use for: stated purpose, quick start.
+- [CONTRIBUTING](../CONTRIBUTING.md) — Use for: PR conventions, dev setup.
+- [docs/](../docs/) — in-repo documentation. Use for: {what it actually covers}.
 
 ## Stack docs
 - [Framework X docs](https://example.com) — official reference for the main framework. Use for: routing, lifecycle.
@@ -25,7 +25,7 @@ It is built from [templates/doc.html](./templates/doc.html): the source of truth
 
 ## Rules
 
-- **The repo is source zero.** Always link the repo's own README, CONTRIBUTING, and docs first, with relative paths into the tree. These outrank any external write-up.
+- **The repo is source zero.** Always link the repo's own README, CONTRIBUTING, and docs first, with relative paths into the tree. These outrank any external write-up. `sources.html` sits at `.repo-atlas/` root, so links into the repo are one level up (`../README.md`) — unlike chapters and reference docs, which sit a level deeper and use `../../`.
 - **High-trust only.** Prefer official docs and primary sources over blog posts. If a source is marketing dressed as docs, leave it out.
 - **Annotate every entry.** A bare link rots. Add one line: what it covers and when to reach for it.
 - **Tracker & community is for public repos.** Drop the section for private repos or when `gh` is unavailable; note why if a reader might expect it.
