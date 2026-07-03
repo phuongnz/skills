@@ -1,0 +1,17 @@
+# Two bots, two identities. Copy this to each real (gitignored) filename and fill in
+# after creating the GitHub Apps, then INSTALL each app on the repo.
+#
+#   .orchestrator/.bot-env.impl     <- the implement agent authors as this bot
+#   .orchestrator/.bot-env.review   <- the review agent approves as this bot
+#
+# reviewer != author must hold at the IDENTITY level, so these MUST be two
+# different Apps. app-token.js reads APP_ID / APP_PRIVATE_KEY_PATH / REPO generically.
+# BOT_LOGIN/BOT_EMAIL attribute the agent's git commits (email = <bot-user-id>+<login>@users.noreply.github.com).
+#
+# NEVER commit the filled files or the .pem keys — .bot-env.* and *.pem are gitignored,
+# and the orchestrator denies the Read tool on both so a key can't be slurped into context.
+export APP_ID=000000
+export APP_PRIVATE_KEY_PATH="$HOME/.config/your-bot.private-key.pem"
+export REPO="owner/repo"
+export BOT_LOGIN="your-bot[bot]"
+export BOT_EMAIL="0000000+your-bot[bot]@users.noreply.github.com"
