@@ -26,6 +26,12 @@ report) against an entry:
   lifecycle but not eval/observability leaves the *eval-day-one* non-negotiable with the user).
 - **No match / empty registry** — say nothing is on the shelf; the design stands whole and is
   hand-built. **Never force a fit.**
+- **Wanted (not yet built)** — entries under *§ Wanted* name a known gap that **no skill
+  instantiates yet**. They carry **no `PROVIDES.md` and no install line**, so **never propose one
+  as installable**. Their only use: when a design's *non-coverage* (e.g. Monitor + Evaluate on a
+  *maintained* product) matches a wanted entry, say so in the report's *hand-build this
+  separately* note — "a skill to close this is planned, not yet built" — so the gap is **tracked
+  once**, not silently re-discovered every design.
 
 Each skill's linked `PROVIDES.md` is the **authoritative** signature; the row here is a curated
 summary — re-sync it from the source when the skill changes.
@@ -59,6 +65,40 @@ Evaluate — instrument those separately if the design's lifespan is *maintained
 
 ---
 
+## Wanted (not yet built)
+
+Known gaps a design keeps landing on that **no skill instantiates yet**. These are *signposts*,
+not shelf items: **no install line, no `PROVIDES.md`** — step 7 must never propose them as
+installable. Their job is to make a recurring non-coverage **visible**, so the report's
+*hand-build this separately* note can say "planned, not yet built" instead of rediscovering the
+same gap every time.
+
+### `instrument-eval-observability`  ·  status: **WANTED — not built**
+
+> **Would close the gap left by `run-devops-with-orch-impl-rev`: Monitor + Evaluate.** For a
+> *maintained* product the design's **eval-day-one** non-negotiable currently stays with the
+> user (hand-built) — this skill would instantiate it.
+
+**Would instantiate:** the **product-plane foundation** for a maintained build — **Monitor**
+(run-trace observability) + **Evaluate** (an eval harness that grades the *trajectory*, not only
+the final answer) — stood up **day one**, wrapping whatever build loop is already running.
+
+| Facet | Intended signature *(hypothetical — not yet built)* |
+|---|---|
+| Architecture | **Not** an agent topology — **instrumentation around** the build loop: tracing spans on every agent/tool call, an **eval harness** as a separate grader, metrics/dashboards. Composes *alongside* a loop skill like `run-devops`; it does not replace it. |
+| Workflow | **Eval-in-CI** — trajectory grading as a gate, not just app tests; continuous run-trace collection so *a-posteriori* climb triggers become **observable**. |
+| Tools | Anchored on the two evidence-backed standards the matrix already names — **OpenTelemetry GenAI** (tracing) and **MAST** (failure taxonomy for eval) — plus a trace/eval store (searched live when built). |
+| Would satisfy | ✅ **eval & observability day-one** — the exact non-negotiable `run-devops` leaves open for maintained products. |
+| Does **NOT** cover | the build loop itself (that's `run-devops` or another instantiation skill) · the design decision (upstream — this skill). |
+
+**Why it belongs here now (empty though it is):** the dry-run against a *maintained* GitHub repo
+lands on `run-devops` for the loop **plus** a hand-built eval/observe layer. That second half is
+a real, recurring gap — logging it as a want means the next maintained design *names* it instead
+of re-deriving it. When it gets built, a maintained design would propose **both** skills together
+and close the band with no hand-built remainder.
+
+---
+
 ## Adding a new instantiation skill
 1. In the new skill, author a `PROVIDES.md` — its coverage signature in the shape above: what
    it instantiates, its facet table, non-negotiables satisfied, liftable parts, what it does
@@ -67,3 +107,7 @@ Evaluate — instrument those separately if the design's lifespan is *maintained
    install line.
 3. **Nothing in `SKILL.md` changes** — step 7 reads this file. The skill is *closed for
    modification, open for extension*: growth is new rows here, never new logic there.
+
+**Promoting a wanted entry.** When a skill under *§ Wanted* actually gets built, run the three
+steps above and **remove its wanted stub** — a gap is tracked once, either as a want or as a
+shelf item, never both.
