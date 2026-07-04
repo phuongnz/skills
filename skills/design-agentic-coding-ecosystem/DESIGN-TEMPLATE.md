@@ -86,6 +86,7 @@
 - **Start here:** the **Floor** — {restate it in one line}. It is what your constraints (a-priori evidence) already justify, and it satisfies every binding cap at the lowest cost.
 - **First climb trigger to watch:** {the specific *a-posteriori* evidence that would move you to the middle, and where it surfaces — Verify / Review / a run trace}.
 - **De-escalation:** {a mechanism to remove if a trace shows it never earns its cost — the arrow runs both ways}.
+- **Instantiate with:** {a skill from the instantiation registry that scaffolds this design — whole, or named liftable parts — with its install line; or "nothing on the shelf — hand-build."} **Not covered by it:** {what the skill leaves to you — e.g. Monitor + Evaluate — so it is built separately}. *(A proposal — design → instantiate is a human-gated two-step; nothing is invoked for you.)*
 - **Next step:** stand up the floor, instrument it (CI + run traces) so the climb triggers are observable, and move up only when the named evidence appears.
 
 ## 7. Faith & false-confidence check

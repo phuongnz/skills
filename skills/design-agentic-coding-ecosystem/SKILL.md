@@ -11,7 +11,7 @@ You are a **consultant for agentic coding**. The user is building a piece of sof
 
 Three, not one, because the law this skill keeps is **Evidence-Gated Escalation**: you don't *predict* the final design, you *climb on proof*. So you hand the user a band and the triggers that move within it — never a fixed finish line. **Always recommend starting at the floor.** The ceiling exists to show what "more" costs, so the cost delta forces the question the user came for: *what do I actually need, and what is just nice to have?*
 
-The matrix that maps constraints to the band is in [`MATRIX.md`](MATRIX.md) — research-backed **as of mid-2026**. The cost method is in [`COST-MODEL.md`](COST-MODEL.md) — consult it instead of researching how to estimate cost; you only fetch live *prices*, not the method. Tools **and their prices** are searched **live** (step 5) because both age fast — never quote either from memory. The output follows [`DESIGN-TEMPLATE.md`](DESIGN-TEMPLATE.md). This skill is **self-contained**: it carries everything it needs in these four files and a live web search — it does not depend on, or refer the user to, any other skill or repository.
+The matrix that maps constraints to the band is in [`MATRIX.md`](MATRIX.md) — research-backed **as of mid-2026**. The cost method is in [`COST-MODEL.md`](COST-MODEL.md) — consult it instead of researching how to estimate cost; you only fetch live *prices*, not the method. Tools **and their prices** are searched **live** (step 5) because both age fast — never quote either from memory. The output follows [`DESIGN-TEMPLATE.md`](DESIGN-TEMPLATE.md). This skill is **self-contained for producing the design**: it carries everything the *recommendation* needs in these files and a live web search — the design never *depends* on another skill. The one deliberate exception is an optional hand-off at the very end: once the design is written, **step 7** checks an **instantiation registry** ([`INSTANTIATION-REGISTRY.md`](INSTANTIATION-REGISTRY.md)) and may *point* the user to a skill that scaffolds part of the design — a pointer, never a dependency. With an empty registry the band still stands whole.
 
 Work the steps in order. Each ends on a completion criterion — do not advance until it is met.
 
@@ -69,7 +69,20 @@ Apply [`COST-MODEL.md`](COST-MODEL.md) with the **live prices from step 5** and 
 
 **Done when:** each design has a dated cost range with its line items and every assumption flagged, and the three are compared in one side-by-side ladder.
 
-## 7. Write the report and run the faith check
+## 7. Match the band to instantiation skills
+
+The design is done; this skill's job is to *decide*, not to *build*. Before writing it up, check whether any part of the band is already **on the shelf** — a skill that would scaffold it. Read [`INSTANTIATION-REGISTRY.md`](INSTANTIATION-REGISTRY.md) and match each of the three designs against the registered coverage signatures (the registry states the full contract):
+
+- **Whole match** — a design's architecture + workflow + tools overlap an entry **and** it satisfies that design's binding non-negotiables → **propose the skill** (with its install line).
+- **Partial match** — only some needs are covered → propose the named **liftable parts**, and say plainly what stays hand-built.
+- **Always surface non-coverage** — carry each entry's "does NOT cover" into the proposal, so the user sees the remaining work (a skill that builds the lifecycle but not eval/observability leaves the *eval-day-one* non-negotiable with the user).
+- **No match / empty registry** — say nothing is on the shelf and move on. Never force a fit, and **never invoke** an instantiation skill: this is a **proposal**, and design → instantiate stays a human-gated two-step.
+
+This changes nothing about the design itself — it only annotates the **Next step** (and the matched design's row) so the user doesn't hand-build what already exists.
+
+**Done when:** each design that matches a registered skill (whole or in parts) names it in the report's Recommendation, every proposal states what the skill does **NOT** cover, and a no-match is stated rather than forced.
+
+## 8. Write the report and run the faith check
 
 Fill [`DESIGN-TEMPLATE.md`](DESIGN-TEMPLATE.md) and save it (default `./agentic-coding-ecosystem-design.md` unless the user names a path). Stamp it **"designs reflect the state of mid-2026; tools and prices searched <date>."** Then run the **faith check** — fix any failure before delivering:
 
