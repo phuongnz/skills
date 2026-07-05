@@ -42,7 +42,7 @@
 
 *The lightest start the constraints permit — everything your a-priori evidence justifies, no more. Build this.*
 
-- **Architecture (coding agents):** rung {1} — {single supervised agent + tools / + a reviewer agent / a multi-agent crew}. Durable state: {checkpointing / worktrees / branch-per-task / none}. Project memory: {in-context first / a `CLAUDE.md`-style file the agent updates / …}. HITL: {gate on {the risky merge — money/auth/irreversible code}, or "none — low blast radius"}. Eval: {CI from day-one if maintained / minimal}.
+- **Architecture (coding agents):** rung {1} — {single supervised agent + tools / + a reviewer agent / a multi-agent crew}. Durable state: {checkpointing / worktrees / branch-per-task / none}. Project memory: {in-context first / minimal always-loaded pointer + load-on-demand (progressive disclosure) / external write-path only when context cost bites — never a growing always-loaded file; see [`MEMORY.md`](MEMORY.md)}. HITL: {gate on the risky action — money/auth/irreversible code, designed against rubber-stamping; or "none — low blast radius"; see [`HITL.md`](HITL.md)}. Eval: {trajectory eval + traces from day-one if maintained / minimal; see [`EVAL-OBSERVABILITY.md`](EVAL-OBSERVABILITY.md)}.
 - **Workflow:** spec = {low/mid} · autonomy = {…} · {named workflow}. Verify+Review: {how, never cut}.
 - **Tools (live, {date}):** {capability → tool}, … — landscape, not a ranking.
 - **Caps honoured:** {tick each binding cap — show the floor still obeys them}.

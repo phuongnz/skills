@@ -43,7 +43,7 @@ For each reading, pull its **floor**, its **cap** (the ceiling it imposes), and 
 
 ## 4. Draft the three designs (floor → middle → ceiling)
 
-Synthesize the readings into three complete designs, each spanning **architecture** (the coding-agent topology — rung · durable/checkpointed state · project memory · HITL gate · CI/eval), **workflow** (spec dial · autonomy · named dev workflow · the never-cut Verify+Review), and **tools**:
+Synthesize the readings into three complete designs, each spanning **architecture** (the coding-agent topology — rung · durable/checkpointed state · **project memory** ([`MEMORY.md`](MEMORY.md)) · **HITL gate** ([`HITL.md`](HITL.md)) · **CI/eval** ([`EVAL-OBSERVABILITY.md`](EVAL-OBSERVABILITY.md))), **workflow** (spec dial · autonomy · named dev workflow · the never-cut Verify+Review), and **tools**. Those three mechanism references carry the *how* — consult them as step 6 consults [`COST-MODEL.md`](COST-MODEL.md), so no facet is defaulted to a shallow answer (project memory is progressive disclosure, **not** a `CLAUDE.md` re-read every turn):
 
 - **Floor** — the lightest start the constraints *permit*: everything your **a-priori** evidence (the constraints) already justifies, and nothing heavier. Where the user actually begins. It must still satisfy **every binding cap** (a floor that skips the HITL gate on a high-blast-radius action is not the cheap design — it is the broken one).
 - **Middle** — the realistic next stop once the first **a-posteriori** evidence arrives. Name the **climb trigger** (the run-time evidence) that moves the user from floor to middle.

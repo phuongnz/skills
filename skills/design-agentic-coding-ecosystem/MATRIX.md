@@ -44,7 +44,7 @@ Three columns = the three design surfaces of the coding ecosystem: the **archite
 |---|---|---|---|
 | **Blast radius: high** (money · safety · irreversible) | **cap ·** HITL gate on the risky change — the agent never merges money / auth / irreversible code unreviewed; observability on. Start rung 1; add a critic agent early if correctness is machine-checkable. | **cap ·** spec-first; **Verify & Review never cut**. Lower autonomy — gate each phase. | Independent critic + clean-context reviewer; typed, schema-validated tool calls. |
 | **Blast radius: low** | Rung 1; HITL optional; climb only on proof. | Vibe → EPCC; higher autonomy is fine. | Default light toolset. |
-| **Lifespan: long / maintained** | **cap ·** CI evaluation & run-trace observability from day one. **→ add a persistent project-memory file (e.g. a `CLAUDE.md`/notes doc the agent updates) when re-establishing context starts to cost too much.** | Spec-driven; living docs; Review never cut. | Durable, checkpointed state; tracing (OpenTelemetry GenAI). |
+| **Lifespan: long / maintained** | **cap ·** CI evaluation & run-trace observability from day one. **→ add an external memory *write-path* when re-establishing context starts to cost too much — progressive disclosure (a minimal always-loaded pointer + load-on-demand), *not* a growing `CLAUDE.md`/notes doc re-read every turn; see [`MEMORY.md`](MEMORY.md).** | Spec-driven; living docs; Review never cut. | Durable, checkpointed state; tracing (OpenTelemetry GenAI). |
 | **Lifespan: throwaway** | Rung 1; skip memory / eval scaffolding. | Vibe coding; minimal ceremony. | Minimal; no durable state needed. |
 
 ### Budget
