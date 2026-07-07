@@ -1,0 +1,25 @@
+<!doctype html>
+<!-- Reference-card template. The compressed essence of one or more lessons, shaped
+     for a two-second lookup and clean printing. The Markdown block is the source of
+     truth; md.js renders it. Keep it dense and scannable — tables, lists, snippets. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Card — &lt;title&gt;</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <div class="wrap">
+    <p class="eyebrow">Reference card<span class="dot">·</span><span>quick lookup</span></p>
+    <script type="text/markdown" data-into="#card">
+# &lt;Card title&gt;
+
+The distilled residue of a lesson — syntax, steps, a formula, a sequence.
+Dense, scannable, print-friendly. Replace this block.
+    </script>
+    <article id="card"></article>
+  </div>
+  <script src="../assets/md.js"></script>
+</body>
+</html>

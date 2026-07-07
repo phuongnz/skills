@@ -1,0 +1,135 @@
+<!doctype html>
+<!-- teach-me-anything console. Copy to index.html. The sidebar, progress meter, and
+     default page are driven by the MENU object below; the Due panel is driven by the
+     retention queue in reviews.js. Edit only MENU here; edit reviews.js for the queue. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Learning Workspace</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <div class="console">
+    <nav class="side">
+      <h1 id="topic"></h1>
+      <div class="goalline" id="goalline"></div>
+      <div class="meter"><span id="meter-fill"></span></div>
+      <div class="meter-label" id="meter-label"></div>
+      <div id="due"></div>
+      <div id="menu"></div>
+    </nav>
+    <main class="stage"><iframe id="stage" title="lesson"></iframe></main>
+  </div>
+
+  <!-- In-browser self-test overlay (ungraded practice; the graded review is run with the tutor) -->
+  <div class="sr-overlay" id="sr" hidden>
+    <div class="sr-card">
+      <div class="sr-progress" id="sr-progress"></div>
+      <div class="sr-prompt" id="sr-prompt"></div>
+      <div class="sr-recall" id="sr-recall" hidden></div>
+      <div class="sr-actions">
+        <button id="sr-reveal">Reveal</button>
+        <button id="sr-next" hidden>Next</button>
+        <button id="sr-close" class="ghost">Close</button>
+      </div>
+      <p class="sr-note">Self-test only — your tutor runs the graded review that reschedules these.</p>
+    </div>
+  </div>
+
+  <!-- Retention queue: window.REVIEW = [ … ] -->
+  <script src="reviews.js"></script>
+  <script>
+    /* ── The single source of truth for the sidebar. ──────────────────────
+       Update this as learning grows:
+         new lesson    → push to MENU.lessons and set MENU.current
+         lesson done   → set that lesson's done: true
+         new card      → push to MENU.cards
+         goal changed  → update MENU.goalLine
+       (The review queue lives in reviews.js, not here.)                      */
+    const MENU = {
+      topic: "<topic>",
+      goalLine: "<one-line goal>",
+      current: "lessons/0001-.html",       // page shown on load
+      foundations: [
+        { href: "goal.html", title: "Goal" },
+        { href: "glossary.html", title: "Glossary" },
+        { href: "sources.html", title: "Sources" },
+      ],
+      lessons: [
+        // { n: 1, href: "lessons/0001-first.html", title: "First lesson", done: false },
+      ],
+      cards: [
+        // { href: "reference/0001-card.html", title: "A card" },
+      ],
+    };
+
+    (function () {
+      const $ = id => document.getElementById(id);
+      $("topic").textContent = MENU.topic;
+      $("goalline").textContent = MENU.goalLine;
+
+      const done = MENU.lessons.filter(l => l.done).length;
+      $("meter-fill").style.width = Math.round(100 * done / (MENU.lessons.length || 1)) + "%";
+      $("meter-label").textContent =
+        MENU.lessons.length ? done + " of " + MENU.lessons.length + " lessons done" : "no lessons yet";
+
+      const stage = $("stage");
+      const linkTo = href => `event.preventDefault();document.getElementById('stage').src='${href}'`;
+      function group(title, items, render) {
+        return items.length ? '<div class="group">' + title + "</div>" + items.map(render).join("") : "";
+      }
+      $("menu").innerHTML =
+        group("Lessons", MENU.lessons, l =>
+          `<a class="${l.done ? "done" : "todo"}" href="${l.href}" onclick="${linkTo(l.href)}">${l.title}</a>`) +
+        group("Reference cards", MENU.cards, c =>
+          `<a href="${c.href}" onclick="${linkTo(c.href)}">${c.title}</a>`) +
+        group("Foundations", MENU.foundations, f =>
+          `<a href="${f.href}" onclick="${linkTo(f.href)}">${f.title}</a>`);
+
+      /* ── Due-for-review panel, computed from reviews.js against today. ── */
+      const now = new Date();
+      const today = now.getFullYear() + "-" +
+        String(now.getMonth() + 1).padStart(2, "0") + "-" +
+        String(now.getDate()).padStart(2, "0");
+      const queue = Array.isArray(window.REVIEW) ? window.REVIEW : [];
+      const due = queue.filter(item => item.due && item.due <= today);
+
+      if (due.length) {
+        $("due").innerHTML =
+          '<div class="due">' +
+          '<div class="group">Due for review <span class="badge">' + due.length + "</span></div>" +
+          '<button class="due-start" id="due-start">Start self-test</button>' +
+          "<ul>" + due.map(d => "<li>" + d.prompt + "</li>").join("") + "</ul></div>";
+        $("due-start").addEventListener("click", () => runSelfTest(due));
+      } else if (queue.length) {
+        $("due").innerHTML = '<div class="due"><div class="group">Review</div>' +
+          '<p class="due-clear">Nothing due today ✓</p></div>';
+      }
+
+      /* ── Ungraded flip-through of due items. Rescheduling is the tutor's job. ── */
+      function runSelfTest(items) {
+        let i = 0;
+        const overlay = $("sr");
+        function show() {
+          $("sr-progress").textContent = (i + 1) + " / " + items.length;
+          $("sr-prompt").textContent = items[i].prompt;
+          $("sr-recall").textContent = items[i].recall;
+          $("sr-recall").hidden = true;
+          $("sr-reveal").hidden = false;
+          $("sr-next").hidden = true;
+        }
+        $("sr-reveal").onclick = () => { $("sr-recall").hidden = false; $("sr-reveal").hidden = true; $("sr-next").hidden = false; };
+        $("sr-next").onclick = () => { i++; if (i < items.length) show(); else close(); };
+        $("sr-close").onclick = close;
+        function close() { overlay.hidden = true; }
+        show();
+        overlay.hidden = false;
+      }
+
+      go(MENU.current);
+      function go(href) { stage.src = href; }
+    })();
+  </script>
+</body>
+</html>

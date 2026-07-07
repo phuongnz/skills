@@ -1,0 +1,73 @@
+<!doctype html>
+<!-- Lesson template. One self-contained page teaching a single small thing tied to the
+     Goal. Write only the content; styling comes from assets/style.css. Keep it short
+     (~10 min max). Practice comes in two moves: a diagnostic quiz and a mini challenge.
+     Seed a review item in reviews.js for whatever the challenge made the learner produce. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson — &lt;title&gt;</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <div class="wrap">
+    <p class="eyebrow">
+      Lesson 0001<span class="dot">·</span><span>~6 min</span><span class="dot">·</span><span>builds capability</span>
+    </p>
+    <h1>&lt;Lesson title&gt;</h1>
+
+    <!-- ── Understanding: only what the coming skill needs. Cite sources. ── -->
+    <p>Teach the idea plainly here. Link claims to sources
+      <a href="../sources.html">like this</a>, and terms to the
+      <a href="../glossary.html">glossary</a>.</p>
+
+    <!-- ── Move 1: a quick check. Distractors are diagnostic — each wrong answer is a
+         specific misconception, named in its feedback so a miss shows what to fix. ── -->
+    <div class="quiz" id="quiz">
+      <p><strong>Quick check.</strong> &lt;question&gt;</p>
+      <button data-right>&lt;the correct answer&gt;</button>
+      <button data-why="Names the misconception behind this wrong pick.">&lt;a plausible wrong answer&gt;</button>
+      <button data-why="Names a different misconception behind this one.">&lt;another plausible wrong answer&gt;</button>
+      <div class="feedback" id="quiz-fb"></div>
+    </div>
+
+    <!-- ── Move 2: a mini challenge. The learner PRODUCES, then compares to a model. ── -->
+    <div class="challenge">
+      <p><strong>Mini challenge.</strong> &lt;a one-rep task: write / translate / derive / predict / do&gt;</p>
+      <textarea rows="3" placeholder="Have a go from memory before revealing…"></textarea>
+      <button class="reveal" id="model-reveal">Show a model answer</button>
+      <div class="model" id="model" hidden>
+        <p>&lt;a model answer to compare against — note what a good attempt captures&gt;</p>
+      </div>
+      <p class="seed-note">↻ This is what to seed into your review queue.</p>
+    </div>
+
+    <div class="lesson-footer">
+      <p><span class="label">Go deeper</span><br>
+        Primary source: <a href="#">&lt;the best thing to read or watch&gt;</a></p>
+      <p class="reminder"><span class="label">Stuck?</span><br>
+        Ask your tutor in the chat — that is what I am here for. Anything unclear, bring it back.</p>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll("#quiz button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var fb = document.getElementById("quiz-fb");
+        if (b.hasAttribute("data-right")) {
+          b.classList.add("right");
+          fb.textContent = "Right — and here's why it holds.";
+        } else {
+          b.classList.add("wrong");
+          fb.textContent = b.dataset.why || "Not quite — reason it through and try again.";
+        }
+      });
+    });
+    document.getElementById("model-reveal").addEventListener("click", function () {
+      document.getElementById("model").hidden = false;
+      this.hidden = true;
+    });
+  </script>
+</body>
+</html>

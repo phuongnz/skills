@@ -1,0 +1,179 @@
+/* teach-me-anything — shared workspace stylesheet.
+   One file for every page: console, lessons, foundation docs, reference cards.
+   Clean, typographic, print-friendly. Light and dark aware. */
+
+:root {
+  --ink: #1c1a17;
+  --ink-soft: #55504a;
+  --paper: #fbf9f5;
+  --panel: #ffffff;
+  --line: #e6e0d6;
+  --accent: #7a5a2e;
+  --accent-soft: #f0e7d8;
+  --ok: #3f7a4b;
+  --measure: 40rem;
+  --radius: 10px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --serif: Iowan Old Style, Palatino, "Palatino Linotype", Georgia, serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #ece7df;
+    --ink-soft: #a49d92;
+    --paper: #17151200;
+    --paper: #161412;
+    --panel: #1f1c19;
+    --line: #322d27;
+    --accent: #d6ab6a;
+    --accent-soft: #2a231a;
+    --ok: #7fb489;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 18px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: var(--measure); margin: 0 auto; padding: 3rem 1.5rem 6rem; }
+
+h1, h2, h3 { font-family: var(--serif); line-height: 1.2; font-weight: 600; }
+h1 { font-size: 2rem; margin: 0 0 .25rem; }
+h2 { font-size: 1.4rem; margin: 2.5rem 0 .5rem; }
+h3 { font-size: 1.12rem; margin: 1.8rem 0 .4rem; }
+
+p, ul, ol { margin: 0 0 1rem; }
+a { color: var(--accent); text-underline-offset: 2px; }
+
+.eyebrow {
+  font-family: var(--font);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: .72rem;
+  color: var(--ink-soft);
+  margin: 0 0 1.25rem;
+}
+.eyebrow .dot { margin: 0 .5rem; opacity: .5; }
+
+code {
+  font-family: var(--mono);
+  font-size: .88em;
+  background: var(--accent-soft);
+  padding: .1em .35em;
+  border-radius: 4px;
+}
+pre {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+}
+pre code { background: none; padding: 0; }
+
+blockquote {
+  margin: 1rem 0;
+  padding: .25rem 1rem;
+  border-left: 3px solid var(--accent);
+  color: var(--ink-soft);
+}
+hr { border: 0; border-top: 1px solid var(--line); margin: 2.5rem 0; }
+
+/* Cards / callouts */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.4rem;
+  margin: 1.5rem 0;
+}
+
+/* Footer slots shared by lessons */
+.lesson-footer { margin-top: 3rem; border-top: 1px solid var(--line); padding-top: 1.5rem; font-size: .95rem; }
+.lesson-footer .label { color: var(--ink-soft); font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; }
+
+/* Quiz widget */
+.quiz { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.25rem 1.4rem; margin: 1.5rem 0; }
+.quiz button {
+  display: block; width: 100%; text-align: left;
+  font: inherit; color: inherit;
+  background: var(--paper); border: 1px solid var(--line);
+  border-radius: 8px; padding: .6rem .85rem; margin: .4rem 0; cursor: pointer;
+}
+.quiz button:hover { border-color: var(--accent); }
+.quiz button.right { border-color: var(--ok); background: var(--accent-soft); }
+.quiz button.wrong { border-color: #b4553f; opacity: .7; }
+.quiz .feedback { margin-top: .75rem; min-height: 1.4rem; color: var(--ink-soft); }
+
+/* Console (index.html) layout */
+.console { display: grid; grid-template-columns: 16rem 1fr; min-height: 100vh; }
+.side { border-right: 1px solid var(--line); padding: 1.75rem 1.25rem; background: var(--panel); }
+.side h1 { font-size: 1.15rem; margin-bottom: .1rem; }
+.side .goalline { color: var(--ink-soft); font-size: .85rem; margin-bottom: 1.25rem; }
+.side .group { text-transform: uppercase; letter-spacing: .07em; font-size: .68rem; color: var(--ink-soft); margin: 1.4rem 0 .4rem; }
+.side a { display: block; text-decoration: none; color: var(--ink); padding: .28rem .4rem; border-radius: 6px; font-size: .95rem; }
+.side a:hover { background: var(--accent-soft); }
+.side a.done::before { content: "✓ "; color: var(--ok); }
+.side a.todo::before { content: "○ "; color: var(--ink-soft); }
+.meter { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin: .5rem 0 0; }
+.meter > span { display: block; height: 100%; background: var(--ok); }
+.meter-label { font-size: .75rem; color: var(--ink-soft); margin-top: .35rem; }
+.stage { padding: 0; }
+.stage iframe { width: 100%; height: 100vh; border: 0; }
+
+@media (max-width: 720px) {
+  .console { grid-template-columns: 1fr; }
+  .side { border-right: 0; border-bottom: 1px solid var(--line); }
+  .stage iframe { height: 70vh; }
+}
+
+/* Due-for-review panel in the console sidebar */
+.due { margin: 1.25rem 0; }
+.due .badge { background: var(--accent); color: var(--paper); border-radius: 999px; padding: 0 .5em; font-size: .7rem; margin-left: .35rem; }
+.due-start {
+  display: block; width: 100%; font: inherit; cursor: pointer;
+  background: var(--accent-soft); color: var(--ink);
+  border: 1px solid var(--line); border-radius: 8px; padding: .45rem .6rem; margin: .3rem 0 .5rem;
+}
+.due-start:hover { border-color: var(--accent); }
+.due ul { list-style: none; padding: 0; margin: 0; }
+.due li { font-size: .85rem; color: var(--ink-soft); padding: .18rem 0; border-bottom: 1px dashed var(--line); }
+.due-clear { font-size: .85rem; color: var(--ink-soft); margin: .2rem 0; }
+
+/* Mini-challenge block in lessons */
+.challenge { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: var(--radius); padding: 1.25rem 1.4rem; margin: 1.5rem 0; }
+.challenge textarea { width: 100%; font: inherit; color: inherit; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: .6rem .7rem; resize: vertical; }
+.reveal { font: inherit; color: inherit; cursor: pointer; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: .45rem .8rem; margin-top: .6rem; }
+.reveal:hover { border-color: var(--accent); }
+.challenge .model { margin-top: .8rem; padding-top: .8rem; border-top: 1px solid var(--line); }
+.challenge .seed-note { font-size: .78rem; color: var(--ink-soft); margin: .8rem 0 0; }
+
+/* Self-test overlay (console) */
+.sr-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: grid; place-items: center; z-index: 50; padding: 1.5rem; }
+.sr-overlay[hidden] { display: none; }
+.sr-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 2rem; max-width: 34rem; width: 100%; }
+.sr-progress { font-size: .75rem; color: var(--ink-soft); letter-spacing: .06em; }
+.sr-prompt { font-family: var(--serif); font-size: 1.4rem; margin: .75rem 0; }
+.sr-recall { border-top: 1px solid var(--line); padding-top: .9rem; color: var(--ink); }
+.sr-actions { display: flex; gap: .5rem; margin-top: 1.25rem; }
+.sr-actions button { font: inherit; cursor: pointer; background: var(--accent-soft); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: .5rem 1rem; }
+.sr-actions button:hover { border-color: var(--accent); }
+.sr-actions button.ghost { background: transparent; margin-left: auto; }
+.sr-note { font-size: .78rem; color: var(--ink-soft); margin: 1rem 0 0; }
+
+/* Print — cards and lessons should come out clean on paper */
+@media print {
+  body { background: #fff; color: #000; font-size: 12pt; }
+  .side, .lesson-footer .reminder, .sr-overlay { display: none; }
+  a { color: #000; text-decoration: underline; }
+  pre, .card, .quiz { border-color: #999; }
+}
