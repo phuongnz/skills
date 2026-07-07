@@ -75,17 +75,27 @@
         MENU.lessons.length ? done + " of " + MENU.lessons.length + " lessons done" : "no lessons yet";
 
       const stage = $("stage");
-      const linkTo = href => `event.preventDefault();document.getElementById('stage').src='${href}'`;
       function group(title, items, render) {
         return items.length ? '<div class="group">' + title + "</div>" + items.map(render).join("") : "";
       }
       $("menu").innerHTML =
         group("Lessons", MENU.lessons, l =>
-          `<a class="${l.done ? "done" : "todo"}" href="${l.href}" onclick="${linkTo(l.href)}">${l.title}</a>`) +
+          `<a class="${l.done ? "done" : "todo"}" href="${l.href}" data-href="${l.href}">${l.title}</a>`) +
         group("Reference cards", MENU.cards, c =>
-          `<a href="${c.href}" onclick="${linkTo(c.href)}">${c.title}</a>`) +
+          `<a href="${c.href}" data-href="${c.href}">${c.title}</a>`) +
         group("Foundations", MENU.foundations, f =>
-          `<a href="${f.href}" onclick="${linkTo(f.href)}">${f.title}</a>`);
+          `<a href="${f.href}" data-href="${f.href}">${f.title}</a>`);
+
+      /* Sidebar nav: open the page in the stage and highlight the active entry. */
+      const navLinks = Array.from(document.querySelectorAll("#menu a"));
+      function setActive(href) {
+        navLinks.forEach(a => a.classList.toggle("active", a.dataset.href === href));
+      }
+      navLinks.forEach(a => a.addEventListener("click", e => {
+        e.preventDefault();
+        go(a.dataset.href);
+        setActive(a.dataset.href);
+      }));
 
       /* ── Due-for-review panel, computed from reviews.js against today. ── */
       const now = new Date();
@@ -128,6 +138,7 @@
       }
 
       go(MENU.current);
+      setActive(MENU.current);
       function go(href) { stage.src = href; }
     })();
   </script>

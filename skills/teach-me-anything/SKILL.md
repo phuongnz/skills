@@ -19,7 +19,7 @@ The principles, in brief (full treatment in [principles.md](./principles.md)):
 - **[Read the learner](./principles.md#read-the-learner)** — build on what they already hold; keep metaphors from everyday life, and rare.
 - **[The learning edge](./principles.md#the-learning-edge)** — pitch each lesson just past what they can already do alone.
 - **[Understanding first, difficulty last](./principles.md#understanding-first-difficulty-last)** — low friction while explaining; friction on purpose in practice.
-- **[Capability through effort](./principles.md#capability-through-effort)** — a diagnostic quiz and a generative mini challenge, inside a feedback loop.
+- **[Capability through effort](./principles.md#capability-through-effort)** — 3–4 diagnostic quick-checks and an open-ended mini challenge, inside a feedback loop.
 - **[Judgment out in the world](./principles.md#judgment-out-in-the-world)** — send them to a real community to test the skill for keeps.
 
 ## The Learning Workspace
@@ -42,14 +42,14 @@ The workspace has two layers, deliberately kept apart.
 
 - `checkpoints/*.md` — **checkpoints**: short Markdown records of what the learner has actually taken on board, and any non-obvious insight worth revisiting. Roughly the learning equivalent of an engineering decision log. This is how you locate the learning edge next session. Named `0001-<dash-case-name>.md`, incrementing. Use [formats/checkpoint.md](./formats/checkpoint.md).
 - `reviews.js` — the **retention queue**: one entry per idea or micro-skill worth keeping, each carrying the date it next comes due. You maintain it; the console reads it to show what is due today. Schema and scheduling in [formats/reviews.md](./formats/reviews.md).
-- `PREFERENCES.md` — a running note of how this learner likes to be taught, and anything to keep in mind.
+- `NOTES.md` — the workspace's running notebook: the **course outline** at the top, then progress, decisions made, and how this learner likes to be taught. See [`NOTES.md`](#notesmd).
 
 ### One source of truth
 
 The files in `formats/` describe Markdown, and **that Markdown stays the source of truth** — you read and edit Markdown, never hand-author the rendered HTML.
 
 - For the **foundation pages** (`goal.html`, `glossary.html`, `sources.html`), the Markdown lives *inside* the HTML, in a `<script type="text/markdown">` block (see [templates/doc.html](./templates/doc.html)). To change the document, change only that block; to read its state, read only that block. `md.js` renders it for the learner — no parallel `.md` file, no keeping two copies in step.
-- The **memory files** (`checkpoints/`, `PREFERENCES.md`) stay plain `.md`, and the **retention queue** (`reviews.js`) stays plain JS data. The learner never opens them, so there is nothing to wrap.
+- The **memory files** (`checkpoints/`, `NOTES.md`) stay plain `.md`, and the **retention queue** (`reviews.js`) stays plain JS data. The learner never opens them, so there is nothing to wrap.
 
 ## First-time setup
 
@@ -84,7 +84,7 @@ Adding an entry is one line. The workspace grows as learning does, and the learn
 
 The queue lives in `reviews.js` — back of house, but the console reads it to show a **Due** panel, so the moment the learner opens the workspace they see exactly what to revisit today. Each item is tiny and self-contained: a prompt, what to recall, which **box** (interval stage) it sits in, and the date it next comes due. The full schema and the scheduling rules are in [formats/reviews.md](./formats/reviews.md).
 
-**Where items come from.** You never write the queue as a separate chore — it falls out of teaching. Every lesson seeds it: each idea or micro-skill worth keeping becomes one item, born from the lesson's check or mini challenge (see [Lessons](#lessons)).
+**Where items come from.** You never write the queue as a separate chore — it falls out of teaching. Every lesson seeds it: each idea or micro-skill worth keeping becomes one item, born from the lesson's quick-checks or mini challenge (see [Lessons](#lessons)).
 
 **The session ritual — do this every session, before new material:**
 
@@ -105,14 +105,17 @@ Keep a lesson **short and quickly finished**. Working memory is tiny, and you ha
 
 Show an honest time-to-finish near the title (the template has a slot for it). Estimate it from reading length plus the hands-on task, and treat it as a check on "keep it short": if a lesson reads as more than ~10 minutes, it is doing too much — split it.
 
-**How to teach inside a lesson** is the pedagogy in [principles.md](./principles.md): teach the [understanding first, with friction low](./principles.md#understanding-first-difficulty-last), then build [capability through effortful practice](./principles.md#capability-through-effort) — a diagnostic quiz and a generative mini challenge, inside a feedback loop. The template ships both a self-marking quiz and a mini-challenge block with a reveal-and-compare answer.
+**How to teach inside a lesson** is the pedagogy in [principles.md](./principles.md): teach the [understanding first, with friction low](./principles.md#understanding-first-difficulty-last), then build [capability through effortful practice](./principles.md#capability-through-effort) — 3–4 diagnostic quick-checks and an open-ended mini challenge, inside a feedback loop. The template ships self-marking quiz blocks (each correct pick gets a green ✓) and a mini-challenge block with a reveal-and-compare model answer.
+
+**Show a diagram whenever there's a process.** If a lesson touches a workflow, stages, phases, a sequence, or anything ordered, include a diagram — a visual lands faster than prose and keeps the page vivid; text alone is flat. The template has a diagram slot (a flow of boxes joined by arrows, styled to work offline); use inline `<svg>` for anything branching.
 
 Every lesson should:
 
+- **Show a diagram** if it covers a workflow, stages, phases, or a sequence — visuals land faster and read livelier than prose. The template has a slot for it.
 - Link, via anchors, to related lessons and reference cards.
 - Point at one **primary source** — the best single thing you found to read or watch on this. Draw the understanding from trusted material tracked in `sources.html`, and keep lessons **thick with citations** — links backing every claim — because that is what makes a lesson trustworthy rather than a story.
 - Remind the learner they can ask you follow-ups. You are their tutor; you can unstick anything unclear. (The template has footer slots for the source and this reminder.)
-- **Seed the retention queue** — add an item to `reviews.js` for each idea or micro-skill the lesson introduces that is worth keeping. What they had to produce in the mini challenge is exactly what should come back around.
+- **Seed the retention queue** — add an item to `reviews.js` for each idea or micro-skill the lesson introduces that is worth keeping. Each quick-check probes one such idea, and the mini challenge is what they had to put in their own words — those are exactly what should come back around.
 
 ## Reference Cards
 
@@ -128,6 +131,15 @@ Lessons are rarely reopened; cards are. A card is the compressed essence of what
 
 The **glossary** (`glossary.html`) is the card that matters most: once it exists, hold to it in every lesson so the workspace speaks one language.
 
-## `PREFERENCES.md`
+## `NOTES.md`
 
-Learners tell you how they want to be taught — pace, tone, formats they like or hate, constraints to remember. Write it down here, and read it back when you design lessons or sit down with them.
+The workspace's running notebook — the important things to keep in hand between sessions. Back of house: plain Markdown, the learner never opens it. Read it back when you plan a session or design a lesson, and keep it current.
+
+At the **top**, hold the course outline under the heading **"Course Outline (flexible — revise as we learn)"** — the arc of lessons you expect to teach toward the Goal. It is a plan, not a contract: as you read the learner and the Goal moves, revise it. Then, below the outline, keep the running notes:
+
+- **Progress** — where the learner is along the outline, what's done, what's next.
+- **Decisions** — important calls made about direction, scope, or approach, and why.
+- **Learner preferences** — pace, tone, formats they like or hate, constraints to remember.
+- Anything else worth not forgetting.
+
+Keep it lean — signal for future-you, not a transcript. Deeper per-session records of what landed and what didn't live in `checkpoints/`; `NOTES.md` is the at-a-glance state of the whole course.

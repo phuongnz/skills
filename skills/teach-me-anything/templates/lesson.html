@@ -1,8 +1,9 @@
 <!doctype html>
 <!-- Lesson template. One self-contained page teaching a single small thing tied to the
      Goal. Write only the content; styling comes from assets/style.css. Keep it short
-     (~10 min max). Practice comes in two moves: a diagnostic quiz and a mini challenge.
-     Seed a review item in reviews.js for whatever the challenge made the learner produce. -->
+     (~10 min max). Practice comes in two moves: 3–4 diagnostic quick-checks and one
+     open-ended mini challenge. Seed a review item in reviews.js for each idea a quick
+     check probes and for whatever the challenge made the learner articulate. -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -22,23 +23,63 @@
       <a href="../sources.html">like this</a>, and terms to the
       <a href="../glossary.html">glossary</a>.</p>
 
-    <!-- ── Move 1: a quick check. Distractors are diagnostic — each wrong answer is a
-         specific misconception, named in its feedback so a miss shows what to fix. ── -->
-    <div class="quiz" id="quiz">
-      <p><strong>Quick check.</strong> &lt;question&gt;</p>
+    <!-- ── Diagram: REQUIRED whenever the lesson covers a workflow, stages, phases, a
+         sequence, or any ordered process — a visual lands faster than prose and keeps
+         the page vivid. Delete this block only if the lesson has no process in it.
+         Use the flow of boxes below, or hand-author inline <svg> for branching. Mark
+         the current / key step with class="node accent". ── -->
+    <figure class="diagram">
+      <div class="flow">
+        <span class="node accent">&lt;stage 1&gt;</span>
+        <span class="arrow">→</span>
+        <span class="node">&lt;stage 2&gt;</span>
+        <span class="arrow">→</span>
+        <span class="node">&lt;stage 3&gt;</span>
+      </div>
+      <figcaption>&lt;one line naming what the flow shows&gt;</figcaption>
+    </figure>
+
+    <!-- ── Move 1: 3–4 quick checks. One question is too few to catch a shaky spot —
+         aim each at a DIFFERENT idea from the lesson. Distractors are diagnostic: each
+         wrong answer is a specific misconception, named in its feedback so a miss shows
+         what to fix. Add or drop a .quiz block to land in the 3–4 range. ── -->
+    <div class="quiz">
+      <p><strong>Quick check 1.</strong> &lt;question about idea A&gt;</p>
       <button data-right>&lt;the correct answer&gt;</button>
       <button data-why="Names the misconception behind this wrong pick.">&lt;a plausible wrong answer&gt;</button>
       <button data-why="Names a different misconception behind this one.">&lt;another plausible wrong answer&gt;</button>
-      <div class="feedback" id="quiz-fb"></div>
+      <div class="feedback"></div>
     </div>
 
-    <!-- ── Move 2: a mini challenge. The learner PRODUCES, then compares to a model. ── -->
+    <div class="quiz">
+      <p><strong>Quick check 2.</strong> &lt;question about idea B&gt;</p>
+      <button data-why="Names the misconception behind this wrong pick.">&lt;a plausible wrong answer&gt;</button>
+      <button data-right>&lt;the correct answer&gt;</button>
+      <button data-why="Names a different misconception behind this one.">&lt;another plausible wrong answer&gt;</button>
+      <div class="feedback"></div>
+    </div>
+
+    <div class="quiz">
+      <p><strong>Quick check 3.</strong> &lt;question about idea C&gt;</p>
+      <button data-why="Names the misconception behind this wrong pick.">&lt;a plausible wrong answer&gt;</button>
+      <button data-why="Names a different misconception behind this one.">&lt;another plausible wrong answer&gt;</button>
+      <button data-right>&lt;the correct answer&gt;</button>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- ── Move 2: one open-ended mini challenge. It tests UNDERSTANDING, not typing —
+         NO writing code, no config files (.yml and the like). Ask a question that makes
+         the learner put the lesson into their own words: what it means, why it matters
+         for their Goal, where it would apply. The most reliable version is the plainest:
+         summarise what this lesson taught and why it matters. They produce, then compare. ── -->
     <div class="challenge">
-      <p><strong>Mini challenge.</strong> &lt;a one-rep task: write / translate / derive / predict / do&gt;</p>
-      <textarea rows="3" placeholder="Have a go from memory before revealing…"></textarea>
+      <p><strong>Mini challenge.</strong> In your own words, summarise what this lesson
+        taught and why it matters for your Goal. &lt;or another open-ended understanding
+        question — never a coding or config task&gt;</p>
+      <textarea rows="4" placeholder="Answer from memory, in your own words, before revealing…"></textarea>
       <button class="reveal" id="model-reveal">Show a model answer</button>
       <div class="model" id="model" hidden>
-        <p>&lt;a model answer to compare against — note what a good attempt captures&gt;</p>
+        <p>&lt;a model answer — the key points a good summary should capture, and why they matter&gt;</p>
       </div>
       <p class="seed-note">↻ This is what to seed into your review queue.</p>
     </div>
@@ -52,16 +93,19 @@
   </div>
 
   <script>
-    document.querySelectorAll("#quiz button").forEach(function (b) {
-      b.addEventListener("click", function () {
-        var fb = document.getElementById("quiz-fb");
-        if (b.hasAttribute("data-right")) {
-          b.classList.add("right");
-          fb.textContent = "Right — and here's why it holds.";
-        } else {
-          b.classList.add("wrong");
-          fb.textContent = b.dataset.why || "Not quite — reason it through and try again.";
-        }
+    // Each .quiz block marks its own answers and writes to its own .feedback.
+    document.querySelectorAll(".quiz").forEach(function (quiz) {
+      var fb = quiz.querySelector(".feedback");
+      quiz.querySelectorAll("button").forEach(function (b) {
+        b.addEventListener("click", function () {
+          if (b.hasAttribute("data-right")) {
+            b.classList.add("right");            // css adds a green ✓ beside it
+            if (fb) fb.textContent = "Right — and here's why it holds.";
+          } else {
+            b.classList.add("wrong");
+            if (fb) fb.textContent = b.dataset.why || "Not quite — reason it through and try again.";
+          }
+        });
       });
     });
     document.getElementById("model-reveal").addEventListener("click", function () {

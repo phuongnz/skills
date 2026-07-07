@@ -11,7 +11,7 @@
   --accent: #7a5a2e;
   --accent-soft: #f0e7d8;
   --ok: #3f7a4b;
-  --measure: 40rem;
+  --measure: 50rem;
   --radius: 10px;
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --serif: Iowan Old Style, Palatino, "Palatino Linotype", Georgia, serif;
@@ -39,7 +39,7 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font);
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
@@ -97,20 +97,37 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 2.5rem 0; }
   margin: 1.5rem 0;
 }
 
+/* Diagram — a flow of stages / phases / steps for any lesson with a process in it.
+   Offline, no library: a row (or column) of boxes joined by arrows. For anything
+   branching, hand-author inline <svg> instead; it inherits the same colours. */
+figure.diagram { margin: 1.5rem 0; }
+.flow { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.flow.vertical { flex-direction: column; align-items: stretch; }
+.flow .node {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+  padding: .5rem .85rem; font-size: .92rem; text-align: center;
+}
+.flow .node.accent { border-color: var(--accent); background: var(--accent-soft); }
+.flow .arrow { color: var(--ink-soft); font-size: 1.15rem; line-height: 1; }
+figure.diagram figcaption { font-size: .82rem; color: var(--ink-soft); text-align: center; margin-top: .6rem; }
+
 /* Footer slots shared by lessons */
 .lesson-footer { margin-top: 3rem; border-top: 1px solid var(--line); padding-top: 1.5rem; font-size: .95rem; }
 .lesson-footer .label { color: var(--ink-soft); font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; }
 
-/* Quiz widget */
+/* Quiz widget — a lesson carries 3–4 of these blocks, then one mini challenge */
 .quiz { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.25rem 1.4rem; margin: 1.5rem 0; }
 .quiz button {
-  display: block; width: 100%; text-align: left;
+  display: flex; align-items: center; justify-content: space-between; gap: .6rem;
+  width: 100%; text-align: left;
   font: inherit; color: inherit;
   background: var(--paper); border: 1px solid var(--line);
   border-radius: 8px; padding: .6rem .85rem; margin: .4rem 0; cursor: pointer;
 }
 .quiz button:hover { border-color: var(--accent); }
 .quiz button.right { border-color: var(--ok); background: var(--accent-soft); }
+/* Green check next to the correct option once it's chosen */
+.quiz button.right::after { content: "✓"; color: var(--ok); font-weight: 700; font-size: 1.05em; }
 .quiz button.wrong { border-color: #b4553f; opacity: .7; }
 .quiz .feedback { margin-top: .75rem; min-height: 1.4rem; color: var(--ink-soft); }
 
@@ -122,6 +139,7 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 2.5rem 0; }
 .side .group { text-transform: uppercase; letter-spacing: .07em; font-size: .68rem; color: var(--ink-soft); margin: 1.4rem 0 .4rem; }
 .side a { display: block; text-decoration: none; color: var(--ink); padding: .28rem .4rem; border-radius: 6px; font-size: .95rem; }
 .side a:hover { background: var(--accent-soft); }
+.side a.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; box-shadow: inset 2px 0 0 var(--accent); }
 .side a.done::before { content: "✓ "; color: var(--ok); }
 .side a.todo::before { content: "○ "; color: var(--ink-soft); }
 .meter { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin: .5rem 0 0; }
@@ -175,5 +193,5 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 2.5rem 0; }
   body { background: #fff; color: #000; font-size: 12pt; }
   .side, .lesson-footer .reminder, .sr-overlay { display: none; }
   a { color: #000; text-decoration: underline; }
-  pre, .card, .quiz { border-color: #999; }
+  pre, .card, .quiz, .flow .node { border-color: #999; }
 }

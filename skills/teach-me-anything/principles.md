@@ -82,14 +82,16 @@ Design each lesson around a thing the learner will be able to *do*. Include only
 
 While understanding is going in, **keep friction low**. Effort spent fighting the material is working memory stolen from following it (Sweller's *cognitive load*). Smooth the path here — the difficulty comes later, in practice, on purpose.
 
+**Show, don't just tell.** Anything with a shape — a workflow, stages, phases, a sequence, an ordered process — should carry a **diagram**. A picture offloads the relationships the reader would otherwise have to hold in words, so it lands faster and holds longer, and it keeps the page vivid instead of flat. Wall-of-text is higher load and duller; when a lesson has a process in it, draw it.
+
 ## Capability through effort
 
-If understanding is about taking in, capability is about making it stick and bend to use. Now **friction is the point** — the effort of pulling an answer back from memory, or building something from nothing, is precisely what lays down retention. Practise capability in two moves:
+If understanding is about taking in, capability is about making it stick and bend to use. Now **friction is the point** — the effort of pulling an answer back from memory, or putting an idea into your own words, is precisely what lays down retention. Practise capability in two moves:
 
-1. **A quick check** — a short quiz confirming the idea registered. Design the wrong answers to be **diagnostic**: each distractor should embody a *specific, common misconception*, so which wrong option the learner picks tells you which misunderstanding to fix. Distractors that are random noise teach nothing when missed — and never make the right answer stand out by length, tidiness, or hedging language; let the content decide, not the formatting.
-2. **A mini challenge** — a small, active task where the learner *produces* rather than *recognises*: write the line, translate the sentence, hold the pose, derive the next step, predict the output. Recognition is cheap and flatters the learner; generation is where capability actually forms (the *generation effect*). Keep it to a single rep, finishable in a minute or two — but make them make something, then reveal a model answer to compare against.
+1. **Quick checks** — **3–4 short quiz questions** confirming the ideas registered. One question is too few to catch a shaky spot; three or four, each aimed at a *different* idea from the lesson, actually probe it. Design the wrong answers to be **diagnostic**: each distractor should embody a *specific, common misconception*, so which wrong option the learner picks tells you which misunderstanding to fix. Distractors that are random noise teach nothing when missed — and never make the right answer stand out by length, tidiness, or hedging language; let the content decide, not the formatting.
+2. **A mini challenge** — one **open-ended question** that makes the learner put the lesson into their *own words* rather than recognise an option. It tests understanding, not typing: **not code, not a config file** — ask what the lesson means, why it matters for the Goal, or where it would apply. The most reliable version is the plainest: *summarise what this lesson taught, and why it matters to you.* Free recall in the learner's own words is generation, not recognition, and generation is where capability actually forms (the *generation effect*). Keep it to a minute or two, then reveal a model answer to compare against.
 
-Both sit inside a **feedback loop** — the learner acts and finds out how they did at once, ideally automatically. Whatever the learner had to generate is exactly what belongs in the [retention engine](./SKILL.md#the-retention-engine).
+Both sit inside a **feedback loop** — the learner acts and finds out how they did at once, ideally automatically. The ideas the checks probed, and whatever the challenge made the learner articulate, are exactly what belongs in the [retention engine](./SKILL.md#the-retention-engine).
 
 ## Judgment out in the world
 
