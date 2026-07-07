@@ -14,6 +14,7 @@ One-time setup. Run this the first time you land in an empty workspace (no `inde
 
 Before designing a single lesson, run the opening conversation — it sets everything that follows:
 
+- **Settle the teaching language.** Ask what language to teach *in* — **never assume English**. Record it in `NOTES.md`, then write every page (foundations, lessons, cards) *and the templates' visible labels* (the eyebrows, "Quick check", buttons, the console's "Due for review" / "Start self-test", etc.) in it, and set each page's `<html lang>` to match. If the Goal is to learn a language, this is the language of *instruction*, distinct from the target. The pedagogy: [principles.md → Read the learner](./principles.md#read-the-learner).
 - **Settle the Goal.** Why is this learner here, and what do they want to be able to do? Record it in `goal.html` ([formats/goal.md](./formats/goal.md)), and keep its one line in step with `MENU.goalLine`. The pedagogy: [principles.md → Ground everything in the Goal](./principles.md#ground-everything-in-the-goal).
 - **Read the learner.** Prior contact, self-rated level, neighbouring strengths. Write it as the first checkpoint (type `background`, [formats/checkpoint.md](./formats/checkpoint.md)) so every later session inherits it. The pedagogy: [principles.md → Read the learner](./principles.md#read-the-learner).
 

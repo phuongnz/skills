@@ -111,6 +111,7 @@ Show an honest time-to-finish near the title (the template has a slot for it). E
 
 Every lesson should:
 
+- **Be written in the teaching language** recorded in `NOTES.md` — the prose, the quizzes, and the template's visible labels alike, with `<html lang>` set to match. Never default to English.
 - **Show a diagram** if it covers a workflow, stages, phases, or a sequence — visuals land faster and read livelier than prose. The template has a slot for it.
 - Link, via anchors, to related lessons and reference cards.
 - Point at one **primary source** — the best single thing you found to read or watch on this. Draw the understanding from trusted material tracked in `sources.html`, and keep lessons **thick with citations** — links backing every claim — because that is what makes a lesson trustworthy rather than a story.
@@ -137,6 +138,7 @@ The workspace's running notebook — the important things to keep in hand betwee
 
 At the **top**, hold the course outline under the heading **"Course Outline (flexible — revise as we learn)"** — the arc of lessons you expect to teach toward the Goal. It is a plan, not a contract: as you read the learner and the Goal moves, revise it. Then, below the outline, keep the running notes:
 
+- **Teaching language** — the language every page and conversation is written in. Settled at the first diagnostic, never assumed; kept here so every session inherits it.
 - **Progress** — where the learner is along the outline, what's done, what's next.
 - **Decisions** — important calls made about direction, scope, or approach, and why.
 - **Learner preferences** — pace, tone, formats they like or hate, constraints to remember.

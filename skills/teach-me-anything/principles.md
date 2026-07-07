@@ -43,6 +43,7 @@ Goals move as the learner grows — that is healthy. When one shifts, confirm th
 
 Alongside the Goal, size up the **learner** — what they already hold, the fields they are fluent in, their real experience. A few light questions surface enough:
 
+- **Teaching language** — what language to teach *in*. Ask; **never assume English**. Everything you write for this learner goes in it — pages, quizzes, conversation — and it holds across every session (record it in `NOTES.md`). If the Goal is to learn a language, this is the language of *instruction*, which may differ from the target being learned.
 - **Neighbouring strengths** — fields, jobs, or hobbies they know well. Use these to judge how much abstraction they can take, and to spot *genuine* overlap — ideas they already own that the new material truly builds on.
 - **Prior contact** — have they met this before? What stuck, what slid off?
 - **Self-rated level** — fresh start, rusty, or building on foundations.
