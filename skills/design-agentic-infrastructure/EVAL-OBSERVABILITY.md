@@ -42,6 +42,10 @@ Observability makes the trajectory **visible** (spans over agent/tool calls); ev
 
   It maps back onto this skill's own concerns: loss-of-history ↔ memory/context rot; coordination modes ↔ multi-agent; verify-the-middle ↔ the never-cut Verify.
 
+### Fleet health — the same spans, aggregated (the SRE view)
+
+The spans above are per-run. At production scale you also **roll them up into fleet-level health signals** — the AI-specific SRE view: **tokens-per-minute** (throughput/load), **time-to-first-token** (the latency a user feels), and **turn / task success rate** (is the fleet actually completing work?). These are the same quantities the `chat` / `invoke_agent` spans already emit, aggregated across all runs. They belong on the **ceiling** design of a maintained product, where model-endpoint **routing / failover** and capacity tuning keep the fleet inside its SLOs. Per-run trajectory eval tells you *why one run* broke; these tell you the *fleet* is degrading before users file it as an outage.
+
 ## The mature pattern: close the loop
 
 Production traces → **evaluation datasets** → CI gate:
@@ -51,6 +55,8 @@ Production traces → **evaluation datasets** → CI gate:
 3. **CI gates** catch regressions before deploy.
 
 It's keeping a log of every mistake and turning it into next term's practice exam — and it is exactly how a-posteriori evidence gets *manufactured* instead of hoped for.
+
+Evaluation at this depth is now **its own discipline**, not a green bar bolted on at the end: golden datasets curated *with domain experts* (the SMEs who define what "correct" means for the task), **live / online evals** running against production traffic — not offline CI alone — and the whole loop owned like any other production concern. Budget it as real work on a maintained product; "we'll add evals later" is how the correct-looking-final-answer trap survives all the way to production.
 
 ## LLM-as-judge is a biased instrument — reduce, never trust raw
 

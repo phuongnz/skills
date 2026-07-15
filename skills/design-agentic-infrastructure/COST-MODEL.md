@@ -64,6 +64,15 @@ The single biggest lever. It captures how many model passes the design's structu
 
 `retry_factor` (~1.1–1.5×) covers verifier re-runs and failed-and-retried tasks. The independent critic's calls live inside the multiplier; its *retries* live here.
 
+## Cost levers — pull these before you climb (metered / mixed-metered slice)
+
+On metered billing, two levers **soften the cost arm without touching a rung** — reach for them before you price a heavier design:
+
+- **Context thrift** — curate, compact, offload; keep the window in the smart zone. Fewer input tokens per call, the first factor in the formula above.
+- **Caching & reuse — the first cost lever.** More than prompt caching (the `cached_in_tokens` line above); a small taxonomy: **tool-result caching** (API/DB results keyed with a TTL + idempotency keys), **reasoning-artifact reuse** (a plan or analysis reused across calls), and **workflow memoization** (an agent step's output keyed by its inputs/policies/versions, so an unchanged step never re-runs). Each removes calls or tokens the formula would otherwise bill.
+
+⚠ **Caching trades correctness for cost — govern it, don't just switch it on.** A real cache needs TTL + invalidation, semantic keys, PII redaction, per-tenant isolation, and — the honest part — **observability on hit-rate *against* correctness**: a stale hit is a *wrong answer*, not a saving. Treat it as deliberate architecture with a measurable SLA, not a free win; the moment it returns wrong-but-cheap answers it has stopped being a cost lever.
+
 ## The non-token lines (both regimes)
 
 Token cost is rarely the whole bill. Fetch live pricing for each that applies (SKILL step 5):

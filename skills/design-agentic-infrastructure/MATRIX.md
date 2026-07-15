@@ -51,7 +51,7 @@ Three columns = the three design surfaces of the coding infrastructure: the **ar
 
 | Your reading | Architecture | Workflow | Tools |
 |---|---|---|---|
-| **Metered API** (every token a marginal $) | Optimise the rung you're on *before* climbing; context thrift first (curate, compact, offload). Extra rungs sting. | Justify each heavy step; smaller / fewer crews; the one-sentence-diff rule earns real money. | Prompt caching; cheap models for sub-steps; retrieval / code-search instead of stuffing the whole codebase into the window. |
+| **Metered API** (every token a marginal $) | Optimise the rung you're on *before* climbing; context thrift first (curate, compact, offload). Extra rungs sting. | Justify each heavy step; smaller / fewer crews; the one-sentence-diff rule earns real money. | **Caching & reuse — the first cost lever:** prompt · tool-result (TTL + idempotency) · reasoning-artifact · workflow memoization. Then cheap models for sub-steps; retrieval / code-search instead of stuffing the codebase into the window. **→ watch cache hit-rate *against* correctness — a stale hit is a wrong answer, not a saving** (see [`COST-MODEL.md`](COST-MODEL.md) § cost levers). |
 | **Flat subscription** (marginal token ≈ $0) | An extra rung, fresh-context reviewer, or fuller window is nearly free to *try* — but reliability must still earn it. **Frugality stops gating; evidence doesn't.** | Fresh-context reviewers and multi-agent crews are easy to justify here. | Fuller windows; more parallel agents — cost is no longer the gate. |
 | **Mixed** (flat plan as workhorse + metered API for selective high-leverage tasks) | Run the bulk on the flat plan, where an extra rung is nearly free; reach for a metered model only where per-token spend buys real speed or autonomy on a small, high-leverage step. | Default to the flat workhorse; spend metered tokens selectively — the one-sentence-diff rule earns money on the metered slice only. | Fuller windows / parallel agents on the flat plan; caching and cheap-model thrift on the metered slice. |
 
@@ -62,7 +62,7 @@ Three columns = the three design surfaces of the coding infrastructure: the **ar
 | Your reading | Architecture | Workflow | Tools |
 |---|---|---|---|
 | **Boundaries: the build splits into separable sub-tasks** | A *hypothesis* for rung 5 — **don't pre-split**. **→ Multi-agent only on a proven hard boundary or single-agent limit** (single-writer if you do). | — (unchanged) | Single-writer coordinator *if* you ever split. |
-| **Framework / latency / on-prem constraint** | Shapes the durable-state engine; a latency SLA **caps** how many rungs you can climb. | — (unchanged) | Framework often dictated — but they ship the *same primitives*, so pick by ecosystem fit, not hype. |
+| **Framework / latency / on-prem constraint** | Shapes the durable-state engine; a latency SLA **caps** how many rungs you can climb. | — (unchanged) | Framework often dictated — but they ship the *same primitives*, so pick by ecosystem fit, not hype. Favour tools that speak **open standards** (MCP · Kubernetes · OpenTelemetry): *open protocols outlive products*, so an open-standard tool survives a vendor or model change without a rewrite (vendor-mortality is a real tool-fit risk). |
 
 **Tie-break:** when two readings pull different ways, the **most restrictive cap wins** — the tightest ceiling across all constraints is the one you obey. (High blast radius beats a tight budget: keep the HITL gate and pay for it.)
 

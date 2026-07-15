@@ -29,6 +29,16 @@ Pick the one the situation needs — they are not interchangeable.
 
 A single design mixes all three: the refund/merge/deploy is in-the-loop, the lint fix is out-of-the-loop. Choosing globally is the mistake.
 
+## The other end: govern the actions you *don't* gate (the ceiling)
+
+Out-of-the-loop is not un-governed. When an agent acts autonomously — no human at each step — three questions must still be answerable *after the fact*, the **governance triad**:
+
+- **Authorization** — *is this action allowed?* The agent has a scope of permitted actions enforced by policy, independent of what it decides to attempt.
+- **Attribution** — *which agent did this?* Each agent carries its own **identity** — a first-class requirement here, distinct from (not a reuse of) the human's credential — so every action traces to an actor.
+- **Auditability** — *can you prove what happened?* A durable record of what was attempted, by which agent, and whether it was allowed — riding the same durable state the gate already needs.
+
+This is the ceiling's counterpart to the gate: the more autonomy you grant (higher rung, more actions running out-of-the-loop), the more the triad — *policy + identity + audit*, not a human at each step — is what keeps that autonomy accountable. State it concretely per design: the permission scope, the agent identity, and where the audit record lands. *(Resist over-speccing the mechanism — cryptographic delegation chains, kill-switches, Merkle audit trails and per-tool interception are vendor-specific product claims, not a required part of the design. Name the three questions your design answers and how, then search live governance tools at step 5.)*
+
 ## The gate rule — one line
 
 **Gate when expected error-cost > review-latency cost.** Score each action on four risk dimensions, then sort:
