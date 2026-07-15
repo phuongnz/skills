@@ -1,6 +1,6 @@
 # What this skill provides — coverage signature
 
-**Authoritative** source for how `design-agentic-coding-ecosystem` matches a design to this
+**Authoritative** source for how `design-agentic-infrastructure` matches a design to this
 skill. It is described in *that skill's* vocabulary — rung / topology, workflow, autonomy,
 tools, and the **non-negotiables** it satisfies vs. leaves to you — so a finished band design
 can be matched against it. The design skill's `INSTANTIATION-REGISTRY.md` carries a curated
@@ -8,7 +8,7 @@ summary of this file; **this file wins** if the two drift. Keep it current when 
 shape changes.
 
 > **What this skill is.** It *instantiates and runs* a design — it does **not** decide one.
-> Which rung / workflow / tools to run is chosen upstream by `design-agentic-coding-ecosystem`.
+> Which rung / workflow / tools to run is chosen upstream by `design-agentic-infrastructure`.
 > This skill builds a setup that already looks like the signature below.
 
 **Instantiates:** the build-plane lifecycle — **Plan → Build → Verify → Review → Ship** — as a
@@ -47,5 +47,5 @@ the rest), so "just take the orchestrator" is not a clean cut — take the whole
 ## Does NOT cover — hand-build these separately
 - **Monitor / observability** of the loop — no tracing, metrics, or dashboards; crash recovery is *manual* label reconstruction.
 - **Evaluate / eval harness** — no agent-behavior eval, no production feedback. (The target repo's tests are *app* tests, not eval of the agents.) → For a **maintained** product, the design's *eval-day-one* non-negotiable stays with you.
-- **The design decision itself** — which rung / workflow / tools to run. That's `design-agentic-coding-ecosystem`, upstream.
+- **The design decision itself** — which rung / workflow / tools to run. That's `design-agentic-infrastructure`, upstream.
 - Durable execution beyond GitHub labels · untrusted-input / prompt-injection hardening (private-repo trust assumed) · a continuous daemon (turn-driven only) · multi-issue parallelism (one build at a time).

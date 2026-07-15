@@ -1,6 +1,6 @@
 # The Decision Matrix — constraints to a starting band
 
-*Research-backed as of mid-2026. A self-contained decision matrix that maps a software build's constraints to a starting band for its **agentic coding ecosystem** — the coding agents, the workflow, and the tools the developer builds *with*. Re-validate before relying on it; the field moves.*
+*Research-backed as of mid-2026. A self-contained decision matrix that maps a software build's constraints to a starting band for its **agentic coding infrastructure** — the coding agents, the workflow, and the tools the developer builds *with*. Re-validate before relying on it; the field moves.*
 
 ## Read it as a band, not a point
 
@@ -27,7 +27,7 @@ The user's constraints are in business language; the matrix decides in **native 
 
 ## Step 2 · Match the matrix
 
-Three columns = the three design surfaces of the coding ecosystem: the **architecture** of the coding agents (the rung topology you run them on — from one supervised agent to a multi-agent crew), the **workflow** you drive them with, and the **tools**. None of these is the architecture of the product being built — that is the user's to build, not yours to design. Read the floor, obey the caps (**cap ·**), note the climb triggers (**→**).
+Three columns = the three design surfaces of the coding infrastructure: the **architecture** of the coding agents (the rung topology you run them on — from one supervised agent to a multi-agent crew), the **workflow** you drive them with, and the **tools**. None of these is the architecture of the product being built — that is the user's to build, not yours to design. Read the floor, obey the caps (**cap ·**), note the climb triggers (**→**).
 
 ### Requirements
 

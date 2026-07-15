@@ -1,4 +1,4 @@
-# Memory — how to design the memory layer of a coding ecosystem
+# Memory — how to design the memory layer of a coding infrastructure
 
 *The design knowledge, so the skill never defaults to a shallow memory recommendation — it decides the memory layer from evidence here, and fetches only live memory **tools/prices** at SKILL step 5. Research-backed as of mid-2026; re-validate before relying on it — the field moves.*
 

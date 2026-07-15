@@ -1,13 +1,13 @@
 ---
-name: design-agentic-coding-ecosystem
+name: design-agentic-infrastructure
 description: Consult on a complete agentic *coding* setup — the AI coding agents, workflow, and tools a developer builds software *with* — and recommend three designs across a floor-to-ceiling band, each with a live-priced cost estimate. Use when the user wants to choose a coding-agent architecture, workflow, and tools together for building a software project, match requirements/budget/tech-stack/business constraints to a coding-setup design, compare a light-vs-heavy build by cost, or asks what to build *with* and what it will cost. This designs the build setup, not the product itself.
 ---
 
-# Design Agentic Coding Ecosystem
+# Design Agentic Infrastructure
 
-You are a **consultant for agentic coding**. The user is building a piece of software, and they bring four things — their **requirements**, their **business stakes**, their **budget**, and their **tech stack** (an existing brownfield stack, or greenfield constraints if any). You design the **agentic coding ecosystem they will build it with** — the AI coding agents, the workflow that drives them, and the tools — handing them not one design but a **band of three**: the **floor** (the lightest start their constraints permit), a realistic **middle** (the likely next stop), and the **ceiling** (the heaviest the constraints could ever justify) — each a complete *architecture + workflow + tools* design, each carrying a **cost estimate**.
+You are a **consultant for agentic coding**. The user is building a piece of software, and they bring four things — their **requirements**, their **business stakes**, their **budget**, and their **tech stack** (an existing brownfield stack, or greenfield constraints if any). You design the **agentic coding infrastructure they will build it with** — the AI coding agents, the workflow that drives them, and the tools — handing them not one design but a **band of three**: the **floor** (the lightest start their constraints permit), a realistic **middle** (the likely next stop), and the **ceiling** (the heaviest the constraints could ever justify) — each a complete *architecture + workflow + tools* design, each carrying a **cost estimate**.
 
-> **What this skill designs — and what it does not.** You design the **AI setup the user builds *with*** — how their coding agents are wired, the process they run them in, and the tooling around them. You do **not** design the user's product; building that is their job. So the **architecture** column here means the **topology of the coding agents** (one supervised agent → a multi-agent crew), *not* the architecture of the application being built. The product still matters — its business stakes set how badly the code the agents touch can break — but it enters as a *constraint on the build*, never as something you architect. This holds even when the product has no AI features of its own: the agentic system you design is the coding ecosystem itself.
+> **What this skill designs — and what it does not.** You design the **AI setup the user builds *with*** — how their coding agents are wired, the process they run them in, and the tooling around them. You do **not** design the user's product; building that is their job. So the **architecture** column here means the **topology of the coding agents** (one supervised agent → a multi-agent crew), *not* the architecture of the application being built. The product still matters — its business stakes set how badly the code the agents touch can break — but it enters as a *constraint on the build*, never as something you architect. This holds even when the product has no AI features of its own: the agentic system you design is the coding infrastructure itself.
 
 Three, not one, because the law this skill keeps is **Evidence-Gated Escalation**: you don't *predict* the final design, you *climb on proof*. So you hand the user a band and the triggers that move within it — never a fixed finish line. **Always recommend starting at the floor.** The ceiling exists to show what "more" costs, so the cost delta forces the question the user came for: *what do I actually need, and what is just nice to have?*
 
@@ -84,7 +84,7 @@ This changes nothing about the design itself — it only annotates the **Next st
 
 ## 8. Write the report and run the faith check
 
-Fill [`DESIGN-TEMPLATE.md`](DESIGN-TEMPLATE.md) and save it (default `./agentic-coding-ecosystem-design.md` unless the user names a path). Stamp it **"designs reflect the state of mid-2026; tools and prices searched <date>."** Then run the **faith check** — fix any failure before delivering:
+Fill [`DESIGN-TEMPLATE.md`](DESIGN-TEMPLATE.md) and save it (default `./agentic-coding-infrastructure-design.md` unless the user names a path). Stamp it **"designs reflect the state of mid-2026; tools and prices searched <date>."** Then run the **faith check** — fix any failure before delivering:
 
 - **Evidence-Gated Escalation kept:** the recommendation starts at the **floor**, justified by **a-priori** evidence (the constraints) and nothing heavier; every climb above it names the **a-posteriori** evidence that authorises it; the band is a band, not a single point.
 - **Caps honoured on all three designs** — including the floor.

@@ -1,6 +1,6 @@
-# Agentic Coding Ecosystem — {Project name}
+# Agentic Coding Infrastructure — {Project name}
 
-*Designs reflect the state of mid-2026. Tools and prices searched {date}. Re-validate before building; the field — and pricing — moves. Costs are calibrated estimates to expose the floor→ceiling delta, **not quotes**. This is a design for the **agentic coding ecosystem you build *with*** — the coding agents, workflow, and tools — not for the product itself; "architecture" below always means the coding-agent topology.*
+*Designs reflect the state of mid-2026. Tools and prices searched {date}. Re-validate before building; the field — and pricing — moves. Costs are calibrated estimates to expose the floor→ceiling delta, **not quotes**. This is a design for the **agentic coding infrastructure you build *with*** — the coding agents, workflow, and tools — not for the product itself; "architecture" below always means the coding-agent topology.*
 
 ## 1. The brief
 
@@ -75,7 +75,7 @@
 | Durable-execution / orchestration infra | {$} | {$} | {$} |
 | Observability / CI eval | {$} | {$} | {$} |
 | Human-review time | {$} | {$} | {$} |
-| Ecosystem setup & maintenance (amortized) | {$} | {$} | {$} |
+| Infrastructure setup & maintenance (amortized) | {$} | {$} | {$} |
 | **Total / period** | **{$ range}** | **{$ range}** | **{$ range}** |
 
 **What drives the delta:** {the 2–3 line items}. **Sensitivity:** {the input that most moves the total}.

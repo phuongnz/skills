@@ -68,7 +68,7 @@ The single biggest lever. It captures how many model passes the design's structu
 
 Token cost is rarely the whole bill. Fetch live pricing for each that applies (SKILL step 5):
 
-- **Memory / code-index store** — usually just a project-memory file the agents read and update (≈ free). A cost appears only if the design runs a managed vector / code-search index: monthly DB + a one-time embedding pass over the codebase + per-query embed. Most coding ecosystems need little or none — include it only when the design actually uses one.
+- **Memory / code-index store** — usually just a project-memory file the agents read and update (≈ free). A cost appears only if the design runs a managed vector / code-search index: monthly DB + a one-time embedding pass over the codebase + per-query embed. Most coding infrastructure need little or none — include it only when the design actually uses one.
 - **Durable-state infra** — Postgres/checkpointer hosting, or a durable-execution platform's pricing.
 - **Observability / eval** — platform seat/usage, or self-hosted OTel (compute only).
 - **Human-in-the-loop time** — the gate's *real* cost, and often the dominant line for high-blast-radius designs: `reviews_per_period × minutes_per_review × loaded_hourly_rate`. Make it explicit — it is the cost the **cap imposes**, and the user must see that a gate is not free.
