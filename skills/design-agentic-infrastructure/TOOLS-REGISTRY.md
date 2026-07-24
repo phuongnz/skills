@@ -53,4 +53,4 @@ The non-negotiable **independent check** made concrete: at the congress, **21 of
 
 ---
 
-*Captured 2026-07-15 from `/Users/phuongnz/dev/WAD26`. Names only, no prices. Re-verify existence and re-search the live landscape at SKILL step 5 — that step, not this file, is the source of truth for what to actually use.*
+*Captured 2026-07-15 from `/Users/phuongnz/dev/INFO-WAD26`. Names only, no prices. Re-verify existence and re-search the live landscape at SKILL step 5 — that step, not this file, is the source of truth for what to actually use.*

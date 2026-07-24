@@ -26,7 +26,7 @@ If commits after 2026-07-15 touch either sibling's SKILL.md, MATRIX.md, or (prod
 
 ## Field evidence — WAD26 (mid-2026 market snapshot)
 
-One field-evidence source — **WeAreDevelopers World Congress 2026** (Berlin, 2026-07-08/10; 492 sessions, ~98 booths; local capture `/Users/phuongnz/dev/WAD26`). Evidence grade: **market/practitioner signal** — many independent bets, stronger than single-vendor advocacy, still not a controlled benchmark. The durable part is the *dual-use pattern*, not any one product.
+One field-evidence source — **WeAreDevelopers World Congress 2026** (Berlin, 2026-07-08/10; 492 sessions, ~98 booths; local capture `/Users/phuongnz/dev/INFO-WAD26`). Evidence grade: **market/practitioner signal** — many independent bets, stronger than single-vendor advocacy, still not a controlled benchmark. The durable part is the *dual-use pattern*, not any one product.
 
 | Claim in this skill | WAD26 backing |
 |---|---|
