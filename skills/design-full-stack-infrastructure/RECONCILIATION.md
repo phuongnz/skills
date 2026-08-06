@@ -53,6 +53,8 @@ Two guardrails keep this evidence-gated:
 
 **Capacity is additive even when the rung isn't.** Two planes on one deployment means summed load — size the throughput/storage for both planes' volumes at the reconciled rung, and attribute each plane's share so the cost split (and a future unshare) stays computable.
 
+**Recovery and stage are dimensions of size.** Each plane's report states its recovery targets and its environment decision (their skills require it: the product plane per durable store, the coding plane for its own state and footprint). A shared deployment inherits the **stricter stated RPO/RTO** — the same max-rung rule applied to recovery, so it never out-escalates either plane's own justification — and the verdict names **which stage the tenant touches**: the production instance behind its scoped credential, or a non-prod instance. A non-prod instance of a shared component is a **second deployment** — count it and its cost honestly; environment separation can quietly hand back the dedup saving.
+
 ### 4. Who owns it?
 
 Every shared deployment gets **one owning plane** — the one whose demand set the size (in practice almost always the product plane, whose SLO and on-call are stricter). The owner's operational posture governs: its backup/restore discipline, its maintenance windows, its access policy. The other plane is a **tenant** with a scoped credential and an attributed slice of load. A shared component with two owners has none — that's how the untested-restore and the ungoverned credential sneak back in.
@@ -61,9 +63,11 @@ Every shared deployment gets **one owning plane** — the one whose demand set t
 
 Step 3's output — one row per category:
 
-| Category | Product plane specified | Coding plane specified | Verdict | Size / sized-by | Owner | Re-reconcile when |
+| Category | Product plane specified | Coding plane specified | Verdict | Size · recovery / sized-by | Owner | Re-reconcile when |
 |---|---|---|---|---|---|---|
-| {category} | {component + rung, or —} | {component + rung, or —} | **shared** · **separate (cap: {…})** · **single-plane** · **absent** | {reconciled size} ← {plane} | {plane} | {the climb trigger(s) that re-open this row} |
+| {category} | {component + rung, or —} | {component + rung, or —} | **shared** · **separate (cap: {…})** · **single-plane** · **absent** | {reconciled size · RPO/RTO} ← {plane} | {plane} | {the climb trigger(s) that re-open this row} |
+
+Each **shared** row also records the tenant's **stage**: the production instance behind its scoped credential, or a non-prod instance — the latter is its own deployment, priced as one.
 
 ## Cost: counted once, saving stated
 

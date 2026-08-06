@@ -82,6 +82,8 @@ These caps hold no matter where the constraints land. If a cheap, fast runtime v
 
 Step 2 set the floor and caps from **a-priori** evidence. What moves a design up or down *after* you launch is **a-posteriori** evidence — produced by the running product (traffic, latency percentiles, error budget, cost-per-request, the trace of a real incident) — and it has a fixed vocabulary. Arrows run **both ways**: the same discipline *de-provisions* when a tier stops earning its cost.
 
+**Keep demand and capacity distinct.** Rising traffic (demand) is *forecast* input — it says when a limit will arrive, not that one has; every trigger below is **capacity/SLO evidence** (a resource saturating, a budget burning). Demand growth inside the current rung's headroom is watched, not climbed on — name what saturates first, so the forecast has a wall to measure against.
+
 | Evidence you observe | Surface | The move it authorises |
 |---|---|---|
 | Read latency (p95/p99) climbs under load | runtime | + a cache tier, then a read replica — origin offload before a bigger box |

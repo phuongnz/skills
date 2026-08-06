@@ -64,6 +64,7 @@ Runtime cost is rarely just compute. Fetch live pricing for each that applies (S
 - **Egress / CDN** — bytes leaving the network, billed per GB and **often the surprise line**: a chatty API, media, or cross-region replication can make egress the largest single item. Size it explicitly (`bytes_out_per_request × requests`), and separately for cross-region traffic in a multi-region design. CDN offload lowers origin egress but adds its own per-GB + request price.
 - **Managed-service fees** — API gateway, auth/identity, queue/event bus, durable-execution platform, observability platform (seats + ingest/retention). Observability ingest scales with traffic — a high-cardinality trace/metric bill can rival compute; budget retention deliberately.
 - **Inference (only if the product has its own AI features)** — per-token (hosted model API) or GPU-hour (self-hosted). This is the **product's own runtime inference**, distinct from the coding agents' tokens in the sibling skill. Apply the token line of the formula, and cross-check the caching lever below.
+- **Non-production environments** — preview/branch envs and staging carry their own compute + data + tooling lines; staging at prod parity approaches a second estate (blue-green's "double capacity" is the extreme case). Price what the design's environment topology actually runs — "€0, production-only behind flags" is a valid line; an absent line is not.
 - **On-call / operations time** — the *real* cost of a maintained runtime, and often dominant for a high-blast-radius design: `on_call_hours_per_period × loaded_hourly_rate` + incident time. Make it explicit — a runtime with an SLA carries human cost the cap imposes.
 - **Setup / maintenance** — provisioning + IaC + migration effort, amortized per period. Larger for higher tiers (multi-region is "hard operations" — weight it up).
 
@@ -85,6 +86,7 @@ TCO_per_period =
     + egress / CDN
     + managed-service fees (gateway · queue · durable-exec · observability)
     + inference            (only if the product has AI features)
+    + non-prod environments (preview · staging — explicit 0 if prod-only)
     + on-call / ops time
     + amortized setup / maintenance
 ```

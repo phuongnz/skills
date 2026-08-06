@@ -2,6 +2,8 @@
 
 *Designs reflect the state of mid-2026. Tools and prices searched {date}. Re-validate before building; the field — and pricing — moves. Costs are calibrated estimates to expose the floor→ceiling delta, **not quotes**. This is a design for the **agentic coding infrastructure you build *with*** — the coding agents, workflow, and tools — not for the product itself; "architecture" below always means the coding-agent topology.*
 
+*Style contract — this report is a decision record, not a novel: one fact per bullet, two lines max; rationale is a single "why: …" clause, never argued prose; anything enumerable goes in a table with short cells; the recommended topology is drawn (≥ 1 mermaid diagram). A bullet that needs a third line is two facts — split it.*
+
 ## 1. The brief
 
 - **Goal (one sentence):** {the concrete outcome}
@@ -48,6 +50,18 @@
 - **Caps honoured:** {tick each binding cap — show the floor still obeys them}.
 - **Cost / period:** {low / expected / high}. Drivers: {token cost @ {price}, {date}} · {human-review time} · {infra}. ⚠ {assumptions}.
 
+**The floor, drawn** — redraw to match this design; every node must exist in it:
+
+```mermaid
+flowchart LR
+  Dev(["developer"]) --> A["{agent: rung n}"]
+  A --> W["{isolation: worktree · branch}"]
+  A -.checkpoints.-> S[("{durable state — if any}")]
+  A --> V{"Verify + Review"}
+  V -->|"{HITL gate, if stakes demand}"| M["merge / ship"]
+  A -.run traces.-> O["{eval / observability}"]
+```
+
 ### 🟡 Middle — {one-line identity}
 
 *The realistic next stop once the first a-posteriori evidence arrives.*
@@ -65,6 +79,18 @@
 - **Architecture / Workflow / Tools:** {e.g. rung 5 multi-agent, single-writer; multi-agent workflow; fuller tool stack}.
 - **Caps honoured:** {…, incl. single-writer}.
 - **Cost / period:** {low / expected / high}. **Δ vs. floor:** {often large — the `design_multiplier` (4–220× for multi-agent) + review time}.
+
+### Plane durability & footprint
+
+*The coding plane has state of its own and a place it runs. Code is already durable in git; for what is not, say what dies with it — run traces are the **a-posteriori evidence the climbs depend on**; lose them and the triggers go blind. And say where the agents stand relative to production ("nowhere near it" is the usual floor answer — say it).*
+
+| Plane state | Loss costs | Backup → restore (or accepted loss) |
+|---|---|---|
+| {project memory · agent docs} | {re-learning · drift} | {in git → covered / {method + last tested}} |
+| {run traces · eval data} | {climb triggers go blind} | {retention {days} @ {platform} / exported to {…}} |
+| {durable-exec checkpoints, if any} | {in-flight runs restart} | {its state store's backup posture} |
+
+- **Where the agents run:** {local sandbox · worktrees · CI runners · cloud sandbox} — isolation = {worktree / container / VM}. **Reach into production:** {none / a scoped agent credential for {action}, behind the HITL gate — never a human's key; see [`HITL.md`](HITL.md)}.
 
 ## 5. The cost ladder
 
@@ -85,6 +111,14 @@
 
 - **Start here:** the **Floor** — {restate it in one line}. It is what your constraints (a-priori evidence) already justify, and it satisfies every binding cap at the lowest cost.
 - **First climb trigger to watch:** {the specific *a-posteriori* evidence that would move you to the middle, and where it surfaces — Verify / Review / a run trace}.
+
+**When a trigger fires, start looking at** — the designs above name *capabilities* at the middle and ceiling; this table names *candidates*, pulled from the dated live search (§ 8). A shortlist that opens the evaluation, not a pre-decision: the climb still needs its evidence, and the search is re-run at climb time.
+
+| Climb trigger | Capability it calls for | Candidates to evaluate first ({date}) |
+|---|---|---|
+| {e.g. Verify finds a checkable correctness gap} | {rung 2 — critic/reviewer agent} | {2–3 names from the live search} |
+| {e.g. context cost bites on long tasks} | {external memory / code-index store} | {…} |
+
 - **De-escalation:** {a mechanism to remove if a trace shows it never earns its cost — the arrow runs both ways}.
 - **Instantiate with:** {a skill from the instantiation registry that scaffolds this design — whole, or named liftable parts — with its install line; or "nothing on the shelf — hand-build."} **Not covered by it:** {what the skill leaves to you — e.g. Monitor + Evaluate — so it is built separately}. *(A proposal — design → instantiate is a human-gated two-step; nothing is invoked for you.)*
 - **Next step:** stand up the floor, instrument it (CI + run traces) so the climb triggers are observable, and move up only when the named evidence appears.
@@ -93,8 +127,11 @@
 
 - [ ] **Evidence-Gated Escalation kept** — the floor is justified by *a-priori* evidence (constraints) and nothing heavier; every climb above it names the *a-posteriori* evidence that authorises it; the output is a band, not a single point.
 - [ ] **Caps honoured on all three designs**, floor included.
+- [ ] **Plane durability & footprint stated** — memory, traces, and eval data each carry a backup or an accepted loss; where the agents run and their reach into production is explicit, never implicit.
 - [ ] **Cost is a dated range, not a quote** — live prices, date stamped, assumptions flagged.
 - [ ] **Sources listed** — § 8 carries the live URLs behind the tools and prices, so the reader can re-validate.
+- [ ] **No registry candidate dismissed silently** — every `TOOLS-REGISTRY.md` candidate in a designed category has its disposition row in § 8, with the one-line why.
+- [ ] **Style contract kept** — no bullet or table cell exceeds two lines; rationale rides as *why:* clauses; the recommended topology is drawn.
 - [ ] No **rubber-stamped gate** standing in for oversight (looks like oversight, isn't).
 - [ ] No **huge context window** standing in for memory (looks like recall, hallucinates).
 - [ ] **Evaluation grades the middle**, not only the final answer (looks like success, hides failure).
@@ -106,3 +143,10 @@ The live web-search sources behind the tool landscape and the prices used above 
 - {capability or topic} — [{label}]({url}) · [{label}]({url})
 - {capability or topic} — [{label}]({url}) · {OpenTelemetry GenAI spec (vX.YZ)}
 - …
+
+**Registry disposition** — [`TOOLS-REGISTRY.md`](TOOLS-REGISTRY.md) seeded the search (a dated mid-2026 snapshot); every candidate in a category this design covers gets a verdict — losing to the live search is fine, vanishing is not. Categories the design doesn't touch need no row.
+
+| Category | Registry candidate(s) | Verdict | Why (one line) |
+|---|---|---|---|
+| {capability} | {names} | {adopted · priced-and-lost-to-{X} · wrong-shape · not-pinnable} | {e.g. "managed tier ≈ €{n}/mo lost to €0 self-hosted at floor volume"} |
+| … | … | … | … |

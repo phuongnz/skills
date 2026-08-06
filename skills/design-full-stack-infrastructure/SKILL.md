@@ -51,7 +51,7 @@ This is the step only this skill performs. Apply [`RECONCILIATION.md`](RECONCILI
 
 1. **Collect the candidates** — from the product report's shared-substrate flags (its designs mark them per its `AGENT-READY.md` checkpoint) and the coding report's named components, across the five categories: **durable execution · datastore/memory · observability · flags/gates · identity/policy**.
 2. **For each category where both planes specified a component**, decide **share or separate**: sharing is the default *candidate*; a binding cap on either plane (residency, compliance isolation, blast-radius separation) **vetoes** it — most-restrictive-cap-wins, stated with the cap that fired.
-3. **Size each shared deployment to the higher demand** — the heavier of the two planes' *justified* specifications. Never above it: if neither plane justified multi-region, the shared deployment isn't multi-region.
+3. **Size each shared deployment to the higher demand** — the heavier of the two planes' *justified* specifications. Never above it: if neither plane justified multi-region, the shared deployment isn't multi-region. Size includes **recovery and stage**: the stricter stated RPO/RTO, and the stage the tenant touches ([`RECONCILIATION.md`](RECONCILIATION.md) § size).
 4. **Name the re-reconciliation triggers** — each plane's own climb triggers double as the events that re-open the affected category's sizing (whichever plane's a-posteriori evidence arrives first moves the shared component).
 
 **Done when:** every category has a verdict (shared @ size · separate + the vetoing cap · single-plane only · absent), each shared size traces to the plane that demanded it, and the re-reconciliation triggers are named.
@@ -68,12 +68,14 @@ Take the two plane cost ladders **as they are** — no re-estimation, no new met
 
 ## 5. Write the report and run the faith check
 
-Fill [`FULL-STACK-TEMPLATE.md`](FULL-STACK-TEMPLATE.md) and save it (default `./full-stack-infrastructure-design.md` unless the user names a path). It **references** the two plane reports rather than restating them — the bridge report carries only the seam. Stamp it **"reconciliation reflects the state of mid-2026; plane designs dated by their own reports."** Then run the **faith check** — fix any failure before delivering:
+Fill [`FULL-STACK-TEMPLATE.md`](FULL-STACK-TEMPLATE.md) and save it (default `./full-stack-infrastructure-design.md` unless the user names a path). It **references** the two plane reports rather than restating them — the bridge report carries only the seam. Write to the template's **style contract**: one fact per bullet, two lines max; rationale as a single *"why:"* clause; enumerable facts in tables with short cells; the reconciled seam drawn as a mermaid diagram — a decision record, not prose. Stamp it **"reconciliation reflects the state of mid-2026; plane designs dated by their own reports."** Then run the **faith check** — fix any failure before delivering:
 
 - **Both planes designed whole by their own skills** — no plane doctrine restated, overridden, or improvised here; the plane reports stand alone.
 - **Reconciliation never out-escalated the evidence** — every shared component's size traces to a demand one plane justified on its own; sharing changed deployment *count*, not *weight*.
 - **Vetoes are stated, not silent** — every separate-not-shared verdict names the binding cap that fired; every share names its size and the plane that set it.
 - **Shared components are billed once** — the merged total dedups them, the saving is explicit, and no line appears in both plane ladders and the merged view.
+- **Recovery & stage reconciled** — every shared component carries the stricter plane's stated RPO/RTO and names the stage the tenant touches; a non-prod instance counts as its own deployment.
 - **Re-reconciliation triggers named** — the seam stays evidence-gated after delivery: a plane's climb re-opens the affected category, in either direction.
+- **Style contract kept** — no bullet or table cell exceeds two lines; the seam is drawn.
 
 **Done when:** the document exists at the path, points to both dated plane reports, carries the reconciliation table and merged cost view, and passes every check above.

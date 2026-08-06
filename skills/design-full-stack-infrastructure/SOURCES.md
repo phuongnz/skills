@@ -6,7 +6,7 @@ This skill is a **bridge**: it composes two sibling plane skills and adds only t
 
 ## Provenance pins — the two plane skills
 
-Validated: **2026-07-15** (both siblings read in full at that date; same repository, so the pin is the path + date rather than a cross-repo commit hash — drift shows up in this repo's own history).
+Validated: **2026-08-06** (first validated 2026-07-15, both siblings read in full; re-validated 2026-08-06 after the siblings gained the recovery/environment axes, the registry-disposition contract, and the style contract — all additive, no bridge claim invalidated. Same repository, so the pin is the path + date rather than a cross-repo commit hash — drift shows up in this repo's own history).
 
 | Source skill | Plane | What this bridge takes from it |
 |---|---|---|
@@ -20,7 +20,7 @@ Both siblings live in this repository (not vendored — single source of truth s
 git log --oneline -- skills/design-agentic-infrastructure skills/design-product-infrastructure
 ```
 
-If commits after 2026-07-15 touch either sibling's SKILL.md, MATRIX.md, or (product) AGENT-READY.md, re-read those files, fix this bridge if needed, and bump the validated date above.
+If commits after 2026-08-06 touch either sibling's SKILL.md, MATRIX.md, or (product) AGENT-READY.md, re-read those files, fix this bridge if needed, and bump the validated date above.
 
 **Also inherited through the siblings, not re-sourced here:** Evidence-Gated Escalation, the a-priori/a-posteriori evidence timings, band-not-point, and most-restrictive-cap-wins — coined in the upstream `agentic-coding` bridge (see its `SOURCES.md` § "Coined here") and carried by both siblings. This bridge applies them across planes; it does not re-coin them.
 
