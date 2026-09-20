@@ -1,0 +1,20 @@
+#!/bin/zsh -l
+# What the browser drawer runs.
+#
+# First, scrub the launching agent's session markers. If bin/study was started
+# from inside a Claude Code session, everything it spawns inherits
+# CLAUDE_CODE_CHILD_SESSION, and the tutor then runs as somebody else's
+# sub-session with transcript saving off — which also leaves `--continue` with
+# nothing to resume after a page reload. Started from your own terminal none of
+# these are set and this is a no-op.
+for _var in ${(k)parameters[(I)CLAUDE_CODE_*]} ${(k)parameters[(I)CMUX_*]}; do
+  unset "$_var"
+done
+unset CLAUDECODE CLAUDE_PID CLAUDE_EFFORT _var
+
+# A login shell, so PATH matches your terminal rather than the launcher's.
+# `--continue` picks the tutor conversation back up after a page reload; if there
+# is nothing to continue, start fresh. Quit Claude and you keep a normal shell in
+# the workspace, for whatever hands-on practice the topic calls for.
+claude --continue || claude
+exec zsh -l

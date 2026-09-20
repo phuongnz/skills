@@ -41,6 +41,7 @@ When a lesson introduces something worth keeping (usually whatever the [mini cha
 
 - `box: 1`, `due:` = today **+ 1 day**, `added:` = today.
 - Keep `prompt`/`recall` atomic — one idea, answerable in a breath. Split anything bigger into several items.
+- Write `prompt`/`recall` as **plain text**, not HTML. The console escapes them, so a prompt may safely contain quotes, `<placeholders>` or code — and any markup would show up literally.
 
 ## Reviewing (the session ritual)
 

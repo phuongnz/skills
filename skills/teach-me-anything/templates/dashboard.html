@@ -1,7 +1,9 @@
 <!doctype html>
 <!-- teach-me-anything console. Copy to index.html. The sidebar, progress meter, and
      default page are driven by the MENU object below; the Due panel is driven by the
-     retention queue in reviews.js. Edit only MENU here; edit reviews.js for the queue. -->
+     retention queue in reviews.js. Edit only MENU here; edit reviews.js for the queue.
+     The tutor-terminal drawer at the bottom talks to bin/study (copied from
+     templates/bin/); opened straight off disk, the console still works without it. -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -9,7 +11,7 @@
   <title>Learning Workspace</title>
   <link rel="stylesheet" href="assets/style.css">
 </head>
-<body>
+<body class="has-drawer">
   <div class="console">
     <nav class="side">
       <h1 id="topic"></h1>
@@ -20,7 +22,21 @@
       <div id="menu"></div>
     </nav>
     <main class="stage"><iframe id="stage" title="lesson"></iframe></main>
+
+    <!-- Tutor terminal, same-origin via bin/study-server.py. Collapsed to a bar
+         when not in use; shows a hint instead of a shell if the console was opened
+         straight off disk rather than served. -->
+    <section id="drawer" class="collapsed" aria-label="Tutor terminal">
+      <div id="drawer-bar" title="Click to open · drag to resize">
+        <span id="drawer-dot"></span>
+        <strong>Tutor terminal</strong>
+        <span id="drawer-hint">⌃⌘T</span>
+        <button id="drawer-toggle" type="button">Open</button>
+      </div>
+      <div id="term-host"><div id="term-offline" hidden></div></div>
+    </section>
   </div>
+
 
   <!-- In-browser self-test overlay (ungraded practice; the graded review is run with the tutor) -->
   <div class="sr-overlay" id="sr" hidden>
@@ -105,13 +121,29 @@
       const queue = Array.isArray(window.REVIEW) ? window.REVIEW : [];
       const due = queue.filter(item => item.due && item.due <= today);
 
+      /* Prompts are authored text, not markup — escape before it reaches innerHTML.
+         Several carry quotes and angle brackets (policy snippets, <run-id>). */
+      const esc = t => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+                                .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
       if (due.length) {
+        let peekOpen = true;
+        try { peekOpen = localStorage.getItem("duePeek") !== "closed"; } catch (e) {}
+        const n = due.length + (due.length === 1 ? " question" : " questions");
         $("due").innerHTML =
           '<div class="due">' +
           '<div class="group">Due for review <span class="badge">' + due.length + "</span></div>" +
           '<button class="due-start" id="due-start">Start self-test</button>' +
-          "<ul>" + due.map(d => "<li>" + d.prompt + "</li>").join("") + "</ul></div>";
+          '<details class="due-peek" id="due-peek"' + (peekOpen ? " open" : "") + ">" +
+          '<summary><span class="when-closed">Show ' + n + "</span>" +
+          '<span class="when-open">Hide ' + n + "</span></summary>" +
+          "<ul>" + due.map(d =>
+            '<li title="' + esc(d.prompt) + '">' + esc(d.prompt) + "</li>").join("") +
+          "</ul></details></div>";
         $("due-start").addEventListener("click", () => runSelfTest(due));
+        $("due-peek").addEventListener("toggle", function () {
+          try { localStorage.setItem("duePeek", this.open ? "open" : "closed"); } catch (e) {}
+        });
       } else if (queue.length) {
         $("due").innerHTML = '<div class="due"><div class="group">Review</div>' +
           '<p class="due-clear">Nothing due today ✓</p></div>';
@@ -140,6 +172,100 @@
       go(MENU.current);
       setActive(MENU.current);
       function go(href) { stage.src = href; }
+    })();
+  </script>
+  <script>
+    /* ── Tutor terminal drawer ──────────────────────────────────────────
+       The terminal is only fetched when the drawer is first opened, so the
+       console still works when nothing is serving it. */
+    (function () {
+      var drawer = document.getElementById("drawer");
+      var host = document.getElementById("term-host");
+      var bar = document.getElementById("drawer-bar");
+      var toggle = document.getElementById("drawer-toggle");
+      var offline = document.getElementById("term-offline");
+      var served = location.protocol === "http:" || location.protocol === "https:";
+      var loaded = false;
+
+      function put(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+      function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+      var savedH = parseInt(get("drawerHeight") || "", 10);
+      if (savedH > 120) drawer.style.setProperty("--drawer-h", savedH + "px");
+
+      function ensureTerminal() {
+        if (loaded) return;
+        loaded = true;
+        if (!served) {
+          offline.hidden = false;
+          offline.innerHTML = "The tutor terminal needs the workspace served locally.<br>" +
+            "Run <code>bin/study</code>, then open <code>http://127.0.0.1:8800</code>.";
+          return;
+        }
+        var f = document.createElement("iframe");
+        f.title = "tutor terminal";
+        f.src = "/terminal/";
+        host.appendChild(f);
+      }
+
+      function setOpen(open) {
+        drawer.classList.toggle("collapsed", !open);
+        toggle.textContent = open ? "Hide" : "Open";
+        put("drawerOpen", open ? "1" : "0");
+        if (open) {
+          ensureTerminal();
+          var f = host.querySelector("iframe");
+          if (f) setTimeout(function () { try { f.contentWindow.focus(); } catch (e) {} }, 60);
+        }
+      }
+      function isOpen() { return !drawer.classList.contains("collapsed"); }
+
+      toggle.addEventListener("click", function (e) { e.stopPropagation(); setOpen(!isOpen()); });
+
+      /* Drag the bar to resize. A press that never moved counts as a click. */
+      var dragging = false, startY = 0, startH = 0, moved = false;
+      bar.addEventListener("mousedown", function (e) {
+        if (e.target === toggle) return;
+        dragging = true; moved = false; startY = e.clientY;
+        startH = drawer.getBoundingClientRect().height;
+        e.preventDefault();
+      });
+      window.addEventListener("mousemove", function (e) {
+        if (!dragging) return;
+        var dy = startY - e.clientY;
+        if (!moved && Math.abs(dy) > 3) { moved = true; if (!isOpen()) setOpen(true); }
+        if (!moved) return;
+        var h = Math.min(Math.max(startH + dy, 140), window.innerHeight - 140);
+        drawer.style.setProperty("--drawer-h", h + "px");
+      });
+      window.addEventListener("mouseup", function () {
+        if (!dragging) return;
+        dragging = false;
+        if (!moved) setOpen(!isOpen());
+        else put("drawerHeight", Math.round(drawer.getBoundingClientRect().height));
+      });
+
+      function hotkey(e) {
+        if (e.ctrlKey && e.metaKey && (e.key === "t" || e.key === "T")) {
+          e.preventDefault();
+          setOpen(!isOpen());
+        }
+      }
+      document.addEventListener("keydown", hotkey);
+      /* Keys typed inside the terminal never reach this document; same origin
+         lets us listen in there too, so the shortcut works either side. */
+      host.addEventListener("load", function (e) {
+        try {
+          var doc = e.target.contentDocument;
+          /* The dot reports what actually loaded: a terminal, or the server's
+             "not running" page. Green should never mean "an iframe exists". */
+          drawer.classList.toggle("live", !/not running/i.test(doc.title || ""));
+          doc.addEventListener("keydown", hotkey);
+        } catch (err) {}
+      }, true);
+
+      var saved = get("drawerOpen");
+      setOpen(saved === null ? true : saved === "1");
     })();
   </script>
 </body>

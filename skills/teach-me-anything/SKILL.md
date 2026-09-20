@@ -24,13 +24,14 @@ The principles, in brief (full treatment in [principles.md](./principles.md)):
 
 ## The Learning Workspace
 
-Treat the current directory as a **learning workspace**. Everything the learner touches is reached through one page — `index.html`, the **console** — with a growing menu down the side, a progress meter, a panel of what is due for review, and the current lesson in the middle. The learner opens the console and works from there; they never open a raw file.
+Treat the current directory as a **learning workspace**. Everything the learner touches is reached through one page — `index.html`, the **console** — with a growing menu down the side, a progress meter, a panel of what is due for review, the current lesson in the middle, and you — the tutor — in a terminal drawer along the bottom. The learner opens the console and works from there; they never open a raw file.
 
 The workspace has two layers, deliberately kept apart.
 
 **Front of house — what the learner opens (HTML).**
 
-- `index.html` — the **console**. The one page they open: a side menu (lessons, cards, foundations), a progress meter, a **Due-for-review** panel, and the active lesson in the content area. Driven by the `MENU` object in the file and the retention queue in `reviews.js` — see [The Console](#the-console).
+- `index.html` — the **console**. The one page they open: a side menu (lessons, cards, foundations), a progress meter, a **Due-for-review** panel, the active lesson in the content area, and the **tutor terminal** in a drawer beneath it. Driven by the `MENU` object in the file and the retention queue in `reviews.js` — see [The Console](#the-console).
+- `bin/` — `study`, the one command that starts a session: it serves the workspace locally and puts the tutor terminal on the same page. Copied from this skill's `templates/bin/` at setup — see [The Tutor Terminal](#the-tutor-terminal).
 - `assets/` — a shared `style.css` (one stylesheet for every page) and `md.js` (a tiny offline Markdown renderer). Copied from this skill's `assets/` once at setup; leave them untouched per workspace.
 - `goal.html` — the **Goal**: why this learner is here. Grounds everything. Built from [templates/doc.html](./templates/doc.html); its content is Markdown following [formats/goal.md](./formats/goal.md).
 - `glossary.html` — the workspace's shared vocabulary. Built from [templates/doc.html](./templates/doc.html); follows [formats/glossary.md](./formats/glossary.md).
@@ -78,6 +79,8 @@ After you create or finish anything, update the data:
 
 Adding an entry is one line. The workspace grows as learning does, and the learner always lands on what they should do next.
 
+The **Due** panel is built to stay the same size however long the queue gets: the due prompts sit in a collapsible peek — open by default, because seeing what is due is the point — capped in height and scrolling inside itself, each prompt clamped to two lines with the full text on hover. The learner can fold it away, and the console remembers. So the menu below never gets pushed off the screen, whether 6 items are due or 60. Prompts are shown as **plain text** (the console escapes them), so write them as text, never HTML.
+
 ## The Retention Engine
 
 *Durable beats fluent* is only a slogan unless something forces the return visits. The **retention engine** is that something: a queue of everything worth keeping, each item resurfaced on a widening schedule so it is re-practised just as it is about to slip away. This is the workspace's spine, and the clearest reason it is more than a pile of lessons.
@@ -93,7 +96,19 @@ The queue lives in `reviews.js` — back of house, but the console reads it to s
 3. **Grade each** (`forgot` / `hard` / `good` / `easy`) and move its box up or down per the rules in [formats/reviews.md](./formats/reviews.md), setting the next due date.
 4. **Rewrite `reviews.js`** with the new boxes and dates. Log a checkpoint only for surprises — a stubborn item that keeps lapsing, or one clearly mastered and worth retiring.
 
+The console's **Start self-test** button is *not* this ritual. It is an ungraded flip-through the learner can run alone, and nothing it shows reaches you. If the learner says they "did the review" there, you have no answers to grade — run the due items with them in the terminal anyway, or, if they decline, reschedule as `good` and say plainly that you assumed it.
+
 Only then move on to teaching at the [learning edge](./principles.md#the-learning-edge). Lessons feed the queue; the queue decides much of what each session opens with; the console keeps it in sight. Skip the ritual and you are back to teaching fluency that quietly evaporates.
+
+## The Tutor Terminal
+
+The console carries a drawer along the bottom holding a real terminal with you in it, so the learner reads the lesson and asks the follow-up on the same page — no switching windows, and the graded review happens right under the Due panel. The drawer collapses to a bar, drags to resize, toggles with `⌃⌘T`, and remembers its state. It is wired into the template; you never build it.
+
+**How it runs.** The learner runs `bin/study` from the workspace, in their own terminal. It serves the workspace at `http://127.0.0.1:8800` (`STUDY_PORT` to change), opens it, and starts the terminal; Ctrl-C shuts everything down and leaves nothing listening. The drawer runs `claude --continue`, so a page reload — or a whole new day — picks the tutoring conversation back up instead of starting over. If they quit Claude they keep an ordinary shell in the workspace, which is where any hands-on practice the topic calls for can happen. It needs `ttyd` and the `claude` CLI, and is written for macOS (zsh, `open`).
+
+- **Never launch `bin/study` yourself.** It is a long-running foreground process that belongs to the learner's terminal — and because the drawer runs `claude --continue`, starting it from inside your own session would attach a second tutor to the very conversation you are in. Tell the learner to run it.
+- **It is optional, and the console says so.** Opened straight off disk (`file://`), everything still works for reading; the drawer shows a one-line hint on how to start the session instead of a shell. A learner without `ttyd` loses nothing but the drawer.
+- **Do not weaken how it is exposed.** A terminal in a browser is a shell on the learner's machine. `ttyd` listens on a **UNIX socket**, never a TCP port; `study-server.py` is the only thing that can reach that socket, and it **refuses any `/terminal` request carrying another site's Origin** — which is what stops an unrelated browser tab from opening a shell. Everything binds to `127.0.0.1` and lives only as long as the session: no daemon, no launchd job. If you ever edit the scripts, these properties stay.
 
 ## Lessons
 

@@ -167,6 +167,26 @@ figure.diagram figcaption { font-size: .82rem; color: var(--ink-soft); text-alig
 .due li { font-size: .85rem; color: var(--ink-soft); padding: .18rem 0; border-bottom: 1px dashed var(--line); }
 .due-clear { font-size: .85rem; color: var(--ink-soft); margin: .2rem 0; }
 
+/* The Due panel grows with the queue, so the prompts are a capped, collapsible
+   peek rather than an ever-lengthening menu. Open by default — seeing what is due
+   is the point — but never taller than 20rem, whether that holds 6 items or 60. */
+.due-peek summary { list-style: none; cursor: pointer; display: flex; align-items: center;
+                    gap: .35rem; font-size: .78rem; color: var(--ink-soft); padding: .15rem 0; }
+.due-peek summary::-webkit-details-marker { display: none; }
+/* Drawn with borders, not a glyph — U+25B8 is missing from some of the fonts in
+   the stack, and the fallback is silently a dot. */
+.due-peek summary::before { content: ""; display: inline-block; width: 0; height: 0;
+                            border: .3em solid transparent; border-left-color: currentColor;
+                            transition: transform .12s ease; }
+.due-peek[open] summary::before { transform: rotate(90deg); }
+.due-peek summary:hover { color: var(--ink); }
+.due-peek .when-open { display: none; }
+.due-peek[open] .when-open { display: inline; }
+.due-peek[open] .when-closed { display: none; }
+.due-peek ul { max-height: 20rem; overflow-y: auto; margin-top: .2rem; padding-right: .3rem; }
+.due-peek li { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+               overflow: hidden; }
+
 /* Mini-challenge block in lessons */
 .challenge { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: var(--radius); padding: 1.25rem 1.4rem; margin: 1.5rem 0; }
 .challenge textarea { width: 100%; font: inherit; color: inherit; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: .6rem .7rem; resize: vertical; }
@@ -187,11 +207,55 @@ figure.diagram figcaption { font-size: .82rem; color: var(--ink-soft); text-alig
 .sr-actions button:hover { border-color: var(--accent); }
 .sr-actions button.ghost { background: transparent; margin-left: auto; }
 .sr-note { font-size: .78rem; color: var(--ink-soft); margin: 1rem 0 0; }
+/* ── Tutor-terminal drawer (console) ────────────────────────────────────
+   Scoped to body.has-drawer, because lessons and cards share this file and must
+   keep scrolling normally. The console becomes a fixed, full-height frame: the
+   sidebar keeps a column of its own, and the lesson and the terminal stack inside
+   the right-hand one, so the drawer lines up with the lesson instead of running
+   underneath the menu. */
+body.has-drawer { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+.has-drawer .console { flex: 1 1 auto; min-height: 0;
+                       grid-template-rows: minmax(0, 1fr) auto; }
+.has-drawer .side { grid-row: 1 / 3; overflow-y: auto; }
+.has-drawer .stage { grid-column: 2; grid-row: 1; min-width: 0; min-height: 0; overflow: hidden; }
+.has-drawer .stage iframe { height: 100%; }
+
+#drawer { grid-column: 2; grid-row: 2; display: flex; flex-direction: column;
+          min-width: 0; height: var(--drawer-h, 22rem); background: var(--panel);
+          border-top: 1px solid var(--line); }
+#drawer.collapsed { height: auto; }
+#drawer.collapsed #term-host { display: none; }
+#drawer-bar { display: flex; align-items: center; gap: .55rem;
+              padding: .4rem .9rem; font-size: .78rem; color: var(--ink-soft);
+              cursor: ns-resize; user-select: none;
+              border-bottom: 1px solid var(--line); }
+#drawer.collapsed #drawer-bar { cursor: pointer; border-bottom: 0; }
+#drawer-bar strong { color: var(--ink); font-size: .8rem; font-weight: 600; }
+#drawer-dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--line); }
+#drawer.live #drawer-dot { background: var(--ok); }
+#drawer-hint { margin-left: auto; opacity: .75; }
+#drawer-toggle { font: inherit; border: 1px solid var(--line); background: var(--paper);
+                 color: var(--ink); border-radius: 6px; padding: .1rem .55rem; cursor: pointer; }
+/* The terminal is dark in both colour schemes, to match ttyd's theme in bin/study. */
+#term-host { flex: 1 1 auto; min-height: 0; background: #1c1a17; }
+#term-host iframe { width: 100%; height: 100%; border: 0; display: block; }
+#term-offline { color: #c9c2b6; padding: 1.25rem 1.4rem; font-size: .85rem; line-height: 1.7; }
+#term-offline code { background: #2a251f; color: #e8e2d8; padding: .1em .4em; border-radius: 4px; }
+
+@media (max-width: 720px) {
+  /* One column: let the page scroll again rather than clip what doesn't fit. */
+  body.has-drawer { height: auto; display: block; overflow: visible; }
+  .has-drawer .side { grid-row: auto; overflow-y: visible; }
+  .has-drawer .stage { grid-column: 1; grid-row: auto; }
+  .has-drawer .stage iframe { height: 70vh; }
+  #drawer { grid-column: 1; grid-row: auto; height: var(--drawer-h, 15rem); }
+}
+
 
 /* Print — cards and lessons should come out clean on paper */
 @media print {
   body { background: #fff; color: #000; font-size: 12pt; }
-  .side, .lesson-footer .reminder, .sr-overlay { display: none; }
+  .side, .lesson-footer .reminder, .sr-overlay, #drawer { display: none; }
   a { color: #000; text-decoration: underline; }
   pre, .card, .quiz, .flow .node { border-color: #999; }
 }

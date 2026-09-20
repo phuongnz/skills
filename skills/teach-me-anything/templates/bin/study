@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+# Start a study session: the workspace and the tutor terminal on one page.
+#
+#   bin/study            → http://127.0.0.1:8800
+#   STUDY_PORT=9000 bin/study
+#
+# Ctrl-C shuts both halves down. Nothing is left listening afterwards.
+# Written for bash 3.2, which is what macOS ships — notably no `wait -n`.
+set -uo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PORT="${STUDY_PORT:-8800}"
+# One run directory per workspace, so two workspaces can be studied side by side.
+# Keyed by a checksum of the path rather than its name: a UNIX socket path is capped
+# at ~104 bytes, and macOS's TMPDIR has already spent half of that.
+RUNDIR="${TMPDIR:-/tmp}/teach-me-$(id -u)-$(printf %s "$HERE" | cksum | cut -d' ' -f1)"
+SOCK="$RUNDIR/tutor.sock"
+MAX_RESTARTS=5
+
+command -v ttyd >/dev/null 2>&1 || {
+  echo "ttyd is not installed.  brew install ttyd  (or your package manager)" >&2; exit 1; }
+
+if lsof -nP -iTCP:"$PORT" -sTCP:LISTEN >/dev/null 2>&1; then
+  echo "port $PORT is already in use — set STUDY_PORT to something else" >&2; exit 1
+fi
+
+mkdir -p "$RUNDIR"; chmod 700 "$RUNDIR"
+
+TTYD_PID=""; SRV_PID=""
+cleanup() {
+  [ -n "$TTYD_PID" ] && kill "$TTYD_PID" 2>/dev/null
+  [ -n "$SRV_PID" ]  && kill "$SRV_PID"  2>/dev/null
+  rm -f "$SOCK"
+  echo "study session closed."
+}
+trap cleanup EXIT INT TERM
+
+# The terminal listens on a UNIX socket, never a TCP port: nothing on the
+# network can see it, and nothing in the browser can reach it except through
+# study-server.py, which refuses requests carrying another site's Origin.
+start_ttyd() {
+  rm -f "$SOCK"
+  ttyd --interface "$SOCK" --base-path /terminal --writable \
+       --cwd "$HERE" \
+       --terminal-type xterm-256color \
+       --client-option fontSize=13 \
+       --client-option 'fontFamily=SF Mono, Menlo, monospace' \
+       --client-option 'theme={"background":"#1c1a17","foreground":"#e8e2d8","cursor":"#d9a441","selectionBackground":"#3a352e"}' \
+       --client-option disableLeaveAlert=true \
+       "$HERE/bin/tutor-shell" >/dev/null 2>&1 &
+  TTYD_PID=$!
+  local i
+  for i in $(seq 1 50); do [ -S "$SOCK" ] && break; sleep 0.1; done
+  [ -S "$SOCK" ] || return 1
+  chmod 600 "$SOCK"
+}
+
+start_ttyd || { echo "ttyd did not start" >&2; exit 1; }
+
+python3 "$HERE/bin/study-server.py" --root "$HERE" --port "$PORT" --socket "$SOCK" &
+SRV_PID=$!
+
+for i in $(seq 1 50); do
+  curl -sf -o /dev/null "http://127.0.0.1:$PORT/index.html" && break; sleep 0.1
+done
+
+echo "workspace   http://127.0.0.1:$PORT"
+echo "terminal    drawer at the bottom of the page  (⌃⌘T to toggle)"
+echo "stop        Ctrl-C"
+open "http://127.0.0.1:$PORT" 2>/dev/null || xdg-open "http://127.0.0.1:$PORT" 2>/dev/null || true
+
+# Supervise both halves. bash 3.2 has no `wait -n`, so waiting on one process
+# would let the other die unnoticed — which is precisely how a dead ttyd once
+# left the drawer serving errors while everything looked fine from here.
+restarts=0
+while :; do
+  if ! kill -0 "$TTYD_PID" 2>/dev/null; then
+    if [ "$restarts" -ge "$MAX_RESTARTS" ]; then
+      echo "tutor terminal keeps stopping — giving up after $restarts restarts" >&2
+      break
+    fi
+    restarts=$((restarts + 1))
+    echo "tutor terminal stopped; restarting ($restarts/$MAX_RESTARTS)" >&2
+    start_ttyd || { echo "restart failed" >&2; break; }
+  fi
+  if ! kill -0 "$SRV_PID" 2>/dev/null; then
+    echo "workspace server stopped" >&2
+    break
+  fi
+  sleep 1
+done
