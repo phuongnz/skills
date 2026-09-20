@@ -88,6 +88,48 @@ blockquote {
 }
 hr { border: 0; border-top: 1px solid var(--line); margin: 2.5rem 0; }
 
+/* Tables — reference cards lean on these, so keep them dense, scannable and printable.
+   md.js wraps every rendered table in .table-wrap so a wide one scrolls instead of
+   overflowing the measure. Hand-authored <table> in a lesson gets the same styling. */
+.table-wrap { overflow-x: auto; margin: 1.5rem 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: .92rem;
+}
+.table-wrap table { margin: 0; }
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: .5rem .7rem;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  font-family: var(--font);
+  font-size: .76rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--ink-soft);
+  white-space: nowrap;
+}
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--accent-soft); }
+td code, th code { white-space: nowrap; }
+td:first-child { white-space: nowrap; }
+
+@media (max-width: 720px) {
+  table { font-size: .84rem; }
+  th, td { padding: .45rem .5rem; }
+  td:first-child { white-space: normal; }
+}
+@media print {
+  tbody tr:hover { background: none; }
+  .table-wrap { overflow-x: visible; }
+}
+
 /* Cards / callouts */
 .card {
   background: var(--panel);
