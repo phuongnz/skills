@@ -127,34 +127,101 @@ class StudyHandler(http.server.SimpleHTTPRequestHandler):
             self.terminal_down()
             return
 
-        # Replay the request upstream verbatim, with Host rewritten. ttyd runs
-        # with `-b /terminal`, so the path is forwarded unchanged.
+        # Replay the request upstream with Host rewritten. ttyd runs with
+        # `-b /terminal`, so the path is forwarded unchanged.
+        upgrade = "upgrade" in (self.headers.get("Connection") or "").lower()
+        dropped = {"host", "keep-alive"} if upgrade else {"host", "keep-alive", "connection"}
         head = [f"{self.command} {self.path} HTTP/1.1"]
         for key, value in self.headers.items():
-            if key.lower() == "host":
+            if key.lower() in dropped:
                 continue
             head.append(f"{key}: {value}")
         head.append("Host: 127.0.0.1")
+        if not upgrade:
+            head.append("Connection: close")
         request = ("\r\n".join(head) + "\r\n\r\n").encode("latin-1")
 
+        # Either way this client connection is finished afterwards.
         self.close_connection = True
-        client = self.connection
         try:
             upstream.sendall(request)
             length = int(self.headers.get("Content-Length") or 0)
             if length:
                 upstream.sendall(self.rfile.read(length))
-
-            down = threading.Thread(
-                target=_pump_socket, args=(upstream, client), daemon=True
-            )
-            down.start()
-            _pump_reader(self.rfile, upstream)
-            down.join(timeout=5)
+            if upgrade:
+                self.tunnel(upstream)
+            else:
+                self.forward_one_response(upstream)
         except OSError:
             pass
         finally:
             upstream.close()
+
+    def tunnel(self, upstream):
+        """A WebSocket: after the 101 the connection is ttyd's for good, so bytes
+        are pumped both ways until either side hangs up."""
+        down = threading.Thread(
+            target=_pump_socket, args=(upstream, self.connection), daemon=True
+        )
+        down.start()
+        _pump_reader(self.rfile, upstream)
+        down.join(timeout=5)
+
+    def forward_one_response(self, upstream):
+        """A plain request: relay exactly ONE response, then hang up.
+
+        This must not be a raw two-way pipe. Browsers keep connections alive and
+        reuse them, so a pipe left open after `GET /terminal/` would carry the
+        browser's *next* request — a lesson, the stylesheet — straight to ttyd,
+        which knows nothing about it and answers with its own bare "404". That
+        was a real bug: refresh the console and the lesson came back as 404.
+        So the response is marked `Connection: close` and the socket is shut,
+        which makes the browser open a fresh connection that gets routed again.
+        """
+        upstream.settimeout(15)
+        buf = b""
+        while b"\r\n\r\n" not in buf:
+            chunk = upstream.recv(CHUNK)
+            if not chunk:
+                break
+            buf += chunk
+        head, sep, body = buf.partition(b"\r\n\r\n")
+        if not sep:
+            self.send_error(502, "the tutor terminal sent no response")
+            return
+
+        lines = head.split(b"\r\n")
+        length = None
+        kept = [lines[0]]
+        for line in lines[1:]:
+            name = line.split(b":", 1)[0].strip().lower()
+            if name in (b"connection", b"keep-alive"):
+                continue
+            if name == b"content-length":
+                try:
+                    length = int(line.split(b":", 1)[1])
+                except ValueError:
+                    pass
+            kept.append(line)
+        kept.append(b"Connection: close")
+        self.connection.sendall(b"\r\n".join(kept) + b"\r\n\r\n")
+
+        status = lines[0].split(b" ", 2)[1:2]
+        if self.command == "HEAD" or status in ([b"204"], [b"304"]):
+            return  # these carry a Content-Length but never a body
+
+        # With a Content-Length, stop there; without one, the body runs to EOF,
+        # which `Connection: close` upstream guarantees will come.
+        sent = 0
+        while True:
+            if body:
+                self.connection.sendall(body)
+                sent += len(body)
+            if length is not None and sent >= length:
+                break
+            body = upstream.recv(CHUNK)
+            if not body:
+                break
 
     def terminal_down(self):
         """Explain the outage in the drawer rather than showing a bare 502."""
