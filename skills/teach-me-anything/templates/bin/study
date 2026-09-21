@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Start a study session: the workspace and the tutor terminal on one page.
 #
-#   bin/study            → http://127.0.0.1:8800
+#   bin/study            → http://127.0.0.1:<this workspace's port>, printed on start
 #   STUDY_PORT=9000 bin/study
 #
 # Ctrl-C shuts both halves down. Nothing is left listening afterwards.
@@ -9,19 +9,70 @@
 set -uo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PORT="${STUDY_PORT:-8800}"
+CKSUM="$(printf %s "$HERE" | cksum | cut -d' ' -f1)"
 # One run directory per workspace, so two workspaces can be studied side by side.
 # Keyed by a checksum of the path rather than its name: a UNIX socket path is capped
 # at ~104 bytes, and macOS's TMPDIR has already spent half of that.
-RUNDIR="${TMPDIR:-/tmp}/teach-me-$(id -u)-$(printf %s "$HERE" | cksum | cut -d' ' -f1)"
+RUNDIR="${TMPDIR:-/tmp}/teach-me-$(id -u)-$CKSUM"
 SOCK="$RUNDIR/tutor.sock"
 MAX_RESTARTS=5
+# One port per workspace too, from the same checksum: every workspace sharing a
+# fixed default meant the second one could never start. Derived rather than "next
+# free", so a workspace keeps its address — the console's remembered state lives
+# in localStorage, which the browser keys by origin, port included.
+PORT_BASE=8800; PORT_SPAN=1000
 
 command -v ttyd >/dev/null 2>&1 || {
   echo "ttyd is not installed.  brew install ttyd  (or your package manager)" >&2; exit 1; }
 
-if lsof -nP -iTCP:"$PORT" -sTCP:LISTEN >/dev/null 2>&1; then
-  echo "port $PORT is already in use — set STUDY_PORT to something else" >&2; exit 1
+open_url() { open "$1" 2>/dev/null || xdg-open "$1" 2>/dev/null || true; }
+
+port_busy() { lsof -nP -iTCP:"$1" -sTCP:LISTEN >/dev/null 2>&1; }
+
+# The port this workspace is already being served on, if it is.
+serving_port() {
+  ps -axo command= | NEEDLE="study-server.py --root $HERE --port " awk '
+    { i = index($0, ENVIRON["NEEDLE"])
+      if (i) { split(substr($0, i + length(ENVIRON["NEEDLE"])), a, " "); print a[1]; exit } }'
+}
+
+# Who holds a port, in words: another workspace's session by its path, else the command.
+port_holder() {
+  local pid root
+  pid="$(lsof -nP -t -iTCP:"$1" -sTCP:LISTEN 2>/dev/null | head -1)"
+  [ -n "$pid" ] || { echo "another process"; return; }
+  root="$(ps -o command= -p "$pid" 2>/dev/null |
+          sed -n 's/.*study-server\.py --root \(.*\) --port [0-9].*/\1/p')"
+  if [ -n "$root" ]; then echo "the study session for $root"
+  else echo "$(ps -o comm= -p "$pid" 2>/dev/null | sed 's|.*/||') (pid $pid)"; fi
+}
+
+# Already running — perhaps in a terminal long since forgotten? Then the page is
+# what was wanted, not a second session fighting the first for the tutor.
+ALREADY="$(serving_port)"
+if [ -n "$ALREADY" ]; then
+  echo "this workspace is already being served — opening http://127.0.0.1:$ALREADY"
+  open_url "http://127.0.0.1:$ALREADY"; exit 0
+fi
+
+if [ -n "${STUDY_PORT:-}" ]; then
+  # Asked for by number: take it or say why not, never quietly move elsewhere.
+  PORT="$STUDY_PORT"
+  if port_busy "$PORT"; then
+    echo "port $PORT is held by $(port_holder "$PORT") — set STUDY_PORT to something else" >&2
+    exit 1
+  fi
+else
+  # Two paths can land on one port; walk upward from there, wrapping inside the span.
+  offset=$((CKSUM % PORT_SPAN)); PORT=""; tries=0
+  while [ "$tries" -lt "$PORT_SPAN" ]; do
+    candidate=$((PORT_BASE + (offset + tries) % PORT_SPAN))
+    if ! port_busy "$candidate"; then PORT="$candidate"; break; fi
+    echo "port $candidate is held by $(port_holder "$candidate") — trying the next" >&2
+    tries=$((tries + 1))
+  done
+  [ -n "$PORT" ] || {
+    echo "no free port in $PORT_BASE–$((PORT_BASE + PORT_SPAN - 1)) — set STUDY_PORT" >&2; exit 1; }
 fi
 
 mkdir -p "$RUNDIR"; chmod 700 "$RUNDIR"
@@ -67,7 +118,7 @@ done
 echo "workspace   http://127.0.0.1:$PORT"
 echo "terminal    drawer at the bottom of the page  (⌃⌘T to toggle)"
 echo "stop        Ctrl-C"
-open "http://127.0.0.1:$PORT" 2>/dev/null || xdg-open "http://127.0.0.1:$PORT" 2>/dev/null || true
+open_url "http://127.0.0.1:$PORT"
 
 # Supervise both halves. bash 3.2 has no `wait -n`, so waiting on one process
 # would let the other die unnoticed — which is precisely how a dead ttyd once
