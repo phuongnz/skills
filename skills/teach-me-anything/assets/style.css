@@ -245,6 +245,21 @@ figure.diagram figcaption { font-size: .82rem; color: var(--ink-soft); text-alig
 .challenge .model { margin-top: .8rem; padding-top: .8rem; border-top: 1px solid var(--line); }
 .challenge .seed-note { font-size: .78rem; color: var(--ink-soft); margin: .8rem 0 0; }
 
+/* Assessment pages (curriculum mode): quiz blocks that lock on the first pick, short answers marked by the learner, a result line to report */
+.lead { font-size: 1.05rem; color: var(--ink-soft); margin-bottom: 2rem; }
+.quiz textarea { width: 100%; font: inherit; color: inherit; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: .6rem .7rem; resize: vertical; }
+.quiz.short .reveal, .quiz .mark button { display: inline-flex; width: auto; margin: 0 .2rem 0 0; }
+.quiz .model { margin-top: .8rem; padding-top: .8rem; border-top: 1px solid var(--line); }
+.quiz .mark { margin-top: .6rem; color: var(--ink-soft); }
+.quiz .mark button.picked { border-color: var(--accent); background: var(--accent-soft); }
+.quiz button:disabled { cursor: default; }
+.quiz button:disabled:hover { border-color: var(--line); }
+.quiz button.right:disabled:hover { border-color: var(--ok); }
+.result-note { font-size: .85rem; color: var(--ink-soft); margin-top: 2rem; }
+.result { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--ok); border-radius: var(--radius); padding: 1.25rem 1.4rem; margin: 2rem 0; }
+.result .report { margin: .6rem 0 0; font-size: .9rem; color: var(--ink-soft); }
+.result code { user-select: all; }
+
 /* Review overlay (console) */
 .sr-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: grid; place-items: center; z-index: 50; padding: 1.5rem; }
 .sr-overlay[hidden] { display: none; }
