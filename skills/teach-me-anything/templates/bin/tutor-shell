@@ -27,9 +27,25 @@ if [ -z "$_agent" ]; then
     if command -v "$_c" >/dev/null 2>&1; then _agent="$_c"; break; fi
   done
 fi
+
+# Tell the tutor where it is, in a way it cannot miss. An environment variable is
+# invisible to a model unless it thinks to look, and "run bin/study status first"
+# is a step it can skip — so the fact goes into the system prompt (Claude Code) or
+# arrives as the first line of the conversation, in the page's [console] voice
+# (Codex). bin/study sets STUDY_URL only for the drawer, so run by hand this is empty.
+_where=""
+if [ -n "${STUDY_URL:-}" ]; then
+  _where="You are the tutor in the drawer of the learning console at $STUDY_URL: the learner is reading the console page in their browser and typing to you beneath it. bin/study is already running and serving it — never tell the learner to run bin/study, and never run it yourself. When you write or change a page, say where it sits in the console's menu; a 'new content' badge on the page brings it in."
+fi
+_sys=(); _first=()
+if [ -n "$_where" ]; then
+  _sys=(--append-system-prompt "$_where")
+  _first=("[console] Drawer opened. $_where")
+fi
+
 case "$_agent" in
-  claude) claude --continue || claude ;;
-  codex)  codex resume --last || codex ;;
+  claude) claude --continue "${_sys[@]}" || claude "${_sys[@]}" ;;
+  codex)  codex resume --last "${_first[@]}" || codex "${_first[@]}" ;;
   "")     echo "No tutor found. Install Claude Code (claude) or Codex (codex), or set STUDY_AGENT to the command to run." ;;
   *)      eval "$_agent" ;;
 esac
