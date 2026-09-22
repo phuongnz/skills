@@ -210,16 +210,12 @@ figure.diagram figcaption { font-size: .82rem; color: var(--ink-soft); text-alig
   position: absolute; top: .9rem; left: 1.1rem; z-index: 5;
   font: 700 .82rem/1 var(--font); letter-spacing: .02em;
   color: #fff; background: var(--alert); border: 0; border-radius: 999px;
-  padding: .6em 1.1em; cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0,0,0,.25), 0 0 0 0 var(--alert-bright);
-  animation: fresh-blink 1s ease-in-out infinite;
+  padding: .6em 1.1em; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,.25);
+  animation: fresh-blink 1.2s steps(1) infinite;
 }
 #fresh:hover { animation: none; background: var(--alert-bright); }
-/* Never dims: swings between the two signal shades and throws a ring, so it reads
-   as a pulse at the edge of vision rather than something fading out. */
-@keyframes fresh-blink {
-  50% { background: var(--alert-bright); box-shadow: 0 2px 10px rgba(0,0,0,.25), 0 0 0 6px transparent; }
-}
+/* A plain blink between the two signal shades — never dims, no ring. */
+@keyframes fresh-blink { 50% { background: var(--alert-bright); } }
 
 @media (max-width: 720px) {
   .console { grid-template-columns: 1fr; }
