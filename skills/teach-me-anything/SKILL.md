@@ -19,7 +19,7 @@ The principles, in brief (full treatment in [principles.md](./principles.md)):
 - **[Read the learner](./principles.md#read-the-learner)** — build on what they already hold; keep metaphors from everyday life, and rare.
 - **[The learning edge](./principles.md#the-learning-edge)** — pitch each lesson just past what they can already do alone.
 - **[Understanding first, difficulty last](./principles.md#understanding-first-difficulty-last)** — low friction while explaining; friction on purpose in practice.
-- **[Capability through effort](./principles.md#capability-through-effort)** — 3–4 diagnostic quick-checks and an open-ended mini challenge, inside a feedback loop.
+- **[Capability through effort](./principles.md#capability-through-effort)** — 3–4 diagnostic quick-checks and a mini challenge that is always the learner's own summary, inside a feedback loop.
 - **[Judgment out in the world](./principles.md#judgment-out-in-the-world)** — send them to a real community to test the skill for keeps.
 
 ## The Learning Workspace
@@ -63,7 +63,7 @@ Once a workspace exists, every session runs the same shape:
 1. **Clear what's due.** Run the [retention ritual](#the-retention-engine) first — old material retrieved before new material taught, always.
 2. **Find the edge.** Read the `checkpoints/` and the Goal, and pick the most relevant thing sitting just past what the learner can already do (the [learning edge](./principles.md#the-learning-edge)).
 3. **Teach one lesson** at that edge (see [Lessons](#lessons)), ending in practice that makes the learner *produce*.
-4. **Seed and update.** Add what they generated to `reviews.js`, mark progress, and update the console.
+4. **Propose and update.** Offer 1–3 review items from the lesson; add to `reviews.js` the ones the learner confirms, and any they add. Mark progress and update the console.
 
 ## The Console
 
@@ -75,11 +75,11 @@ After you create or finish anything, update the data:
 - **Lesson finished** → set that lesson's `done: true`. The meter and the ✓ marks read from this.
 - **New reference card** → push `{ href, title }` onto `MENU.cards`.
 - **Goal one-liner changed** → update `MENU.goalLine`.
-- **New idea/skill to retain, or a review just done** → add or rewrite entries in `reviews.js` (see [The Retention Engine](#the-retention-engine)). The **Due** panel reads straight from it.
+- **Review item confirmed, or a review just done** → add or rewrite entries in `reviews.js` (see [The Retention Engine](#the-retention-engine)). The **Due** panel reads straight from it.
 
 Adding an entry is one line. The workspace grows as learning does, and the learner always lands on what they should do next.
 
-The **Due** panel is built to stay the same size however long the queue gets: the due prompts sit in a collapsible peek — open by default, because seeing what is due is the point — capped in height and scrolling inside itself, each prompt clamped to two lines with the full text on hover. The learner can fold it away, and the console remembers. So the menu below never gets pushed off the screen, whether 6 items are due or 60. Prompts are shown as **plain text** (the console escapes them), so write them as text, never HTML.
+The **Due** panel shows at most **six** items a day — the shakiest first — however long the queue is; the rest wait unseen, because a wall of twenty prompts reads as a verdict, and six reads as today's work. The prompts sit in a collapsible peek — open by default, because seeing what is due is the point — with a **Review** button above them. The learner can fold it away, and the console remembers, so the menu below never gets pushed off the screen. Prompts are shown as **plain text** (the console escapes them), so write them as text, never HTML.
 
 ## The Retention Engine
 
@@ -87,16 +87,16 @@ The **Due** panel is built to stay the same size however long the queue gets: th
 
 The queue lives in `reviews.js` — back of house, but the console reads it to show a **Due** panel, so the moment the learner opens the workspace they see exactly what to revisit today. Each item is tiny and self-contained: a prompt, what to recall, which **box** (interval stage) it sits in, and the date it next comes due. The full schema and the scheduling rules are in [formats/reviews.md](./formats/reviews.md).
 
-**Where items come from.** You never write the queue as a separate chore — it falls out of teaching. Every lesson seeds it: each idea or micro-skill worth keeping becomes one item, born from the lesson's quick-checks or mini challenge (see [Lessons](#lessons)).
+**Where items come from.** You never write the queue as a separate chore — it falls out of teaching, but it is **proposed, not imposed**. At the end of every lesson you offer 1–3 candidates — the learner's own summary from the mini challenge, plus any idea a quick check caught them out on — and the learner confirms, edits, drops, or adds their own (see [Lessons](#lessons) and [formats/reviews.md](./formats/reviews.md#adding-items--propose-then-let-the-learner-decide)). A queue the learner agreed to is one they will clear; one that fills itself is one they stop opening. The one exception is a post-assessment miss, which is a proven gap and goes in without asking.
 
 **The session ritual — do this every session, before new material:**
 
-1. Load `reviews.js` and compute what is **due** against today's date.
-2. **Clear the due items first.** Old material retrieved before new material taught — always. Run each as a genuine retrieval attempt: pose the prompt, let the learner answer *from memory*, then reveal the recall.
-3. **Grade each** (`forgot` / `hard` / `good` / `easy`) and move its box up or down per the rules in [formats/reviews.md](./formats/reviews.md), setting the next due date.
+1. Load `reviews.js` and compute what is **due** against today's date. The console shows the learner at most six — the shakiest first. If far more than that has piled up, **triage** it out loud before anything else: merge, retire, and spread the rest over the coming weeks ([backlog triage](./formats/reviews.md#backlog-triage)). Never march them through twenty.
+2. **Clear the day's items first.** Old material retrieved before new material taught — always. Run each as a genuine retrieval attempt: pose the prompt, let the learner answer *from memory*, then reveal the recall.
+3. **Grade each** `weak` / `good` / `strong` and move its box per [formats/reviews.md](./formats/reviews.md#reviewing-the-session-ritual). A weak answer gets asked *when* it should come back — tomorrow, a few days, a week — never *whether*. A good or strong one moves on silently; a strong one from a high box retires, and you say so.
 4. **Rewrite `reviews.js`** with the new boxes and dates. Log a checkpoint only for surprises — a stubborn item that keeps lapsing, or one clearly mastered and worth retiring.
 
-The console's **Start self-test** button is *not* this ritual. It is an ungraded flip-through the learner can run alone, and nothing it shows reaches you. If the learner says they "did the review" there, you have no answers to grade — run the due items with them in the terminal anyway, or, if they decline, reschedule as `good` and say plainly that you assumed it.
+The console's **Review** button is *not* this ritual. It is an ungraded flip-through the learner can run alone, and nothing it shows reaches you. If the learner says they "did the review" there, ask how each one went and grade from that; if they would rather not go through them, reschedule as `good` and say plainly that you assumed it.
 
 Only then move on to teaching at the [learning edge](./principles.md#the-learning-edge). Lessons feed the queue; the queue decides much of what each session opens with; the console keeps it in sight. Skip the ritual and you are back to teaching fluency that quietly evaporates.
 
@@ -120,7 +120,7 @@ Keep a lesson **short and quickly finished**. Working memory is tiny, and you ha
 
 Show an honest time-to-finish near the title (the template has a slot for it). Estimate it from reading length plus the hands-on task, and treat it as a check on "keep it short": if a lesson reads as more than ~10 minutes, it is doing too much — split it.
 
-**How to teach inside a lesson** is the pedagogy in [principles.md](./principles.md): teach the [understanding first, with friction low](./principles.md#understanding-first-difficulty-last), then build [capability through effortful practice](./principles.md#capability-through-effort) — 3–4 diagnostic quick-checks and an open-ended mini challenge, inside a feedback loop. The template ships self-marking quiz blocks (each correct pick gets a green ✓) and a mini-challenge block with a reveal-and-compare model answer.
+**How to teach inside a lesson** is the pedagogy in [principles.md](./principles.md): teach the [understanding first, with friction low](./principles.md#understanding-first-difficulty-last), then build [capability through effortful practice](./principles.md#capability-through-effort) — 3–4 diagnostic quick-checks and the mini challenge, which is always the same task: *ask about anything unclear first, then summarise the lesson in your own words*. The template ships self-marking quiz blocks (each correct pick gets a green ✓) and the mini-challenge block with a reveal-and-compare model answer; keep its prompt as it is and write only the model answer.
 
 **Show a diagram whenever there's a process.** If a lesson touches a workflow, stages, phases, a sequence, or anything ordered, include a diagram — a visual lands faster than prose and keeps the page vivid; text alone is flat. The template has a diagram slot (a flow of boxes joined by arrows, styled to work offline); use inline `<svg>` for anything branching.
 
@@ -131,7 +131,7 @@ Every lesson should:
 - Link, via anchors, to related lessons and reference cards.
 - Point at one **primary source** — the best single thing you found to read or watch on this. Draw the understanding from trusted material tracked in `sources.html`, and keep lessons **thick with citations** — links backing every claim — because that is what makes a lesson trustworthy rather than a story.
 - Remind the learner they can ask you follow-ups. You are their tutor; you can unstick anything unclear. (The template has footer slots for the source and this reminder.)
-- **Seed the retention queue** — add an item to `reviews.js` for each idea or micro-skill the lesson introduces that is worth keeping. Each quick-check probes one such idea, and the mini challenge is what they had to put in their own words — those are exactly what should come back around.
+- **Propose review items** — when the lesson is done, offer 1–3 candidates for `reviews.js`: the summary they wrote for the mini challenge, plus only the ideas a quick check caught them out on. The learner confirms, edits, drops, or adds their own; you may argue once for one you think will fade, then yield. Add only what they agreed to ([formats/reviews.md](./formats/reviews.md#adding-items--propose-then-let-the-learner-decide)).
 
 ## Reference Cards
 
