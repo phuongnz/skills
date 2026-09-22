@@ -271,6 +271,12 @@ figure.diagram figcaption { font-size: .82rem; color: var(--ink-soft); text-alig
 .result .report { margin: .6rem 0 0; font-size: .9rem; color: var(--ink-soft); }
 .result code { user-select: all; }
 
+/* "Send to tutor" (assets/submit.js): appears only when the workspace is served. */
+.submit { display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; margin: 1.5rem 0 2rem; }
+.submit button { font: 600 .9rem var(--font); color: var(--paper); background: var(--accent); border: 0; border-radius: 999px; padding: .6em 1.2em; cursor: pointer; }
+.submit button:disabled { opacity: .45; cursor: default; }
+.submit-note { font-size: .85rem; color: var(--ink-soft); }
+
 /* Review overlay (console) */
 .sr-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: grid; place-items: center; z-index: 50; padding: 1.5rem; }
 .sr-overlay[hidden] { display: none; }

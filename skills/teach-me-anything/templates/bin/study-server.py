@@ -16,15 +16,19 @@ Everything binds to 127.0.0.1. Stdlib only.
 """
 
 import argparse
+import datetime
 import http.server
 import json
 import os
+import re
 import socket
 import sys
 import threading
 
 TERMINAL_PREFIX = "/terminal"
 CHANGES_PATH = "/changes"
+SUBMIT_PATH = "/submit"
+SUBMIT_MAX = 256 * 1024
 CHUNK = 65536
 
 # What the console renders, and so what counts as "new content" landing.
@@ -135,10 +139,95 @@ class StudyHandler(http.server.SimpleHTTPRequestHandler):
         return super().do_HEAD()
 
     def do_POST(self):
-        # ttyd asks for a token over POST; nothing else here accepts one.
+        # ttyd asks for a token over POST; the only other POST is a page's answers.
         if self._is_terminal():
             return self.relay()
+        if self.path.split("?", 1)[0] == SUBMIT_PATH:
+            return self.submit()
         self.send_error(405, "nothing here accepts POST")
+
+    # ---- submissions -----------------------------------------------------
+    def submit(self):
+        """A page's answers (assets/submit.js) → submissions/<date>-<kind>.md, and
+        the one-line note the console then types into the tutor's drawer. Same
+        Origin rule as the terminal: only this console may write here."""
+        origin = self.headers.get("Origin", "")
+        if origin and origin not in self.allowed_origins:
+            self.send_error(403, "wrong origin")
+            return
+        try:
+            length = int(self.headers.get("Content-Length", "0"))
+            if not 0 < length <= SUBMIT_MAX:
+                raise ValueError("size")
+            data = json.loads(self.rfile.read(length).decode("utf-8"))
+            items = data["items"]
+            if not isinstance(items, list):
+                raise ValueError("items")
+        except (ValueError, KeyError, TypeError):
+            self.send_error(400, "bad submission")
+            return
+
+        kind = re.sub(r"[^a-z0-9-]+", "-", str(data.get("kind", "page")).lower()).strip("-") or "page"
+        page = str(data.get("page", ""))
+        when = datetime.datetime.now()
+        outcome = lambda it: str(it.get("outcome", "open"))
+        right = sum(1 for it in items if outcome(it) == "right")
+        missed = [it for it in items if outcome(it) == "missed"]
+        open_ = sum(1 for it in items if outcome(it) == "open")
+        written = sum(1 for it in items if it.get("type") in ("short", "challenge") and it.get("answer"))
+        missed_topics = []
+        for it in missed:
+            t = str(it.get("topic") or ("Q" + str(it.get("n", "?"))))
+            if t not in missed_topics:
+                missed_topics.append(t)
+
+        lines = ["# %s — %s" % (kind, when.strftime("%Y-%m-%d %H:%M")), "",
+                 "page: %s" % page,
+                 "%d right · %d missed · %d unanswered · %d written" %
+                 (right, len(missed), open_, written), ""]
+        for it in items:
+            # Questions carry their own numbering ("1. …"); only number the unnumbered.
+            question = str(it.get("question", ""))
+            head = "## " + (question if re.match(r"\d", question) else "%s. %s" % (it.get("n", "?"), question))
+            if it.get("topic"):
+                head += "   [%s]" % it["topic"]
+            lines += [head + " — " + outcome(it)]
+            if it.get("type") == "choice":
+                picked = it.get("picked") or []
+                lines += ["picked: " + (" → ".join(map(str, picked)) if picked else "(nothing)"),
+                          "correct: " + str(it.get("correct", ""))]
+            else:
+                answer = str(it.get("answer", "")).strip()
+                lines += ["answer:"] + (["> " + l for l in answer.splitlines()] if answer else ["> (nothing written)"])
+                if it.get("model"):
+                    lines += ["model: " + str(it["model"])]
+            lines += [""]
+
+        sub_dir = os.path.join(self.directory, "submissions")
+        os.makedirs(sub_dir, exist_ok=True)
+        stem = when.strftime("%Y-%m-%d-%H%M") + "-" + kind
+        name, n = stem + ".md", 2
+        while os.path.exists(os.path.join(sub_dir, name)):
+            name, n = "%s-%d.md" % (stem, n), n + 1
+        with open(os.path.join(sub_dir, name), "w", encoding="utf-8") as f:
+            f.write("\n".join(lines))
+        rel = "submissions/" + name
+
+        summary = "%d right, %d missed" % (right, len(missed))
+        if missed_topics:
+            summary += " (" + ", ".join(missed_topics) + ")"
+        if open_:
+            summary += ", %d unanswered" % open_
+        if written:
+            summary += ", %d written answer%s to grade" % (written, "" if written == 1 else "s")
+        line = "[console] I submitted %s: %s. Full answers: %s" % (page or kind, summary, rel)
+
+        body = json.dumps({"path": rel, "line": line}).encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
 
     # ---- the terminal relay ----------------------------------------------
     def relay(self):

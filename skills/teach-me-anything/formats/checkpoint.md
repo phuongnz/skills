@@ -29,6 +29,6 @@ when. This drives future sessions.>
 
 - Write one whenever something non-obvious happens: a concept lands, a concept won't land, the learner reveals a preference or a strength, or the Goal moves.
 - Always write the **first** checkpoint after the opening diagnostic (type `background`): the learner's prior knowledge, level, and neighbouring strengths. Later sessions inherit it.
-- Write one after every **assessment** (type `assessment`, curriculum mode): the result line as reported, which topics it cleared or confirmed, which did not hold, and what you decided to do about each.
+- Write one after every **assessment** (type `assessment`, curriculum mode): the submission (or the result line, if reported by hand), which topics it cleared or confirmed, which did not hold, and what you decided to do about each.
 - Be honest about **durable vs quick** — don't record a fluent-in-the-moment answer as mastery. Note when something is due for spaced review.
 - Keep them short. A checkpoint is a signal for future-you, not a transcript.

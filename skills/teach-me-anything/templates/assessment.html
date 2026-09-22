@@ -5,7 +5,7 @@
      and short answers, one or two per topic, each block tagged data-topic with the topic's
      name from curriculum.html. It is NOT a simulation of any real exam: no exam formats, no
      timer; that practice is the learner's own preparation. The page scores itself — first
-     pick counts — and prints a result line the learner reports to you in the terminal;
+     pick counts — and ends in "Send to tutor", which lands the answers in submissions/;
      nothing else reaches you. Save as assessments/m1-pre.html or m1-post.html (a re-take of
      the missed topics only: m1-post-2.html), then set pre/post on the milestone in MENU. -->
 <html lang="en">
@@ -69,7 +69,7 @@
     <p class="result-note" id="result-note">Answer every question and the result appears here.</p>
     <div class="result" id="result" hidden>
       <p><strong>Result.</strong> <span id="result-line"></span></p>
-      <p class="report">Tell your tutor: <code id="report"></code></p>
+      <p class="report">If there is no <em>Send to tutor</em> button, tell your tutor: <code id="report"></code></p>
     </div>
   </div>
 
@@ -129,5 +129,7 @@
       document.getElementById("result").hidden = false;
     }
   </script>
+  <!-- "Send to tutor": hands the answers to the drawer when the workspace is served. -->
+  <script src="../assets/submit.js"></script>
 </body>
 </html>

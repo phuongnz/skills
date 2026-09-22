@@ -45,6 +45,7 @@ The workspace has two layers, deliberately kept apart.
 
 - `checkpoints/*.md` — **checkpoints**: short Markdown records of what the learner has actually taken on board, and any non-obvious insight worth revisiting. Roughly the learning equivalent of an engineering decision log. This is how you locate the learning edge next session. Named `0001-<dash-case-name>.md`, incrementing. Use [formats/checkpoint.md](./formats/checkpoint.md).
 - `reviews.js` — the **retention queue**: one entry per idea or micro-skill worth keeping, each carrying the date it next comes due. You maintain it; the console reads it to show what is due today. Schema and scheduling in [formats/reviews.md](./formats/reviews.md).
+- `submissions/*.md` — what the learner answered on a page, written by `bin/study-server.py` when they press **Send to tutor**: every quick check, short answer and mini-challenge summary, with the model answer beside it. See [Submissions](#submissions).
 - `NOTES.md` — the workspace's running notebook: the **course outline** at the top, then progress, decisions made, and how this learner likes to be taught. See [`NOTES.md`](#notesmd).
 - `curriculum/` — curriculum mode only, and only when the learner handed you the syllabus as a file: the file itself, kept as given.
 
@@ -84,6 +85,20 @@ Once a workspace exists, every session runs the same shape:
 2. **Find the edge.** Read the `checkpoints/` and the Goal, and pick the most relevant thing sitting just past what the learner can already do (the [learning edge](./principles.md#the-learning-edge)). In curriculum mode the edge sits inside the **active milestone**: the next `open` topic in `curriculum.html` that builds on what they hold. Glance at the pace in `NOTES.md`, and say so if they are behind.
 3. **Teach one lesson** at that edge (see [Lessons](#lessons)), ending in practice that makes the learner *produce*.
 4. **Propose and update.** Offer 1–3 review items from the lesson; add to `reviews.js` the ones the learner confirms, and any they add. Mark progress and update the console.
+
+### Submissions
+
+Every lesson and assessment page ends in a **Send to tutor** button (from `assets/submit.js`, shown only while the workspace is served). Pressing it writes the learner's answers to `submissions/<date>-<kind>.md` and types one line into your terminal:
+
+`[console] I submitted assessments/m1-pre.html: 14 right, 5 missed (1.3 components, 2.1 …), 2 written answers to grade. Full answers: submissions/2026-09-22-1432-m1-pre.md`
+
+That line is the page speaking, not the learner. **Read the file before you answer.** It has every block: what they picked and what was correct, and their written answers next to the model answer. Then:
+
+- **Grade the written answers yourself** — a mini-challenge summary or a short answer marked "unmarked". Say what held and what was missing, briefly, against the model answer. On an assessment the learner already marked short answers themselves; take their mark, and only comment where the text plainly contradicts it.
+- **On a lesson**, this is the feedback loop: wrong picks are misconceptions to name, and the summary is the first review item to offer (step 4).
+- **On an assessment**, this is the result: go on as [Milestones and assessments](#milestones-and-assessments) says, and write the checkpoint from the file rather than from a line the learner typed.
+
+If the drawer could not take the line (it was not open, or the console was opened off disk), the page shows the learner the file's name and tells them to mention it — so a learner saying "check submissions" means the same thing.
 
 ## The Console
 
@@ -174,7 +189,7 @@ The **glossary** (`glossary.html`) is the card that matters most: once it exists
 
 *Curriculum mode only.* A milestone is too big to read the learner on in conversation, so each one is gated by two short assessments: a **pre-assessment** before its first lesson, and a **post-assessment** after its last. Both are pages built from [templates/assessment.html](./templates/assessment.html), saved to `assessments/` as `m1-pre.html` / `m1-post.html`, and linked from the milestone's `pre` / `post` in `MENU` so they sit under it in the menu.
 
-**What an assessment is.** Plain multiple choice and short answers, one or two questions per topic in the milestone, each block tagged with the topic's name from `curriculum.html`. It is written in the teaching language like everything else. It is **not** a simulation of the real exam — no exam formats, no timer, no drag-and-drop. Its job is to challenge what the learner holds about the milestone; practising the exam's own format is the learner's preparation, not the workspace's, and say so if they ask. The page scores itself (first pick counts) and ends with a result line — `m1-post 7/10 missed: vlan trunking, stp` — that the learner reports to you in the terminal. Nothing else reaches you, so ask for that line.
+**What an assessment is.** Plain multiple choice and short answers, one or two questions per topic in the milestone, each block tagged with the topic's name from `curriculum.html`. It is written in the teaching language like everything else. It is **not** a simulation of the real exam — no exam formats, no timer, no drag-and-drop. Its job is to challenge what the learner holds about the milestone; practising the exam's own format is the learner's preparation, not the workspace's, and say so if they ask. The page scores itself (first pick counts) and ends with **Send to tutor**, which lands the whole thing in `submissions/` and announces it in your terminal ([Submissions](#submissions)). Opened off disk there is no button, only a result line — `m1-post 7/10 missed: vlan trunking, stp` — that the learner reports to you; ask for it if nothing arrives.
 
 **The pre-assessment is a filter.** The opening diagnostic reads the learner in broad strokes; this reads them topic by topic, which no conversation could. Write it from the milestone's topics, tell the learner where it is in the console — the page will show a **new content** badge; that brings it in — and take the result at face value: every topic it clears becomes `known` in `curriculum.html` — no lesson for it. If it clears the whole milestone, set the milestone `known` and move to the next one; otherwise set it `active` and teach the `open` topics. Frame it as it is: there is nothing here to pass or fail, only time saved.
 

@@ -343,6 +343,41 @@
 
       var saved = get("drawerOpen");
       setOpen(saved === null ? true : saved === "1");
+
+      /* ── Typing into the drawer ────────────────────────────────────────
+         A page's "Send to tutor" (assets/submit.js) calls this with a one-line
+         note. The terminal is same-origin, so we hand the text to xterm the way
+         a paste does, then press Enter. Resolves false when there is no live
+         terminal to take it, and the page tells the learner to speak up instead. */
+      window.tutorSend = function (line) {
+        if (!served) return Promise.resolve(false);
+        if (!isOpen()) setOpen(true);
+        return new Promise(function (resolve) {
+          var tries = 0;
+          (function attempt() {
+            var ta = null;
+            try {
+              var f = host.querySelector("iframe");
+              ta = f && drawer.classList.contains("live") &&
+                f.contentDocument.querySelector(".xterm-helper-textarea");
+            } catch (e) {}
+            if (!ta) {
+              if (++tries > 40) return resolve(false);   // ~4 s for a fresh drawer to load
+              return setTimeout(attempt, 100);
+            }
+            try {
+              var dt = new DataTransfer();
+              dt.setData("text/plain", line);
+              ta.dispatchEvent(new ClipboardEvent("paste", { clipboardData: dt, bubbles: true, cancelable: true }));
+              setTimeout(function () {
+                ta.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", code: "Enter", keyCode: 13, which: 13, bubbles: true }));
+                try { f.contentWindow.focus(); } catch (e) {}
+                resolve(true);
+              }, 200);
+            } catch (e) { resolve(false); }
+          })();
+        });
+      };
     })();
   </script>
   <script>
