@@ -2,8 +2,9 @@
 <!-- Assessment template (curriculum mode). One page per milestone gate: a PRE-assessment
      before its first lesson — a filter, so what the learner already holds is skipped — or a
      POST-assessment after its last — an honest reading of what held. Plain multiple choice
-     and short answers, one or two per topic, each block tagged data-topic with the topic's
-     name from curriculum.html. It is NOT a simulation of any real exam: no exam formats, no
+     and short answers, at least one per sub-item the syllabus line names (count them; a
+     topic with fewer questions than items can never be marked known), each block tagged
+     data-topic with the topic's name from curriculum.html. It is NOT a simulation of any real exam: no exam formats, no
      timer; that practice is the learner's own preparation. The page scores itself — first
      pick counts — and ends in "Send to tutor", which lands the answers in submissions/;
      nothing else reaches you. Save as assessments/m1-pre.html or m1-post.html (a re-take of
@@ -37,7 +38,9 @@
          First pick counts and the block locks — a reading, not a lesson. Distractors are
          still diagnostic: each names its misconception in data-why. Write all options to the
          same length and shape, and vary where the right one sits: a test-wise learner picks
-         the longest or the first, and then the reading is of nothing. ── -->
+         the longest or the first, and then the reading is of nothing. Then MEASURE it —
+         `bin/check-quiz assessments/<this page>` — and rewrite what it flags before you
+         link the page; pages written to this rule alone have come out at 79%. ── -->
     <div class="quiz" data-topic="&lt;topic name&gt;">
       <p><strong>1.</strong> &lt;question&gt;</p>
       <button data-right>&lt;the correct answer&gt;</button>

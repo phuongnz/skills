@@ -29,6 +29,6 @@ when. This drives future sessions.>
 
 - Write one whenever something non-obvious happens: a concept lands, a concept won't land, the learner reveals a preference or a strength, or the Goal moves.
 - Always write the **first** checkpoint after the opening diagnostic (type `background`): the learner's prior knowledge, level, and neighbouring strengths. Later sessions inherit it.
-- Write one after every **assessment** (type `assessment`, curriculum mode): the submission (or the result line, if reported by hand), which topics it cleared or confirmed, which did not hold, and what you decided to do about each.
+- Write one after every **assessment** (type `assessment`, curriculum mode): the submission (or the result line, if reported by hand), which topics it cleared or confirmed, which did not hold, and what you decided to do about each. When you **overrule** the page — a short answer marked "had it" over a token like *ok* or a bare word — record the overrule and write the headline as the **adjusted** score (`page said 17/49; adjusted 16/49 after Q37 overruled`). The adjusted number is the one the curriculum state and the pace in `NOTES.md` are computed from; the page's number is not.
 - Be honest about **durable vs quick** — don't record a fluent-in-the-moment answer as mastery. Note when something is due for spaced review.
 - Keep them short. A checkpoint is a signal for future-you, not a transcript.

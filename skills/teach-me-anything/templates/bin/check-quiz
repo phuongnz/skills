@@ -1,0 +1,98 @@
+#!/usr/bin/env python3
+"""Measure whether a page's multiple-choice options give the answer away.
+
+    bin/check-quiz assessments/m1-pre.html [lessons/0003-*.html ...]
+
+For every .quiz block with option buttons it asks two things: is the right option
+the LONGEST one (a test-wise learner picks the longest), and where does it sit?
+Chance for "right is longest" is 1/options — about 33% with three. Above the
+ceiling the page reads test-wiseness, not knowledge: rewrite the flagged questions
+until it passes. Exit 1 when any file is over the ceiling, so it can gate a link.
+
+Stdlib only; the pages are our own templates, so a small parser is enough.
+"""
+import re
+import sys
+from html.parser import HTMLParser
+
+CEILING = 0.40   # share of questions whose right option is strictly the longest
+
+
+class Quiz(HTMLParser):
+    """Collects, per .quiz block, the text of each option and which one is right."""
+
+    def __init__(self):
+        super().__init__()
+        self.blocks, self.depth, self.block, self.button, self.text = [], [], None, None, []
+        self.number = 0
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        classes = (a.get("class") or "").split()
+        if tag == "div" and "quiz" in classes:
+            self.number += 1
+            self.block = {"n": self.number, "options": [], "right": None, "short": "short" in classes}
+            self.depth = [tag]
+        elif self.block is not None:
+            self.depth.append(tag)
+            if tag == "button" and ("data-right" in a or "data-why" in a):
+                self.button = "data-right" in a
+                self.text = []
+
+    def handle_endtag(self, tag):
+        if self.block is None:
+            return
+        if tag == "button" and self.button is not None:
+            text = re.sub(r"\s+", " ", "".join(self.text)).strip()
+            if self.button:
+                self.block["right"] = len(self.block["options"])
+            self.block["options"].append(text)
+            self.button = None
+        if self.depth and self.depth[-1] == tag:
+            self.depth.pop()
+        if not self.depth:
+            if self.block["options"] and not self.block["short"]:
+                self.blocks.append(self.block)
+            self.block = None
+
+    def handle_data(self, data):
+        if self.button is not None:
+            self.text.append(data)
+
+
+def check(path):
+    p = Quiz()
+    with open(path, encoding="utf-8") as f:
+        p.feed(f.read())
+    blocks = p.blocks
+    if not blocks:
+        print("%s: no multiple-choice blocks" % path)
+        return True
+    longest, positions, flagged = 0, {}, []
+    for b in blocks:
+        lens = [len(o) for o in b["options"]]
+        r = b["right"]
+        if r is None:
+            flagged.append("  Q%d: no data-right option" % b["n"])
+            continue
+        positions[r] = positions.get(r, 0) + 1
+        if lens[r] > max(l for i, l in enumerate(lens) if i != r):
+            longest += 1
+            flagged.append("  Q%d: right is longest  %s" % (b["n"], " / ".join(str(l) for l in lens)))
+    share = longest / len(blocks)
+    n = max(len(b["options"]) for b in blocks)
+    pos = " ".join("%d:%d" % (k + 1, positions[k]) for k in sorted(positions))
+    ok = share <= CEILING
+    print("%s: right is longest in %d/%d (%d%%; chance ~%d%%, ceiling %d%%)  position %s  %s"
+          % (path, longest, len(blocks), round(share * 100), round(100 / n), round(CEILING * 100), pos,
+             "ok" if ok else "REWRITE"))
+    if not ok:
+        print("\n".join(flagged))
+    return ok
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print(__doc__.strip().splitlines()[0], "\n\n    bin/check-quiz <page.html> [...]", file=sys.stderr)
+        sys.exit(2)
+    sys.exit(0 if all([check(p) for p in sys.argv[1:]]) else 1)
