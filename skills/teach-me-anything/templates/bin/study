@@ -3,6 +3,7 @@
 #
 #   bin/study            → http://127.0.0.1:<this workspace's port>, printed on start
 #   STUDY_PORT=9000 bin/study
+#   STUDY_AGENT=codex bin/study   → which agent tutors in the drawer (see bin/tutor-shell)
 #   bin/study status     → prints the address if this workspace is being served, else exit 1
 #
 # Ctrl-C shuts both halves down. Nothing is left listening afterwards.
@@ -100,7 +101,7 @@ trap cleanup EXIT INT TERM
 # study-server.py, which refuses requests carrying another site's Origin.
 start_ttyd() {
   rm -f "$SOCK"
-  # The drawer's shell learns where it lives; tutor-shell tells the tutor.
+  # The drawer's shell learns where it lives; AGENTS.md tells the tutor what that means.
   STUDY_URL="http://127.0.0.1:$PORT" \
   ttyd --interface "$SOCK" --base-path /terminal --writable \
        --cwd "$HERE" \

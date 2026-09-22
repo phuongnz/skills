@@ -1,10 +1,14 @@
 #!/bin/zsh -l
-# What the browser drawer runs.
+# What the browser drawer runs: the tutor, then a plain shell once it quits.
+#
+# Which agent is the tutor: STUDY_AGENT if set (`STUDY_AGENT=codex bin/study`, or any
+# command line, e.g. STUDY_AGENT="gemini -r"), else the first of claude, codex found on
+# PATH. The workspace itself is agent-neutral; only this file knows the agents' names.
 #
 # First, scrub the launching agent's session markers. If bin/study was started
 # from inside a Claude Code session, everything it spawns inherits
 # CLAUDE_CODE_CHILD_SESSION, and the tutor then runs as somebody else's
-# sub-session with transcript saving off — which also leaves `--continue` with
+# sub-session with transcript saving off — which also leaves resuming with
 # nothing to resume after a page reload. Started from your own terminal none of
 # these are set and this is a no-op.
 for _var in ${(k)parameters[(I)CLAUDE_CODE_*]} ${(k)parameters[(I)CMUX_*]}; do
@@ -13,18 +17,20 @@ done
 unset CLAUDECODE CLAUDE_PID CLAUDE_EFFORT _var
 
 # A login shell, so PATH matches your terminal rather than the launcher's.
-# `--continue` picks the tutor conversation back up after a page reload; if there
-# is nothing to continue, start fresh. Quit Claude and you keep a normal shell in
-# the workspace, for whatever hands-on practice the topic calls for.
-#
-# bin/study sets STUDY_URL; from it the tutor knows it is speaking through the
-# drawer of a console the learner is already looking at — so it never tells them
-# to start one, and points at the page's refresh badge when new content lands.
-_where="You are the tutor in the terminal drawer of the learning console at ${STUDY_URL:-http://127.0.0.1}, \
-which the learner already has open in their browser (started with bin/study). \
-Never tell them to run bin/study: after writing or changing a page, tell them where it is in the console's menu \
-and that the 'new content' badge at the top of the page brings it in. \
-A message starting with [console] is the page's 'Send to tutor' button, not the learner typing: \
-read the submissions/ file it names before responding."
-claude --continue --append-system-prompt "$_where" || claude --append-system-prompt "$_where"
+# Each agent resumes its last conversation in this directory, so a page reload — or
+# a whole new day — picks the tutoring back up; with nothing to resume, it starts
+# fresh and AGENTS.md / CLAUDE.md tell it where it is. Quit the tutor and you keep a
+# normal shell in the workspace, for whatever hands-on practice the topic calls for.
+_agent="${STUDY_AGENT:-}"
+if [ -z "$_agent" ]; then
+  for _c in claude codex; do
+    if command -v "$_c" >/dev/null 2>&1; then _agent="$_c"; break; fi
+  done
+fi
+case "$_agent" in
+  claude) claude --continue || claude ;;
+  codex)  codex resume --last || codex ;;
+  "")     echo "No tutor found. Install Claude Code (claude) or Codex (codex), or set STUDY_AGENT to the command to run." ;;
+  *)      eval "$_agent" ;;
+esac
 exec zsh -l
