@@ -184,6 +184,14 @@ figure.diagram figcaption { font-size: .82rem; color: var(--ink-soft); text-alig
 .side a.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; box-shadow: inset 2px 0 0 var(--accent); }
 .side a.done::before { content: "✓ "; color: var(--ok); }
 .side a.todo::before { content: "○ "; color: var(--ink-soft); }
+/* Milestones (curriculum mode): a heading per milestone with its status tag; what belongs to it sits indented beneath */
+.side .milestone { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; margin: 1.3rem 0 .3rem; font-size: .85rem; font-weight: 600; }
+.side .tag { flex: none; font-size: .62rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; padding: .1em .55em; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-soft); }
+.side .tag.active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.side .tag.passed, .side .tag.known { border-color: var(--ok); color: var(--ok); }
+.side .under a { padding-left: 1rem; }
+.side a.assess { font-size: .88rem; color: var(--ink-soft); }
+.side a.assess::before { content: "◇ "; }
 .meter { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin: .5rem 0 0; }
 .meter > span { display: block; height: 100%; background: var(--ok); }
 .meter-label { font-size: .75rem; color: var(--ink-soft); margin-top: .35rem; }

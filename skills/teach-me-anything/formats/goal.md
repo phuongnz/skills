@@ -20,8 +20,8 @@ This is the Markdown that goes inside the `<script type="text/markdown">` block 
 This is what lets you judge what to teach next and keep lessons from floating.>
 
 ## Constraints & context
-<Timeframe, budget, tools they must use, how much time per week, anything that
-bounds the teaching.>
+<Timeframe — including the exam or course date, if there is one — budget, tools
+they must use, how much time per week, anything that bounds the teaching.>
 
 ## Out of scope (for now)
 <What this Goal deliberately does not cover, so lessons stay focused.>
@@ -31,4 +31,5 @@ bounds the teaching.>
 
 - The **one line** also lives in `index.html` as `MENU.goalLine`. Keep the two in step.
 - Write success as something observable, not a feeling. "Can hold a five-minute conversation," not "feel confident in French."
+- A dated goal (an exam, a course) also gets its date on `curriculum.html` ([formats/curriculum.md](./curriculum.md)); keep the two in step.
 - Goals shift as the learner grows. When one does, rewrite this document, update `MENU.goalLine`, and log a checkpoint noting the change — after confirming it with the learner.
