@@ -186,6 +186,24 @@ The **glossary** (`glossary.html`) is the card that matters most: once it exists
 
 Log an `assessment` checkpoint after each one ([formats/checkpoint.md](./formats/checkpoint.md)), update the milestone's status in `MENU`, and update the pace in `NOTES.md`.
 
+## The feedback conversation
+
+The opening diagnostic reads the learner before any teaching has happened, which is the one moment they cannot tell you how the teaching suits them. So ask once it has: a short, deliberate conversation about the experience so far — **at the end of the first milestone** in curriculum mode, **after about the third lesson** in open mode. This is the tutor's counterpart of the post-assessment: an honest reading of how *you* are doing.
+
+Ask plainly, one thing at a time, and take the answers as given:
+
+- **Pace** — too fast, too slow, about right? Are lessons short enough to finish in one sitting?
+- **Material** — do the sources land, or would they rather read, watch, or do more?
+- **Language** — is the teaching language right, and the register (plain, technical, formal)?
+- **Content** — too much theory, too little, or is the tie to the Goal getting lost?
+- **The quick checks** — useful, or a chore?
+- **Review** — how the daily six feel, whether the items proposed are the right ones, whether they are adding their own.
+- **The pages** — anything about the console, the lessons, or the drawer that gets in the way.
+
+Record what you learn in `NOTES.md` under **Learner preferences**, and under **Decisions** if it changes direction — with a `preference` checkpoint for anything non-obvious. Then **act on it in the very next lesson**, and say what you changed: feedback that visibly changes something is feedback the learner keeps giving.
+
+After that, keep the door open cheaply: at the end of every later milestone (or every few lessons in open mode), one line — *anything you'd like changed about how this is going?* — is enough. Pace trouble tends to show in the third milestone, not the first.
+
 ## `NOTES.md`
 
 The workspace's running notebook — the important things to keep in hand between sessions. Back of house: plain Markdown, the learner never opens it. Read it back when you plan a session or design a lesson, and keep it current.
@@ -196,7 +214,7 @@ At the **top**, hold the course outline under the heading **"Course Outline (fle
 - **Teaching language** — the language every page and conversation is written in. Settled at the first diagnostic, never assumed; kept here so every session inherits it.
 - **Progress** — where the learner is along the outline, what's done, what's next. In curriculum mode, also the **pace**: milestones left against weeks to the deadline, updated as milestones close.
 - **Decisions** — important calls made about direction, scope, or approach, and why.
-- **Learner preferences** — pace, tone, formats they like or hate, constraints to remember.
+- **Learner preferences** — pace, tone, formats they like or hate, constraints to remember. Fed by the [feedback conversation](#the-feedback-conversation) as much as by what you observe.
 - Anything else worth not forgetting.
 
 Keep it lean — signal for future-you, not a transcript. Deeper per-session records of what landed and what didn't live in `checkpoints/`; `NOTES.md` is the at-a-glance state of the whole course.
