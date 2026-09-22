@@ -1,0 +1,133 @@
+<!doctype html>
+<!-- Assessment template (curriculum mode). One page per milestone gate: a PRE-assessment
+     before its first lesson — a filter, so what the learner already holds is skipped — or a
+     POST-assessment after its last — an honest reading of what held. Plain multiple choice
+     and short answers, one or two per topic, each block tagged data-topic with the topic's
+     name from curriculum.html. It is NOT a simulation of any real exam: no exam formats, no
+     timer; that practice is the learner's own preparation. The page scores itself — first
+     pick counts — and prints a result line the learner reports to you in the terminal;
+     nothing else reaches you. Save as assessments/m1-pre.html or m1-post.html (a re-take of
+     the missed topics only: m1-post-2.html), then set pre/post on the milestone in MENU. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pre-assessment — &lt;milestone&gt;</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<!-- data-kind is the label in the result line: "m1-pre", "m1-post", "m1-post-2" -->
+<body data-kind="m1-pre">
+  <div class="wrap">
+    <p class="eyebrow">
+      Pre-assessment<span class="dot">·</span><span>Milestone 1 — &lt;title&gt;</span><span class="dot">·</span><span>~8 min</span>
+    </p>
+    <h1>&lt;Milestone title&gt;: what do you already hold?</h1>
+
+    <!-- ── Intro. Pre: this is a filter, nothing to pass or fail. Post: this is a reading of
+         where you stand, and whatever did not hold gets closed, not counted against them. ── -->
+    <p class="lead">Answer from what you know today — no looking things up, and no guessing
+      to look good. What you already have, we skip; what you don't, we teach. There is
+      nothing here to pass or fail.</p>
+    <!-- Post-assessment version:
+    <p class="lead">This is a reading of where you stand after the milestone, not a grade.
+      Answer from memory. Whatever didn't hold gets a lesson or a review item, and you
+      retake only that part.</p> -->
+
+    <!-- ── Multiple choice: one block per question, data-topic naming the topic it probes.
+         First pick counts and the block locks — a reading, not a lesson. Distractors are
+         still diagnostic: each names its misconception in data-why. ── -->
+    <div class="quiz" data-topic="&lt;topic name&gt;">
+      <p><strong>1.</strong> &lt;question&gt;</p>
+      <button data-right>&lt;the correct answer&gt;</button>
+      <button data-why="Names the misconception behind this pick.">&lt;a plausible wrong answer&gt;</button>
+      <button data-why="Names a different misconception.">&lt;another plausible wrong answer&gt;</button>
+      <div class="feedback"></div>
+    </div>
+
+    <div class="quiz" data-topic="&lt;topic name&gt;">
+      <p><strong>2.</strong> &lt;question&gt;</p>
+      <button data-why="Names the misconception behind this pick.">&lt;a plausible wrong answer&gt;</button>
+      <button data-right>&lt;the correct answer&gt;</button>
+      <button data-why="Names a different misconception.">&lt;another plausible wrong answer&gt;</button>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- ── Short answer: the learner writes from memory, reveals the answer, and marks
+         themselves. Use these for anything recognition would flatter. ── -->
+    <div class="quiz short" data-topic="&lt;topic name&gt;">
+      <p><strong>3.</strong> &lt;question that needs a sentence, not a pick&gt;</p>
+      <textarea rows="3" placeholder="From memory, in your own words…"></textarea>
+      <button class="reveal">Show the answer</button>
+      <div class="model" hidden>
+        <p>&lt;the answer — what a correct response has to contain&gt;</p>
+        <p class="mark">Did you have it? <button data-had>Yes</button> <button data-missed>No</button></p>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- ── Result: filled in by the script once every block is answered. ── -->
+    <p class="result-note" id="result-note">Answer every question and the result appears here.</p>
+    <div class="result" id="result" hidden>
+      <p><strong>Result.</strong> <span id="result-line"></span></p>
+      <p class="report">Tell your tutor: <code id="report"></code></p>
+    </div>
+  </div>
+
+  <script>
+    // Every block records one outcome, right or missed; the page scores itself once all
+    // are answered. First pick counts — that is what makes it a reading, not a lesson.
+    var KIND = document.body.dataset.kind || "assessment";
+    var blocks = Array.prototype.slice.call(document.querySelectorAll(".quiz"));
+
+    function settle(quiz, right) {
+      quiz.dataset.outcome = right ? "right" : "missed";
+      quiz.querySelectorAll("button").forEach(function (b) { b.disabled = true; });
+      tally();
+    }
+    blocks.forEach(function (quiz) {
+      var fb = quiz.querySelector(".feedback");
+      // multiple choice: mark the pick, show the right one if it was wrong, lock the block
+      quiz.querySelectorAll("button[data-right], button[data-why]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          if (quiz.dataset.outcome) return;
+          var right = b.hasAttribute("data-right");
+          b.classList.add(right ? "right" : "wrong");
+          if (!right) quiz.querySelector("button[data-right]").classList.add("right");
+          if (fb) fb.textContent = right ? "Right." : (b.dataset.why || "Not this one.");
+          settle(quiz, right);
+        });
+      });
+      // short answer: reveal, then the learner's own yes / no is the outcome
+      var reveal = quiz.querySelector(".reveal"), model = quiz.querySelector(".model");
+      if (reveal) reveal.addEventListener("click", function () { model.hidden = false; reveal.hidden = true; });
+      quiz.querySelectorAll("button[data-had], button[data-missed]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          if (quiz.dataset.outcome) return;
+          b.classList.add("picked");
+          settle(quiz, b.hasAttribute("data-had"));
+        });
+      });
+    });
+
+    function tally() {
+      var note = document.getElementById("result-note");
+      var left = blocks.filter(function (q) { return !q.dataset.outcome; }).length;
+      if (left) {
+        note.textContent = left + (left === 1 ? " question" : " questions") + " left — the result appears when all are answered.";
+        return;
+      }
+      var right = blocks.filter(function (q) { return q.dataset.outcome === "right"; }).length;
+      var missed = [];
+      blocks.forEach(function (q) {
+        if (q.dataset.outcome === "missed" && missed.indexOf(q.dataset.topic) < 0) missed.push(q.dataset.topic);
+      });
+      document.getElementById("result-line").textContent =
+        right + " of " + blocks.length + " held." + (missed.length ? " Didn't hold: " + missed.join(", ") + "." : " Everything held.");
+      document.getElementById("report").textContent =
+        KIND + " " + right + "/" + blocks.length + " missed: " + (missed.length ? missed.join(", ") : "none");
+      note.hidden = true;
+      document.getElementById("result").hidden = false;
+    }
+  </script>
+</body>
+</html>

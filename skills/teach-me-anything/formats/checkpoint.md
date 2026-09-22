@@ -11,7 +11,7 @@ Checkpoints are **back of house** — plain Markdown in `checkpoints/`, never sh
 
 - **Date:** <YYYY-MM-DD>
 - **Lesson:** <link to the lesson this came from, if any>
-- **Type:** learned | insight | struggle | preference | goal-change | background
+- **Type:** learned | insight | struggle | preference | goal-change | background | assessment
 
 ## What happened
 <One or two sentences. What was taught, or what you learned about the learner.>
@@ -29,5 +29,6 @@ when. This drives future sessions.>
 
 - Write one whenever something non-obvious happens: a concept lands, a concept won't land, the learner reveals a preference or a strength, or the Goal moves.
 - Always write the **first** checkpoint after the opening diagnostic (type `background`): the learner's prior knowledge, level, and neighbouring strengths. Later sessions inherit it.
+- Write one after every **assessment** (type `assessment`, curriculum mode): the result line as reported, which topics it cleared or confirmed, which did not hold, and what you decided to do about each.
 - Be honest about **durable vs quick** — don't record a fluent-in-the-moment answer as mastery. Note when something is due for spaced review.
 - Keep them short. A checkpoint is a signal for future-you, not a transcript.

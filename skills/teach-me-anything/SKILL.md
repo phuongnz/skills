@@ -38,6 +38,7 @@ The workspace has two layers, deliberately kept apart.
 - `sources.html` — the trusted material teaching is drawn from. Built from [templates/doc.html](./templates/doc.html); follows [formats/sources.md](./formats/sources.md).
 - `curriculum.html` — **curriculum mode only**: the external syllabus, as milestones and topics with the state each is in. Built from [templates/doc.html](./templates/doc.html); follows [formats/curriculum.md](./formats/curriculum.md). See [Two modes](#two-modes-open-and-curriculum).
 - `lessons/*.html` — the lessons. A **lesson** is one self-contained page teaching a single small thing tied to the Goal. The main thing you make. Built from [templates/lesson.html](./templates/lesson.html), named `0001-<dash-case-name>.html`, the number rising each time.
+- `assessments/*.html` — **curriculum mode only**: the pre- and post-assessment that open and close each milestone, `m1-pre.html` / `m1-post.html`. Built from [templates/assessment.html](./templates/assessment.html) — see [Milestones and assessments](#milestones-and-assessments).
 - `reference/*.html` — **reference cards**: the distilled residue of lessons (cheat sheets, syntax tables, sequences, formulae). Clean documents that print well and are meant to be returned to. Built from [templates/reference.html](./templates/reference.html).
 
 **Back of house — your working memory, never opened by the learner.**
@@ -93,6 +94,7 @@ After you create or finish anything, update the data:
 - **New lesson** → push `{ n, href, title, done: false }` onto `MENU.lessons` and set `MENU.current` to it (it becomes the default page). In curriculum mode add `milestone: "m1"` so it files under its milestone.
 - **Lesson finished** → set that lesson's `done: true`. The meter and the ✓ marks read from this.
 - **Milestone changes state** (curriculum mode) → set its `status` in `MENU.milestones`: `active` when its first lesson is written, `known` when the pre-assessment clears the whole thing, `passed` when the post-assessment holds. The meter counts `known` + `passed`. Keep `curriculum.html` in step.
+- **Assessment written** (curriculum mode) → set the milestone's `pre` or `post` to its path (`assessments/m1-pre.html`); the menu shows it under the milestone. Point `post` at the latest re-take if there is one.
 - **New reference card** → push `{ href, title }` onto `MENU.cards`.
 - **Goal one-liner changed** → update `MENU.goalLine`.
 - **Review item confirmed, or a review just done** → add or rewrite entries in `reviews.js` (see [The Retention Engine](#the-retention-engine)). The **Due** panel reads straight from it.
@@ -166,6 +168,23 @@ Lessons are rarely reopened; cards are. A card is the compressed essence of what
 - A glossary for any topic with its own vocabulary.
 
 The **glossary** (`glossary.html`) is the card that matters most: once it exists, hold to it in every lesson so the workspace speaks one language.
+
+## Milestones and assessments
+
+*Curriculum mode only.* A milestone is too big to read the learner on in conversation, so each one is gated by two short assessments: a **pre-assessment** before its first lesson, and a **post-assessment** after its last. Both are pages built from [templates/assessment.html](./templates/assessment.html), saved to `assessments/` as `m1-pre.html` / `m1-post.html`, and linked from the milestone's `pre` / `post` in `MENU` so they sit under it in the menu.
+
+**What an assessment is.** Plain multiple choice and short answers, one or two questions per topic in the milestone, each block tagged with the topic's name from `curriculum.html`. It is written in the teaching language like everything else. It is **not** a simulation of the real exam — no exam formats, no timer, no drag-and-drop. Its job is to challenge what the learner holds about the milestone; practising the exam's own format is the learner's preparation, not the workspace's, and say so if they ask. The page scores itself (first pick counts) and ends with a result line — `m1-post 7/10 missed: vlan trunking, stp` — that the learner reports to you in the terminal. Nothing else reaches you, so ask for that line.
+
+**The pre-assessment is a filter.** The opening diagnostic reads the learner in broad strokes; this reads them topic by topic, which no conversation could. Write it from the milestone's topics, have the learner run it in the console, and take the result at face value: every topic it clears becomes `known` in `curriculum.html` — no lesson for it. If it clears the whole milestone, set the milestone `known` and move to the next one; otherwise set it `active` and teach the `open` topics. Frame it as it is: there is nothing here to pass or fail, only time saved.
+
+**The post-assessment is an honest reading.** Once the last `open` topic is taught, write it over **all** the milestone's topics — the `known` ones too, because clearing a pre-assessment was a claim and this checks it. What did not hold is a fact about the material, not about the learner: say so plainly. Then close the gaps:
+
+- Each missed topic goes to `shaky` in `curriculum.html`, and gets a review item straight into `reviews.js` as `source: "assessment"` — the one kind of item you add without asking, because a miss here is a proven gap.
+- If a miss looks like a real gap rather than a slip, teach one short targeted lesson for it.
+- Then re-take **only the missed topics** — a smaller page, `m1-post-2.html`, or in the terminal if it is a topic or two. Never the whole milestone again.
+- The milestone is `passed` when you and the learner agree the gaps are closed. It is a judgment, not a score threshold.
+
+Log an `assessment` checkpoint after each one ([formats/checkpoint.md](./formats/checkpoint.md)), update the milestone's status in `MENU`, and update the pace in `NOTES.md`.
 
 ## `NOTES.md`
 
