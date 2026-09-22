@@ -203,7 +203,7 @@ figure.diagram figcaption { font-size: .82rem; color: var(--ink-soft); text-alig
 
 /* New-content badge: floats over the stage, blinks until clicked. */
 #fresh {
-  position: absolute; top: .9rem; right: 1.1rem; z-index: 5;
+  position: absolute; top: .9rem; left: 1.1rem; z-index: 5;
   font: 600 .8rem/1 var(--font); letter-spacing: .02em;
   color: var(--paper); background: var(--accent); border: 0; border-radius: 999px;
   padding: .55em 1em; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,.18);
