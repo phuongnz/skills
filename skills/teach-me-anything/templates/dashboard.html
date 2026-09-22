@@ -60,9 +60,11 @@
     /* ── The single source of truth for the sidebar. ──────────────────────
        Update this as learning grows:
          new lesson    → push to MENU.lessons and set MENU.current
+                         (curriculum mode: give it the milestone: "m1" it belongs to)
          lesson done   → set that lesson's done: true
          new card      → push to MENU.cards
          goal changed  → update MENU.goalLine
+         milestone     → set its status: "todo" | "active" | "known" | "passed"
        (The review queue lives in reviews.js, not here.)                      */
     const MENU = {
       topic: "<topic>",
@@ -72,9 +74,18 @@
         { href: "goal.html", title: "Goal" },
         { href: "glossary.html", title: "Glossary" },
         { href: "sources.html", title: "Sources" },
+        // curriculum mode: { href: "curriculum.html", title: "Curriculum" },
+      ],
+      // Curriculum mode only — leave empty for an open workspace. Every milestone shows in
+      // the menu from day one with its status, so the learner sees what is done and what is
+      // coming; lessons file under the milestone named by their `milestone` key. pre / post
+      // are the assessment pages that open and close it (assessments/m1-pre.html …), shown
+      // once they exist. The meter counts milestones instead of lessons.
+      milestones: [
+        // { id: "m1", title: "Network fundamentals", status: "todo", pre: null, post: null },
       ],
       lessons: [
-        // { n: 1, href: "lessons/0001-first.html", title: "First lesson", done: false },
+        // { n: 1, href: "lessons/0001-first.html", title: "First lesson", done: false, milestone: "m1" },
       ],
       cards: [
         // { href: "reference/0001-card.html", title: "A card" },
@@ -86,18 +97,43 @@
       $("topic").textContent = MENU.topic;
       $("goalline").textContent = MENU.goalLine;
 
-      const done = MENU.lessons.filter(l => l.done).length;
-      $("meter-fill").style.width = Math.round(100 * done / (MENU.lessons.length || 1)) + "%";
-      $("meter-label").textContent =
-        MENU.lessons.length ? done + " of " + MENU.lessons.length + " lessons done" : "no lessons yet";
+      /* Curriculum mode when milestones exist: progress is milestones done, a denominator
+         that is honest from day one. Otherwise lessons, which only grow as they are written. */
+      const ms = Array.isArray(MENU.milestones) && MENU.milestones.length ? MENU.milestones : null;
+      const STATUS = { todo: "to come", active: "in progress", known: "already known", passed: "passed" };
+      if (ms) {
+        const done = ms.filter(m => m.status === "passed" || m.status === "known").length;
+        $("meter-fill").style.width = Math.round(100 * done / ms.length) + "%";
+        $("meter-label").textContent = done + " of " + ms.length + " milestones done";
+      } else {
+        const done = MENU.lessons.filter(l => l.done).length;
+        $("meter-fill").style.width = Math.round(100 * done / (MENU.lessons.length || 1)) + "%";
+        $("meter-label").textContent =
+          MENU.lessons.length ? done + " of " + MENU.lessons.length + " lessons done" : "no lessons yet";
+      }
 
       const stage = $("stage");
       function group(title, items, render) {
         return items.length ? '<div class="group">' + title + "</div>" + items.map(render).join("") : "";
       }
+      const lessonLink = l =>
+        `<a class="${l.done ? "done" : "todo"}" href="${l.href}" data-href="${l.href}">${l.title}</a>`;
+      /* One block per milestone: its title and status tag, then what sits under it —
+         the pre-assessment, its lessons in order, the post-assessment. */
+      function milestone(m) {
+        const status = STATUS[m.status] ? m.status : "todo";
+        const assess = (href, title) => href ? `<a class="assess" href="${href}" data-href="${href}">${title}</a>` : "";
+        return '<div class="milestone"><span>' + m.title + '</span>' +
+          '<span class="tag ' + status + '">' + STATUS[status] + "</span></div>" +
+          '<div class="under">' + assess(m.pre, "Pre-assessment") +
+          MENU.lessons.filter(l => l.milestone === m.id).map(lessonLink).join("") +
+          assess(m.post, "Post-assessment") + "</div>";
+      }
       $("menu").innerHTML =
-        group("Lessons", MENU.lessons, l =>
-          `<a class="${l.done ? "done" : "todo"}" href="${l.href}" data-href="${l.href}">${l.title}</a>`) +
+        (ms
+          ? ms.map(milestone).join("") +
+            group("Other lessons", MENU.lessons.filter(l => !ms.some(m => m.id === l.milestone)), lessonLink)
+          : group("Lessons", MENU.lessons, lessonLink)) +
         group("Reference cards", MENU.cards, c =>
           `<a href="${c.href}" data-href="${c.href}">${c.title}</a>`) +
         group("Foundations", MENU.foundations, f =>

@@ -30,12 +30,13 @@ The workspace has two layers, deliberately kept apart.
 
 **Front of house — what the learner opens (HTML).**
 
-- `index.html` — the **console**. The one page they open: a side menu (lessons, cards, foundations), a progress meter, a **Due-for-review** panel, the active lesson in the content area, and the **tutor terminal** in a drawer beneath it. Driven by the `MENU` object in the file and the retention queue in `reviews.js` — see [The Console](#the-console).
+- `index.html` — the **console**. The one page they open: a side menu (lessons — under their milestones in curriculum mode — cards, foundations), a progress meter, a **Due-for-review** panel, the active lesson in the content area, and the **tutor terminal** in a drawer beneath it. Driven by the `MENU` object in the file and the retention queue in `reviews.js` — see [The Console](#the-console).
 - `bin/` — `study`, the one command that starts a session: it serves the workspace locally and puts the tutor terminal on the same page. Copied from this skill's `templates/bin/` at setup — see [The Tutor Terminal](#the-tutor-terminal).
 - `assets/` — a shared `style.css` (one stylesheet for every page) and `md.js` (a tiny offline Markdown renderer). Copied from this skill's `assets/` once at setup; leave them untouched per workspace.
 - `goal.html` — the **Goal**: why this learner is here. Grounds everything. Built from [templates/doc.html](./templates/doc.html); its content is Markdown following [formats/goal.md](./formats/goal.md).
 - `glossary.html` — the workspace's shared vocabulary. Built from [templates/doc.html](./templates/doc.html); follows [formats/glossary.md](./formats/glossary.md).
 - `sources.html` — the trusted material teaching is drawn from. Built from [templates/doc.html](./templates/doc.html); follows [formats/sources.md](./formats/sources.md).
+- `curriculum.html` — **curriculum mode only**: the external syllabus, as milestones and topics with the state each is in. Built from [templates/doc.html](./templates/doc.html); follows [formats/curriculum.md](./formats/curriculum.md). See [Two modes](#two-modes-open-and-curriculum).
 - `lessons/*.html` — the lessons. A **lesson** is one self-contained page teaching a single small thing tied to the Goal. The main thing you make. Built from [templates/lesson.html](./templates/lesson.html), named `0001-<dash-case-name>.html`, the number rising each time.
 - `reference/*.html` — **reference cards**: the distilled residue of lessons (cheat sheets, syntax tables, sequences, formulae). Clean documents that print well and are meant to be returned to. Built from [templates/reference.html](./templates/reference.html).
 
@@ -44,6 +45,7 @@ The workspace has two layers, deliberately kept apart.
 - `checkpoints/*.md` — **checkpoints**: short Markdown records of what the learner has actually taken on board, and any non-obvious insight worth revisiting. Roughly the learning equivalent of an engineering decision log. This is how you locate the learning edge next session. Named `0001-<dash-case-name>.md`, incrementing. Use [formats/checkpoint.md](./formats/checkpoint.md).
 - `reviews.js` — the **retention queue**: one entry per idea or micro-skill worth keeping, each carrying the date it next comes due. You maintain it; the console reads it to show what is due today. Schema and scheduling in [formats/reviews.md](./formats/reviews.md).
 - `NOTES.md` — the workspace's running notebook: the **course outline** at the top, then progress, decisions made, and how this learner likes to be taught. See [`NOTES.md`](#notesmd).
+- `curriculum/` — curriculum mode only, and only when the learner handed you the syllabus as a file: the file itself, kept as given.
 
 ### One source of truth
 
@@ -51,6 +53,23 @@ The files in `formats/` describe Markdown, and **that Markdown stays the source 
 
 - For the **foundation pages** (`goal.html`, `glossary.html`, `sources.html`), the Markdown lives *inside* the HTML, in a `<script type="text/markdown">` block (see [templates/doc.html](./templates/doc.html)). To change the document, change only that block; to read its state, read only that block. `md.js` renders it for the learner — no parallel `.md` file, no keeping two copies in step.
 - The **memory files** (`checkpoints/`, `NOTES.md`) stay plain `.md`, and the **retention queue** (`reviews.js`) stays plain JS data. The learner never opens them, so there is nothing to wrap.
+
+## Two modes: open and curriculum
+
+A workspace runs in one of two modes, settled at the opening diagnostic and recorded in `NOTES.md`.
+
+**Open mode** is the default: the learner wants to master a topic, and the outline is yours to shape. The course outline lives in `NOTES.md`, lessons are the unit of progress, and the meter counts them. Everything in this file describes open mode unless it says otherwise.
+
+**Curriculum mode** is for a goal with an **external syllabus** — a certification blueprint, a course, a textbook to get through. Ask for it at the diagnostic: *is there a syllabus or exam this has to cover?* When there is, the coverage is not yours to invent, and it is too big to size up in one conversation, so the workspace gains structure:
+
+- The syllabus becomes `curriculum.html` ([formats/curriculum.md](./formats/curriculum.md)) — its parts as **milestones**, each listing its topics and the state each is in.
+- Every milestone shows in the console's menu **from day one**, each carrying a status tag (`to come` / `in progress` / `already known` / `passed`), so the learner sees what is done and what is coming. Lessons file under their milestone, still written one at a time at the learning edge — the milestone only says where the edge is allowed to be.
+- The meter counts **milestones**, not lessons — a denominator that is honest from the first day instead of growing with every lesson written.
+- The syllabus's weights set how much **time** a milestone gets; the **order** is yours, chosen for how the ideas build.
+- A deadline sets **pace**: keep milestones-left against weeks-left in `NOTES.md`, and say out loud when the learner is behind.
+- Each milestone opens with a **pre-assessment** and closes with a **post-assessment** — see [Milestones and assessments](#milestones-and-assessments).
+
+Nothing else changes: the retention engine, the lessons, the cards, and the session shape are the same in both modes.
 
 ## First-time setup
 
@@ -61,7 +80,7 @@ The first time you land in an empty workspace (no `index.html`), stand it up bef
 Once a workspace exists, every session runs the same shape:
 
 1. **Clear what's due.** Run the [retention ritual](#the-retention-engine) first — old material retrieved before new material taught, always.
-2. **Find the edge.** Read the `checkpoints/` and the Goal, and pick the most relevant thing sitting just past what the learner can already do (the [learning edge](./principles.md#the-learning-edge)).
+2. **Find the edge.** Read the `checkpoints/` and the Goal, and pick the most relevant thing sitting just past what the learner can already do (the [learning edge](./principles.md#the-learning-edge)). In curriculum mode the edge sits inside the **active milestone**: the next `open` topic in `curriculum.html` that builds on what they hold. Glance at the pace in `NOTES.md`, and say so if they are behind.
 3. **Teach one lesson** at that edge (see [Lessons](#lessons)), ending in practice that makes the learner *produce*.
 4. **Propose and update.** Offer 1–3 review items from the lesson; add to `reviews.js` the ones the learner confirms, and any they add. Mark progress and update the console.
 
@@ -71,8 +90,9 @@ The console is the learner's home. Its side menu, progress meter, default page, 
 
 After you create or finish anything, update the data:
 
-- **New lesson** → push `{ n, href, title, done: false }` onto `MENU.lessons` and set `MENU.current` to it (it becomes the default page).
+- **New lesson** → push `{ n, href, title, done: false }` onto `MENU.lessons` and set `MENU.current` to it (it becomes the default page). In curriculum mode add `milestone: "m1"` so it files under its milestone.
 - **Lesson finished** → set that lesson's `done: true`. The meter and the ✓ marks read from this.
+- **Milestone changes state** (curriculum mode) → set its `status` in `MENU.milestones`: `active` when its first lesson is written, `known` when the pre-assessment clears the whole thing, `passed` when the post-assessment holds. The meter counts `known` + `passed`. Keep `curriculum.html` in step.
 - **New reference card** → push `{ href, title }` onto `MENU.cards`.
 - **Goal one-liner changed** → update `MENU.goalLine`.
 - **Review item confirmed, or a review just done** → add or rewrite entries in `reviews.js` (see [The Retention Engine](#the-retention-engine)). The **Due** panel reads straight from it.
@@ -151,10 +171,11 @@ The **glossary** (`glossary.html`) is the card that matters most: once it exists
 
 The workspace's running notebook — the important things to keep in hand between sessions. Back of house: plain Markdown, the learner never opens it. Read it back when you plan a session or design a lesson, and keep it current.
 
-At the **top**, hold the course outline under the heading **"Course Outline (flexible — revise as we learn)"** — the arc of lessons you expect to teach toward the Goal. It is a plan, not a contract: as you read the learner and the Goal moves, revise it. Then, below the outline, keep the running notes:
+At the **top**, hold the course outline under the heading **"Course Outline (flexible — revise as we learn)"** — the arc of lessons you expect to teach toward the Goal. It is a plan, not a contract: as you read the learner and the Goal moves, revise it. In curriculum mode the coverage lives in `curriculum.html` instead; the outline here shrinks to the milestone order and why you chose it. Then, below the outline, keep the running notes:
 
+- **Mode** — `open` or `curriculum` ([Two modes](#two-modes-open-and-curriculum)). Settled at the first diagnostic.
 - **Teaching language** — the language every page and conversation is written in. Settled at the first diagnostic, never assumed; kept here so every session inherits it.
-- **Progress** — where the learner is along the outline, what's done, what's next.
+- **Progress** — where the learner is along the outline, what's done, what's next. In curriculum mode, also the **pace**: milestones left against weeks to the deadline, updated as milestones close.
 - **Decisions** — important calls made about direction, scope, or approach, and why.
 - **Learner preferences** — pace, tone, formats they like or hate, constraints to remember.
 - Anything else worth not forgetting.
