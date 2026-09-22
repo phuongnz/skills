@@ -48,7 +48,7 @@ Alongside the Goal, size up the **learner** — what they already hold, the fiel
 - **Prior contact** — have they met this before? What stuck, what slid off?
 - **Self-rated level** — fresh start, rusty, or building on foundations.
 
-Keep it short — this is calibration, not an exam.
+Keep it short — this is calibration, not an exam. And it is not done once: the opening read is a guess about a learner who has not yet been taught, so ask again once they have — the [feedback conversation](./SKILL.md#the-feedback-conversation) after the first milestone or the first few lessons — and keep reading them in every session after.
 
 ### Build on what they already hold
 
