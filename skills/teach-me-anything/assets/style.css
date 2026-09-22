@@ -11,6 +11,8 @@
   --accent: #7a5a2e;
   --accent-soft: #f0e7d8;
   --ok: #3f7a4b;
+  --alert: #c93a1c;        /* signal: the new-content badge, nothing else */
+  --alert-bright: #ef5a2f;
   --measure: 50rem;
   --radius: 10px;
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -29,6 +31,8 @@
     --accent: #d6ab6a;
     --accent-soft: #2a231a;
     --ok: #7fb489;
+    --alert: #e0532b;
+    --alert-bright: #ff7a4f;
   }
 }
 
@@ -204,13 +208,18 @@ figure.diagram figcaption { font-size: .82rem; color: var(--ink-soft); text-alig
 /* New-content badge: floats over the stage, blinks until clicked. */
 #fresh {
   position: absolute; top: .9rem; left: 1.1rem; z-index: 5;
-  font: 600 .8rem/1 var(--font); letter-spacing: .02em;
-  color: var(--paper); background: var(--accent); border: 0; border-radius: 999px;
-  padding: .55em 1em; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,.18);
-  animation: fresh-blink 1.2s ease-in-out infinite;
+  font: 700 .82rem/1 var(--font); letter-spacing: .02em;
+  color: #fff; background: var(--alert); border: 0; border-radius: 999px;
+  padding: .6em 1.1em; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25), 0 0 0 0 var(--alert-bright);
+  animation: fresh-blink 1s ease-in-out infinite;
 }
-#fresh:hover { animation: none; }
-@keyframes fresh-blink { 50% { opacity: .45; } }
+#fresh:hover { animation: none; background: var(--alert-bright); }
+/* Never dims: swings between the two signal shades and throws a ring, so it reads
+   as a pulse at the edge of vision rather than something fading out. */
+@keyframes fresh-blink {
+  50% { background: var(--alert-bright); box-shadow: 0 2px 10px rgba(0,0,0,.25), 0 0 0 6px transparent; }
+}
 
 @media (max-width: 720px) {
   .console { grid-template-columns: 1fr; }
