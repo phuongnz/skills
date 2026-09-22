@@ -21,7 +21,7 @@ Before designing a single lesson, run the opening conversation — it sets every
 - **Settle the mode.** Ask: *is there a syllabus or exam this has to cover?* If not, record `Mode: open` in `NOTES.md` and carry on. If there is, the workspace runs in [curriculum mode](./SKILL.md#two-modes-open-and-curriculum):
   - Get the syllabus. Public (a certification's exam topics, a course page) → fetch it and cite it in `sources.html`. A file from the learner → keep it as given in `curriculum/`.
   - Get the date, if any, into the Goal's constraints.
-  - Build `curriculum.html` from it ([formats/curriculum.md](./formats/curriculum.md)): one milestone per part of the syllabus, in the order *you* would teach them, every topic listed in the syllabus's words, all `open`.
+  - Build `curriculum.html` from it ([formats/curriculum.md](./formats/curriculum.md)): one milestone per part of the syllabus, in the order *you* would teach them (advice — the learner starts them from the menu in any order), every topic listed in the syllabus's words, all `open`.
   - Fill `MENU.milestones` (one entry per milestone, all `status: "todo"`), add `{ href: "curriculum.html", title: "Curriculum" }` to `MENU.foundations`, and record `Mode: curriculum` plus the pace (milestones against weeks to the date) in `NOTES.md`.
 - **Read the learner.** Prior contact, self-rated level, neighbouring strengths. Write it as the first checkpoint (type `background`, [formats/checkpoint.md](./formats/checkpoint.md)) so every later session inherits it. In curriculum mode keep this light — the pre-assessment before each milestone does the fine-grained reading, topic by topic, that no opening conversation can. The pedagogy: [principles.md → Read the learner](./principles.md#read-the-learner).
 

@@ -188,6 +188,9 @@ figure.diagram figcaption { font-size: .82rem; color: var(--ink-soft); text-alig
 .side .milestone { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; margin: 1.3rem 0 .3rem; font-size: .85rem; font-weight: 600; }
 .side .tag { flex: none; font-size: .62rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; padding: .1em .55em; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-soft); }
 .side .tag.active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.side button.tag.start { font-family: var(--font); border-color: var(--accent); color: var(--accent); background: transparent; cursor: pointer; }
+.side button.tag.start:hover { background: var(--accent-soft); }
+.side button.tag.start:disabled { border-color: var(--line); color: var(--ink-soft); background: transparent; cursor: default; }
 .side .tag.passed, .side .tag.known { border-color: var(--ok); color: var(--ok); }
 .side .under a { padding-left: 1rem; }
 .side a.assess { font-size: .88rem; color: var(--ink-soft); }

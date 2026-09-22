@@ -66,9 +66,9 @@ A workspace runs in one of two modes, settled at the opening diagnostic and reco
 **Curriculum mode** is for a goal with an **external syllabus** — a certification blueprint, a course, a textbook to get through. Ask for it at the diagnostic: *is there a syllabus or exam this has to cover?* When there is, the coverage is not yours to invent, and it is too big to size up in one conversation, so the workspace gains structure:
 
 - The syllabus becomes `curriculum.html` ([formats/curriculum.md](./formats/curriculum.md)) — its parts as **milestones**, each listing its topics and the state each is in.
-- Every milestone shows in the console's menu **from day one**, each carrying a status tag (`to come` / `in progress` / `already known` / `passed`), so the learner sees what is done and what is coming. Lessons file under their milestone, still written one at a time at the learning edge — the milestone only says where the edge is allowed to be.
+- Every milestone shows in the console's menu **from day one**, each carrying a status tag (`in progress` / `already known` / `passed`) or, until it is started, a **Start** button — so the learner sees what is done, what is open, and what is theirs to pick up. Lessons file under their milestone, still written one at a time at the learning edge — the milestone only says where the edge is allowed to be.
 - The meter counts **milestones**, not lessons — a denominator that is honest from the first day instead of growing with every lesson written.
-- The syllabus's weights set how much **time** a milestone gets; the **order** is yours, chosen for how the ideas build.
+- The syllabus's weights set how much **time** a milestone gets. The **order** is the learner's: pressing **Start** on a milestone sends `[console] Start milestone m6 — <title>.` to your terminal, and you open it — set it `active` in `MENU.milestones` and `curriculum.html`, write its pre-assessment, and go. Your own sequence in `curriculum.html` is advice: say once, briefly, if what they picked builds on something they have not done yet, then teach what they chose. One milestone in progress at a time is the sensible default; if they start a second, ask whether the first is parked or still running, and record it in `NOTES.md`.
 - A deadline sets **pace**: keep milestones-left against weeks-left in `NOTES.md`, and say out loud when the learner is behind.
 - Each milestone opens with a **pre-assessment** and closes with a **post-assessment** — see [Milestones and assessments](#milestones-and-assessments).
 
@@ -83,7 +83,7 @@ The first time you land in an empty workspace (no `index.html`), stand it up bef
 Once a workspace exists, every session runs the same shape:
 
 1. **Clear what's due.** Run the [retention ritual](#the-retention-engine) first — old material retrieved before new material taught, always.
-2. **Find the edge.** Read the `checkpoints/` and the Goal, and pick the most relevant thing sitting just past what the learner can already do (the [learning edge](./principles.md#the-learning-edge)). In curriculum mode the edge sits inside the **active milestone**: the next `open` topic in `curriculum.html` that builds on what they hold. Glance at the pace in `NOTES.md`, and say so if they are behind.
+2. **Find the edge.** Read the `checkpoints/` and the Goal, and pick the most relevant thing sitting just past what the learner can already do (the [learning edge](./principles.md#the-learning-edge)). In curriculum mode the edge sits inside the **active milestone** — the one the learner started: the next `open` topic in `curriculum.html` that builds on what they hold. If nothing is active, there is no edge to find: point at the **Start** buttons in the menu, suggest which one you would take first and why, and let them press it. Glance at the pace in `NOTES.md`, and say so if they are behind.
 3. **Teach one lesson** at that edge (see [Lessons](#lessons)), ending in practice that makes the learner *produce*.
 4. **Propose and update.** Offer 1–3 review items from the lesson; add to `reviews.js` the ones the learner confirms, and any they add. Mark progress and update the console.
 
@@ -100,6 +100,8 @@ That line is the page speaking, not the learner. **Read the file before you answ
 - **On an assessment**, this is the result: go on as [Milestones and assessments](#milestones-and-assessments) says, and write the checkpoint from the file rather than from a line the learner typed.
 
 If the drawer could not take the line (it was not open, or the console was opened off disk), the page shows the learner the file's name and tells them to mention it — so a learner saying "check submissions" means the same thing.
+
+The menu's **Start** buttons speak the same way: `[console] Start milestone m6 — Automation and Programmability.` There is no file behind that one; it is the learner choosing what to open next — see [Two modes](#two-modes-open-and-curriculum).
 
 ## The Console
 
@@ -192,7 +194,7 @@ The **glossary** (`glossary.html`) is the card that matters most: once it exists
 
 **What an assessment is.** Plain multiple choice and short answers, one or two questions per topic in the milestone, each block tagged with the topic's name from `curriculum.html`. It is written in the teaching language like everything else. It is **not** a simulation of the real exam — no exam formats, no timer, no drag-and-drop. Its job is to challenge what the learner holds about the milestone; practising the exam's own format is the learner's preparation, not the workspace's, and say so if they ask. The page scores itself (first pick counts) and ends with **Send to tutor**, which lands the whole thing in `submissions/` and announces it in your terminal ([Submissions](#submissions)). Opened off disk there is no button, only a result line — `m1-post 7/10 missed: vlan trunking, stp` — that the learner reports to you; ask for it if nothing arrives.
 
-**The pre-assessment is a filter.** The opening diagnostic reads the learner in broad strokes; this reads them topic by topic, which no conversation could. Write it from the milestone's topics, tell the learner where it is in the console — the page will show a **new content** badge; that brings it in — and take the result at face value: every topic it clears becomes `known` in `curriculum.html` — no lesson for it. If it clears the whole milestone, set the milestone `known` and move to the next one; otherwise set it `active` and teach the `open` topics. Frame it as it is: there is nothing here to pass or fail, only time saved.
+**The pre-assessment is a filter.** The opening diagnostic reads the learner in broad strokes; this reads them topic by topic, which no conversation could. Write it from the milestone's topics, tell the learner where it is in the console — the page will show a **new content** badge; that brings it in — and take the result at face value: every topic it clears becomes `known` in `curriculum.html` — no lesson for it. If it clears the whole milestone, set the milestone `known` and hand the choice back — the learner starts the next one from the menu; otherwise keep it `active` and teach the `open` topics. Frame it as it is: there is nothing here to pass or fail, only time saved.
 
 **The post-assessment is an honest reading.** Once the last `open` topic is taught, write it over **all** the milestone's topics — the `known` ones too, because clearing a pre-assessment was a claim and this checks it. What did not hold is a fact about the material, not about the learner: say so plainly. Then close the gaps:
 

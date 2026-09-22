@@ -32,7 +32,7 @@ This is the Markdown that goes inside the `<script type="text/markdown">` block 
 A milestone is one part, section, domain, or module of the syllabus — the unit the learner sees in the console's menu from day one, each with its status, so they always know what is done and what is coming. Its `id` is `m1`, `m2`, … in the order you will teach them; that id is what `MENU.milestones` and each lesson's `milestone` key point at.
 
 - **Weight** is the share the syllabus gives it (an exam blueprint's percentage; for a course, a fair estimate). Weight drives *time*: a 25% domain gets roughly a quarter of the sessions. It does not drive order.
-- **Order is yours.** A blueprint is a coverage list, not a teaching sequence. Put milestones in the order that builds best for this learner, and say in `NOTES.md` why if it differs from the source.
+- **Order is your advice; the choice is the learner's.** A blueprint is a coverage list, not a teaching sequence. List milestones in the order that builds best for this learner, and say in `NOTES.md` why if it differs from the source — but the learner starts whichever they like from the console's menu, and you teach what they chose.
 - **Status** lives in `MENU.milestones` (like the Goal's one line lives in `MENU.goalLine`), not here: `todo` → `active` when its first lesson is written → `passed` when its post-assessment holds, or `known` when the pre-assessment clears the whole thing. Keep the two in step.
 
 ## Topics and their state

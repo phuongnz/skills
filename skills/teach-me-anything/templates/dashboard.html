@@ -139,8 +139,12 @@
         function milestone(m) {
           const status = STATUS[m.status] ? m.status : "todo";
           const assess = (href, title) => href ? `<a class="assess" href="${href}" data-href="${href}">${title}</a>` : "";
-          return '<div class="milestone"><span>' + m.title + '</span>' +
-            '<span class="tag ' + status + '">' + STATUS[status] + "</span></div>" +
+          /* Not started: a Start button that asks the tutor to open it. The learner picks
+             the order; the sequence in curriculum.html is the tutor's advice, not a gate. */
+          const tag = status === "todo"
+            ? `<button type="button" class="tag start" data-start="${m.id}" data-title="${m.title}" title="Ask your tutor to open this milestone">Start</button>`
+            : '<span class="tag ' + status + '">' + STATUS[status] + "</span>";
+          return '<div class="milestone"><span>' + m.title + '</span>' + tag + "</div>" +
             '<div class="under">' + assess(m.pre, "Pre-assessment") +
             MENU.lessons.filter(l => l.milestone === m.id).map(lessonLink).join("") +
             assess(m.post, "Post-assessment") + "</div>";
@@ -161,6 +165,16 @@
           e.preventDefault();
           go(a.dataset.href);
           setActive(a.dataset.href);
+        }));
+        /* Start: one line into the drawer; the tutor sets the milestone active and the
+           new-content badge redraws this tag. Without a live drawer, the learner asks. */
+        document.querySelectorAll("#menu button[data-start]").forEach(b => b.addEventListener("click", () => {
+          b.disabled = true; b.textContent = "Asking…";
+          const line = "[console] Start milestone " + b.dataset.start + " — " + b.dataset.title + ".";
+          Promise.resolve(window.tutorSend ? window.tutorSend(line) : false).then(ok => {
+            b.textContent = ok ? "Asked" : "Ask your tutor";
+            if (!ok) { b.disabled = false; b.title = "Say to your tutor: start " + b.dataset.title; }
+          });
         }));
 
         /* ── Due-for-review panel, computed from reviews.js against today. ──
