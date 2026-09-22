@@ -21,3 +21,6 @@ skills-lock.json
 /working-dir
 # explain-repo atlas output — local only
 .repo-atlas/
+
+# Personal Claude Code instructions — local only
+/CLAUDE.md
