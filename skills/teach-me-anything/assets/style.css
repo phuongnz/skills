@@ -237,7 +237,7 @@ figure.diagram figcaption { font-size: .82rem; color: var(--ink-soft); text-alig
 .challenge .model { margin-top: .8rem; padding-top: .8rem; border-top: 1px solid var(--line); }
 .challenge .seed-note { font-size: .78rem; color: var(--ink-soft); margin: .8rem 0 0; }
 
-/* Self-test overlay (console) */
+/* Review overlay (console) */
 .sr-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: grid; place-items: center; z-index: 50; padding: 1.5rem; }
 .sr-overlay[hidden] { display: none; }
 .sr-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 2rem; max-width: 34rem; width: 100%; }

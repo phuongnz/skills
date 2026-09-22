@@ -38,7 +38,8 @@
   </div>
 
 
-  <!-- In-browser self-test overlay (ungraded practice; the graded review is run with the tutor) -->
+  <!-- In-browser Review overlay: an ungraded flip-through of today's items. Nothing it
+       shows reaches the tutor — the learner reports how it went, and the tutor reschedules. -->
   <div class="sr-overlay" id="sr" hidden>
     <div class="sr-card">
       <div class="sr-progress" id="sr-progress"></div>
@@ -49,7 +50,7 @@
         <button id="sr-next" hidden>Next</button>
         <button id="sr-close" class="ghost">Close</button>
       </div>
-      <p class="sr-note">Self-test only — your tutor runs the graded review that reschedules these.</p>
+      <p class="sr-note">Practice run — tell your tutor how it went, and they reschedule.</p>
     </div>
   </div>
 
@@ -113,13 +114,19 @@
         setActive(a.dataset.href);
       }));
 
-      /* ── Due-for-review panel, computed from reviews.js against today. ── */
+      /* ── Due-for-review panel, computed from reviews.js against today. ──
+         Only DUE_CAP items are shown, shakiest first (lowest box, then most
+         overdue). The rest wait unseen: a long backlog is the tutor's to
+         spread out, never a number the learner has to face. */
+      const DUE_CAP = 6;
       const now = new Date();
       const today = now.getFullYear() + "-" +
         String(now.getMonth() + 1).padStart(2, "0") + "-" +
         String(now.getDate()).padStart(2, "0");
       const queue = Array.isArray(window.REVIEW) ? window.REVIEW : [];
-      const due = queue.filter(item => item.due && item.due <= today);
+      const due = queue.filter(item => item.due && item.due <= today)
+        .sort((a, b) => (a.box || 1) - (b.box || 1) || (a.due < b.due ? -1 : a.due > b.due ? 1 : 0))
+        .slice(0, DUE_CAP);
 
       /* Prompts are authored text, not markup — escape before it reaches innerHTML.
          Several carry quotes and angle brackets (policy snippets, <run-id>). */
@@ -133,14 +140,14 @@
         $("due").innerHTML =
           '<div class="due">' +
           '<div class="group">Due for review <span class="badge">' + due.length + "</span></div>" +
-          '<button class="due-start" id="due-start">Start self-test</button>' +
+          '<button class="due-start" id="due-start">Review</button>' +
           '<details class="due-peek" id="due-peek"' + (peekOpen ? " open" : "") + ">" +
           '<summary><span class="when-closed">Show ' + n + "</span>" +
           '<span class="when-open">Hide ' + n + "</span></summary>" +
           "<ul>" + due.map(d =>
             '<li title="' + esc(d.prompt) + '">' + esc(d.prompt) + "</li>").join("") +
           "</ul></details></div>";
-        $("due-start").addEventListener("click", () => runSelfTest(due));
+        $("due-start").addEventListener("click", () => runReview(due));
         $("due-peek").addEventListener("toggle", function () {
           try { localStorage.setItem("duePeek", this.open ? "open" : "closed"); } catch (e) {}
         });
@@ -149,8 +156,8 @@
           '<p class="due-clear">Nothing due today ✓</p></div>';
       }
 
-      /* ── Ungraded flip-through of due items. Rescheduling is the tutor's job. ── */
-      function runSelfTest(items) {
+      /* ── Ungraded flip-through of today's items. Rescheduling is the tutor's job. ── */
+      function runReview(items) {
         let i = 0;
         const overlay = $("sr");
         function show() {
