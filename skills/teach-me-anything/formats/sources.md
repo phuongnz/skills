@@ -35,3 +35,4 @@ from re-evaluating the same weak source twice.>
 - Every lesson names one **primary source**. It should come from this list.
 - Note *why* each source is trustworthy — that judgement is the point of the file.
 - When a source turns out to be wrong or dated, move it to **Rejected** with a reason rather than deleting it.
+- In curriculum mode with an exam at the end, **Primary** holds a practice-exam source (the vendor's own prep, or a well-regarded engine) — the workspace holds no exam-format practice, so this is where it comes from, and the pace in `NOTES.md` books time for it.

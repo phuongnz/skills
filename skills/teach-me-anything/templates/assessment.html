@@ -35,7 +35,9 @@
 
     <!-- ── Multiple choice: one block per question, data-topic naming the topic it probes.
          First pick counts and the block locks — a reading, not a lesson. Distractors are
-         still diagnostic: each names its misconception in data-why. ── -->
+         still diagnostic: each names its misconception in data-why. Write all options to the
+         same length and shape, and vary where the right one sits: a test-wise learner picks
+         the longest or the first, and then the reading is of nothing. ── -->
     <div class="quiz" data-topic="&lt;topic name&gt;">
       <p><strong>1.</strong> &lt;question&gt;</p>
       <button data-right>&lt;the correct answer&gt;</button>
@@ -97,14 +99,18 @@
           settle(quiz, right);
         });
       });
-      // short answer: reveal, then the learner's own yes / no is the outcome
+      // short answer: reveal, then the learner's own yes / no is the outcome — except that a
+      // blank marked "Yes" is missed. Nothing was retrieved, and a reading must not count it.
       var reveal = quiz.querySelector(".reveal"), model = quiz.querySelector(".model");
+      var ta = quiz.querySelector("textarea");
       if (reveal) reveal.addEventListener("click", function () { model.hidden = false; reveal.hidden = true; });
       quiz.querySelectorAll("button[data-had], button[data-missed]").forEach(function (b) {
         b.addEventListener("click", function () {
           if (quiz.dataset.outcome) return;
+          var wrote = !!(ta && ta.value.trim());
           b.classList.add("picked");
-          settle(quiz, b.hasAttribute("data-had"));
+          if (fb && !wrote) fb.textContent = "Nothing written — counts as missed.";
+          settle(quiz, b.hasAttribute("data-had") && wrote);
         });
       });
     });
