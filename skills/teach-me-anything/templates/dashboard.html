@@ -22,7 +22,7 @@
       <div id="menu"></div>
     </nav>
     <main class="stage">
-      <!-- Shown when the tutor writes or changes a page; click reloads the console. -->
+      <!-- Shown when the tutor writes or changes a page; click refreshes the console in place. -->
       <button id="fresh" type="button" hidden>New content — refresh</button>
       <iframe id="stage" title="lesson"></iframe>
     </main>
@@ -95,105 +95,117 @@
         // { href: "reference/0001-card.html", title: "A card" },
       ],
     };
-
+  </script>
+  <script>
     (function () {
       const $ = id => document.getElementById(id);
-      $("topic").textContent = MENU.topic;
-      $("goalline").textContent = MENU.goalLine;
-
-      /* Curriculum mode when milestones exist: progress is milestones done, a denominator
-         that is honest from day one. Otherwise lessons, which only grow as they are written. */
-      const ms = Array.isArray(MENU.milestones) && MENU.milestones.length ? MENU.milestones : null;
-      const STATUS = { todo: "to come", active: "in progress", known: "already known", passed: "passed" };
-      if (ms) {
-        const done = ms.filter(m => m.status === "passed" || m.status === "known").length;
-        $("meter-fill").style.width = Math.round(100 * done / ms.length) + "%";
-        $("meter-label").textContent = done + " of " + ms.length + " milestones done";
-      } else {
-        const done = MENU.lessons.filter(l => l.done).length;
-        $("meter-fill").style.width = Math.round(100 * done / (MENU.lessons.length || 1)) + "%";
-        $("meter-label").textContent =
-          MENU.lessons.length ? done + " of " + MENU.lessons.length + " lessons done" : "no lessons yet";
-      }
-
       const stage = $("stage");
-      function group(title, items, render) {
-        return items.length ? '<div class="group">' + title + "</div>" + items.map(render).join("") : "";
-      }
-      const lessonLink = l =>
-        `<a class="${l.done ? "done" : "todo"}" href="${l.href}" data-href="${l.href}">${l.title}</a>`;
-      /* One block per milestone: its title and status tag, then what sits under it —
-         the pre-assessment, its lessons in order, the post-assessment. */
-      function milestone(m) {
-        const status = STATUS[m.status] ? m.status : "todo";
-        const assess = (href, title) => href ? `<a class="assess" href="${href}" data-href="${href}">${title}</a>` : "";
-        return '<div class="milestone"><span>' + m.title + '</span>' +
-          '<span class="tag ' + status + '">' + STATUS[status] + "</span></div>" +
-          '<div class="under">' + assess(m.pre, "Pre-assessment") +
-          MENU.lessons.filter(l => l.milestone === m.id).map(lessonLink).join("") +
-          assess(m.post, "Post-assessment") + "</div>";
-      }
-      $("menu").innerHTML =
-        (ms
-          ? ms.map(milestone).join("") +
-            group("Other lessons", MENU.lessons.filter(l => !ms.some(m => m.id === l.milestone)), lessonLink)
-          : group("Lessons", MENU.lessons, lessonLink)) +
-        group("Reference cards", MENU.cards, c =>
-          `<a href="${c.href}" data-href="${c.href}">${c.title}</a>`) +
-        group("Foundations", MENU.foundations, f =>
-          `<a href="${f.href}" data-href="${f.href}">${f.title}</a>`);
-
-      /* Sidebar nav: open the page in the stage and highlight the active entry. */
-      const navLinks = Array.from(document.querySelectorAll("#menu a"));
+      function go(href) { stage.src = href; }
+      let navLinks = [];
       function setActive(href) {
         navLinks.forEach(a => a.classList.toggle("active", a.dataset.href === href));
       }
-      navLinks.forEach(a => a.addEventListener("click", e => {
-        e.preventDefault();
-        go(a.dataset.href);
-        setActive(a.dataset.href);
-      }));
 
-      /* ── Due-for-review panel, computed from reviews.js against today. ──
-         Only DUE_CAP items are shown, shakiest first (lowest box, then most
-         overdue). The rest wait unseen: a long backlog is the tutor's to
-         spread out, never a number the learner has to face. */
-      const DUE_CAP = 6;
-      const now = new Date();
-      const today = now.getFullYear() + "-" +
-        String(now.getMonth() + 1).padStart(2, "0") + "-" +
-        String(now.getDate()).padStart(2, "0");
-      const queue = Array.isArray(window.REVIEW) ? window.REVIEW : [];
-      const due = queue.filter(item => item.due && item.due <= today)
-        .sort((a, b) => (a.box || 1) - (b.box || 1) || (a.due < b.due ? -1 : a.due > b.due ? 1 : 0))
-        .slice(0, DUE_CAP);
+      /* Everything the sidebar shows, drawn from MENU and the review queue. Run once
+         on load, and again by the new-content badge with a freshly fetched MENU, so
+         the console updates in place — a page reload would restart the drawer's
+         terminal, cutting the tutor off mid-answer. */
+      function render(MENU, REVIEW) {
+        $("topic").textContent = MENU.topic;
+        $("goalline").textContent = MENU.goalLine;
 
-      /* Prompts are authored text, not markup — escape before it reaches innerHTML.
-         Several carry quotes and angle brackets (policy snippets, <run-id>). */
-      const esc = t => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;")
-                                .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        /* Curriculum mode when milestones exist: progress is milestones done, a denominator
+           that is honest from day one. Otherwise lessons, which only grow as they are written. */
+        const ms = Array.isArray(MENU.milestones) && MENU.milestones.length ? MENU.milestones : null;
+        const STATUS = { todo: "to come", active: "in progress", known: "already known", passed: "passed" };
+        if (ms) {
+          const done = ms.filter(m => m.status === "passed" || m.status === "known").length;
+          $("meter-fill").style.width = Math.round(100 * done / ms.length) + "%";
+          $("meter-label").textContent = done + " of " + ms.length + " milestones done";
+        } else {
+          const done = MENU.lessons.filter(l => l.done).length;
+          $("meter-fill").style.width = Math.round(100 * done / (MENU.lessons.length || 1)) + "%";
+          $("meter-label").textContent =
+            MENU.lessons.length ? done + " of " + MENU.lessons.length + " lessons done" : "no lessons yet";
+        }
 
-      if (due.length) {
-        let peekOpen = true;
-        try { peekOpen = localStorage.getItem("duePeek") !== "closed"; } catch (e) {}
-        const n = due.length + (due.length === 1 ? " question" : " questions");
-        $("due").innerHTML =
-          '<div class="due">' +
-          '<div class="group">Due for review <span class="badge">' + due.length + "</span></div>" +
-          '<button class="due-start" id="due-start">Review</button>' +
-          '<details class="due-peek" id="due-peek"' + (peekOpen ? " open" : "") + ">" +
-          '<summary><span class="when-closed">Show ' + n + "</span>" +
-          '<span class="when-open">Hide ' + n + "</span></summary>" +
-          "<ul>" + due.map(d =>
-            '<li title="' + esc(d.prompt) + '">' + esc(d.prompt) + "</li>").join("") +
-          "</ul></details></div>";
-        $("due-start").addEventListener("click", () => runReview(due));
-        $("due-peek").addEventListener("toggle", function () {
-          try { localStorage.setItem("duePeek", this.open ? "open" : "closed"); } catch (e) {}
-        });
-      } else if (queue.length) {
-        $("due").innerHTML = '<div class="due"><div class="group">Review</div>' +
-          '<p class="due-clear">Nothing due today ✓</p></div>';
+        function group(title, items, render) {
+          return items.length ? '<div class="group">' + title + "</div>" + items.map(render).join("") : "";
+        }
+        const lessonLink = l =>
+          `<a class="${l.done ? "done" : "todo"}" href="${l.href}" data-href="${l.href}">${l.title}</a>`;
+        /* One block per milestone: its title and status tag, then what sits under it —
+           the pre-assessment, its lessons in order, the post-assessment. */
+        function milestone(m) {
+          const status = STATUS[m.status] ? m.status : "todo";
+          const assess = (href, title) => href ? `<a class="assess" href="${href}" data-href="${href}">${title}</a>` : "";
+          return '<div class="milestone"><span>' + m.title + '</span>' +
+            '<span class="tag ' + status + '">' + STATUS[status] + "</span></div>" +
+            '<div class="under">' + assess(m.pre, "Pre-assessment") +
+            MENU.lessons.filter(l => l.milestone === m.id).map(lessonLink).join("") +
+            assess(m.post, "Post-assessment") + "</div>";
+        }
+        $("menu").innerHTML =
+          (ms
+            ? ms.map(milestone).join("") +
+              group("Other lessons", MENU.lessons.filter(l => !ms.some(m => m.id === l.milestone)), lessonLink)
+            : group("Lessons", MENU.lessons, lessonLink)) +
+          group("Reference cards", MENU.cards, c =>
+            `<a href="${c.href}" data-href="${c.href}">${c.title}</a>`) +
+          group("Foundations", MENU.foundations, f =>
+            `<a href="${f.href}" data-href="${f.href}">${f.title}</a>`);
+
+        /* Sidebar nav: open the page in the stage and highlight the active entry. */
+        navLinks = Array.from(document.querySelectorAll("#menu a"));
+        navLinks.forEach(a => a.addEventListener("click", e => {
+          e.preventDefault();
+          go(a.dataset.href);
+          setActive(a.dataset.href);
+        }));
+
+        /* ── Due-for-review panel, computed from reviews.js against today. ──
+           Only DUE_CAP items are shown, shakiest first (lowest box, then most
+           overdue). The rest wait unseen: a long backlog is the tutor's to
+           spread out, never a number the learner has to face. */
+        const DUE_CAP = 6;
+        const now = new Date();
+        const today = now.getFullYear() + "-" +
+          String(now.getMonth() + 1).padStart(2, "0") + "-" +
+          String(now.getDate()).padStart(2, "0");
+        const queue = Array.isArray(REVIEW) ? REVIEW : [];
+        const due = queue.filter(item => item.due && item.due <= today)
+          .sort((a, b) => (a.box || 1) - (b.box || 1) || (a.due < b.due ? -1 : a.due > b.due ? 1 : 0))
+          .slice(0, DUE_CAP);
+
+        /* Prompts are authored text, not markup — escape before it reaches innerHTML.
+           Several carry quotes and angle brackets (policy snippets, <run-id>). */
+        const esc = t => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+                                  .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+        if (due.length) {
+          let peekOpen = true;
+          try { peekOpen = localStorage.getItem("duePeek") !== "closed"; } catch (e) {}
+          const n = due.length + (due.length === 1 ? " question" : " questions");
+          $("due").innerHTML =
+            '<div class="due">' +
+            '<div class="group">Due for review <span class="badge">' + due.length + "</span></div>" +
+            '<button class="due-start" id="due-start">Review</button>' +
+            '<details class="due-peek" id="due-peek"' + (peekOpen ? " open" : "") + ">" +
+            '<summary><span class="when-closed">Show ' + n + "</span>" +
+            '<span class="when-open">Hide ' + n + "</span></summary>" +
+            "<ul>" + due.map(d =>
+              '<li title="' + esc(d.prompt) + '">' + esc(d.prompt) + "</li>").join("") +
+            "</ul></details></div>";
+          $("due-start").addEventListener("click", () => runReview(due));
+          $("due-peek").addEventListener("toggle", function () {
+            try { localStorage.setItem("duePeek", this.open ? "open" : "closed"); } catch (e) {}
+          });
+        } else if (queue.length) {
+          $("due").innerHTML = '<div class="due"><div class="group">Review</div>' +
+            '<p class="due-clear">Nothing due today ✓</p></div>';
+        } else {
+          $("due").innerHTML = "";
+        }
       }
 
       /* ── Ungraded flip-through of today's items. Rescheduling is the tutor's job. ── */
@@ -216,9 +228,27 @@
         overlay.hidden = false;
       }
 
+      render(MENU, window.REVIEW);
       go(MENU.current);
       setActive(MENU.current);
-      function go(href) { stage.src = href; }
+
+      /* What the new-content badge calls: re-read this file and reviews.js, redraw the
+         sidebar from the fresh MENU, and bring the stage to whatever `current` now
+         points at — reloading it if that is the page already showing. */
+      window.refreshConsole = async function () {
+        const text = url => fetch(url, { cache: "no-store" }).then(r => r.text());
+        const [html, js] = await Promise.all([text("index.html"), text("reviews.js")]);
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const src = Array.from(doc.scripts).map(s => s.textContent).find(t => /const MENU\s*=/.test(t));
+        const menu = new Function(src + "\nreturn MENU;")();
+        const review = new Function(js + "\nreturn window.REVIEW;")();
+        render(menu, review);
+        const target = new URL(menu.current, location.href).href;
+        let showing = "";
+        try { showing = stage.contentWindow.location.href; } catch (e) {}
+        if (showing === target) stage.contentWindow.location.reload(); else go(menu.current);
+        setActive(menu.current);
+      };
     })();
   </script>
   <script>
@@ -319,23 +349,28 @@
     /* ── New-content badge ──────────────────────────────────────────────
        The tutor writes pages straight into the workspace; nothing pushes them
        here. So, when served, ask bin/study-server.py every few seconds for the
-       newest page and show a badge once something lands. A click reloads the
-       whole console — the menu is inlined in this file — and the drawer's
-       `claude --continue` picks the tutor back up, as after any reload. It is
-       a badge and not an auto-reload so a half-answered quiz is never wiped. */
+       newest page and show a badge once something lands. A click redraws the
+       console in place (window.refreshConsole, above) rather than reloading the
+       page, which would restart the drawer's terminal mid-answer. It is a badge
+       and not an auto-refresh so a half-answered quiz is never wiped. */
     (function () {
       if (location.protocol !== "http:" && location.protocol !== "https:") return;
       var badge = document.getElementById("fresh");
-      var seen = null;
+      var seen = null, newest = 0;
       function poll() {
         fetch("/changes", { cache: "no-store" }).then(function (r) { return r.json(); })
           .then(function (c) {
+            newest = c.stamp;
             if (seen === null) { seen = c.stamp; return; }
             if (c.stamp > seen) { badge.title = c.latest; badge.hidden = false; }
           })
           .catch(function () {});
       }
-      badge.addEventListener("click", function () { location.reload(); });
+      badge.addEventListener("click", function () {
+        badge.hidden = true;
+        seen = newest;
+        window.refreshConsole().catch(function () { location.reload(); });
+      });
       poll();
       setInterval(poll, 3000);
     })();

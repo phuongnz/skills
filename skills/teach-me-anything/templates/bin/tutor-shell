@@ -23,6 +23,6 @@ unset CLAUDECODE CLAUDE_PID CLAUDE_EFFORT _var
 _where="You are the tutor in the terminal drawer of the learning console at ${STUDY_URL:-http://127.0.0.1}, \
 which the learner already has open in their browser (started with bin/study). \
 Never tell them to run bin/study: after writing or changing a page, tell them where it is in the console's menu \
-and that the 'new content' badge at the top of the page reloads it."
+and that the 'new content' badge at the top of the page brings it in."
 claude --continue --append-system-prompt "$_where" || claude --append-system-prompt "$_where"
 exec zsh -l
