@@ -21,7 +21,11 @@
       <div id="due"></div>
       <div id="menu"></div>
     </nav>
-    <main class="stage"><iframe id="stage" title="lesson"></iframe></main>
+    <main class="stage">
+      <!-- Shown when the tutor writes or changes a page; click reloads the console. -->
+      <button id="fresh" type="button" hidden>New content — refresh</button>
+      <iframe id="stage" title="lesson"></iframe>
+    </main>
 
     <!-- Tutor terminal, same-origin via bin/study-server.py. Collapsed to a bar
          when not in use; shows a hint instead of a shell if the console was opened
@@ -309,6 +313,31 @@
 
       var saved = get("drawerOpen");
       setOpen(saved === null ? true : saved === "1");
+    })();
+  </script>
+  <script>
+    /* ── New-content badge ──────────────────────────────────────────────
+       The tutor writes pages straight into the workspace; nothing pushes them
+       here. So, when served, ask bin/study-server.py every few seconds for the
+       newest page and show a badge once something lands. A click reloads the
+       whole console — the menu is inlined in this file — and the drawer's
+       `claude --continue` picks the tutor back up, as after any reload. It is
+       a badge and not an auto-reload so a half-answered quiz is never wiped. */
+    (function () {
+      if (location.protocol !== "http:" && location.protocol !== "https:") return;
+      var badge = document.getElementById("fresh");
+      var seen = null;
+      function poll() {
+        fetch("/changes", { cache: "no-store" }).then(function (r) { return r.json(); })
+          .then(function (c) {
+            if (seen === null) { seen = c.stamp; return; }
+            if (c.stamp > seen) { badge.title = c.latest; badge.hidden = false; }
+          })
+          .catch(function () {});
+      }
+      badge.addEventListener("click", function () { location.reload(); });
+      poll();
+      setInterval(poll, 3000);
     })();
   </script>
 </body>

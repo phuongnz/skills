@@ -3,6 +3,7 @@
 #
 #   bin/study            → http://127.0.0.1:<this workspace's port>, printed on start
 #   STUDY_PORT=9000 bin/study
+#   bin/study status     → prints the address if this workspace is being served, else exit 1
 #
 # Ctrl-C shuts both halves down. Nothing is left listening afterwards.
 # Written for bash 3.2, which is what macOS ships — notably no `wait -n`.
@@ -22,9 +23,6 @@ MAX_RESTARTS=5
 # in localStorage, which the browser keys by origin, port included.
 PORT_BASE=8800; PORT_SPAN=1000
 
-command -v ttyd >/dev/null 2>&1 || {
-  echo "ttyd is not installed.  brew install ttyd  (or your package manager)" >&2; exit 1; }
-
 open_url() { open "$1" 2>/dev/null || xdg-open "$1" 2>/dev/null || true; }
 
 port_busy() { lsof -nP -iTCP:"$1" -sTCP:LISTEN >/dev/null 2>&1; }
@@ -35,6 +33,17 @@ serving_port() {
     { i = index($0, ENVIRON["NEEDLE"])
       if (i) { split(substr($0, i + length(ENVIRON["NEEDLE"])), a, " "); print a[1]; exit } }'
 }
+
+# `bin/study status`: is this workspace being served? The tutor asks this before
+# telling the learner to start a session they may already be sitting in.
+if [ "${1:-}" = "status" ]; then
+  RUNNING="$(serving_port)"
+  if [ -n "$RUNNING" ]; then echo "http://127.0.0.1:$RUNNING"; exit 0; fi
+  echo "not running" >&2; exit 1
+fi
+
+command -v ttyd >/dev/null 2>&1 || {
+  echo "ttyd is not installed.  brew install ttyd  (or your package manager)" >&2; exit 1; }
 
 # Who holds a port, in words: another workspace's session by its path, else the command.
 port_holder() {
@@ -91,6 +100,8 @@ trap cleanup EXIT INT TERM
 # study-server.py, which refuses requests carrying another site's Origin.
 start_ttyd() {
   rm -f "$SOCK"
+  # The drawer's shell learns where it lives; tutor-shell tells the tutor.
+  STUDY_URL="http://127.0.0.1:$PORT" \
   ttyd --interface "$SOCK" --base-path /terminal --writable \
        --cwd "$HERE" \
        --terminal-type xterm-256color \

@@ -17,13 +17,19 @@ Everything binds to 127.0.0.1. Stdlib only.
 
 import argparse
 import http.server
+import json
 import os
 import socket
 import sys
 import threading
 
 TERMINAL_PREFIX = "/terminal"
+CHANGES_PATH = "/changes"
 CHUNK = 65536
+
+# What the console renders, and so what counts as "new content" landing.
+CONTENT_EXT = (".html", ".js", ".css")
+SKIP_DIRS = {"bin", "node_modules"}
 
 DOWN_PAGE = """<!doctype html>
 <meta charset="utf-8">
@@ -94,7 +100,34 @@ class StudyHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         if self._is_terminal():
             return self.relay()
+        if self.path.split("?", 1)[0] == CHANGES_PATH:
+            return self.changes()
         return super().do_GET()
+
+    # ---- new content -----------------------------------------------------
+    def changes(self):
+        """The newest page in the workspace, so the console can show a badge
+        when the tutor writes one. Polled; the workspace is small enough that
+        a walk per poll costs nothing worth an inotify dependency."""
+        stamp, latest = 0, ""
+        for base, dirs, files in os.walk(self.directory):
+            dirs[:] = [d for d in dirs if d not in SKIP_DIRS and not d.startswith(".")]
+            for name in files:
+                if not name.endswith(CONTENT_EXT):
+                    continue
+                try:
+                    mtime = os.stat(os.path.join(base, name)).st_mtime_ns
+                except OSError:
+                    continue
+                if mtime > stamp:
+                    stamp = mtime
+                    latest = os.path.relpath(os.path.join(base, name), self.directory)
+        body = json.dumps({"stamp": stamp, "latest": latest}).encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
 
     def do_HEAD(self):
         if self._is_terminal():
@@ -241,8 +274,10 @@ class StudyHandler(http.server.SimpleHTTPRequestHandler):
         # get a short TTL on purpose: a no-store stylesheet has to be re-fetched
         # on every page load, so a restart of this server at the wrong moment
         # leaves a lesson rendering unstyled with no cached copy to fall back on.
+        # reviews.js is data the tutor rewrites, not an asset: never cached either.
         tail = self.path.split("?", 1)[0].rsplit("/", 1)[-1]
-        is_page = tail == "" or tail.endswith(".html") or "." not in tail
+        is_page = tail == "" or tail.endswith(".html") or "." not in tail \
+            or tail == "reviews.js"
         self.send_header("Cache-Control", "no-store" if is_page else "max-age=60")
         super().end_headers()
 

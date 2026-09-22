@@ -16,5 +16,13 @@ unset CLAUDECODE CLAUDE_PID CLAUDE_EFFORT _var
 # `--continue` picks the tutor conversation back up after a page reload; if there
 # is nothing to continue, start fresh. Quit Claude and you keep a normal shell in
 # the workspace, for whatever hands-on practice the topic calls for.
-claude --continue || claude
+#
+# bin/study sets STUDY_URL; from it the tutor knows it is speaking through the
+# drawer of a console the learner is already looking at — so it never tells them
+# to start one, and points at the page's refresh badge when new content lands.
+_where="You are the tutor in the terminal drawer of the learning console at ${STUDY_URL:-http://127.0.0.1}, \
+which the learner already has open in their browser (started with bin/study). \
+Never tell them to run bin/study: after writing or changing a page, tell them where it is in the console's menu \
+and that the 'new content' badge at the top of the page reloads it."
+claude --continue --append-system-prompt "$_where" || claude --append-system-prompt "$_where"
 exec zsh -l
