@@ -246,6 +246,20 @@
       go(MENU.current);
       setActive(MENU.current);
 
+      /* The Due panel is "due ≤ today", and today changes. A tab left open overnight
+         would keep yesterday's panel, so redraw the sidebar from what is already loaded
+         when the date rolls over — no fetch, the stage untouched, works off disk too. */
+      let loaded = { menu: MENU, review: window.REVIEW };
+      const dayOf = () => new Date().toDateString();
+      let day = dayOf();
+      setInterval(() => {
+        if (dayOf() === day) return;
+        day = dayOf();
+        const active = document.querySelector("#nav a.active");
+        render(loaded.menu, loaded.review);
+        setActive(active ? active.dataset.href : loaded.menu.current);
+      }, 60000);
+
       /* What the new-content badge calls: re-read this file and reviews.js, redraw the
          sidebar from the fresh MENU, and bring the stage to whatever `current` now
          points at — reloading it if that is the page already showing. */
@@ -256,6 +270,7 @@
         const src = Array.from(doc.scripts).map(s => s.textContent).find(t => /const MENU\s*=/.test(t));
         const menu = new Function(src + "\nreturn MENU;")();
         const review = new Function(js + "\nreturn window.REVIEW;")();
+        loaded = { menu, review };
         render(menu, review);
         const target = new URL(menu.current, location.href).href;
         let showing = "";
