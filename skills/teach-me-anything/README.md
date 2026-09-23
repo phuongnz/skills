@@ -20,7 +20,7 @@ Lessons are written from trusted sources, cite them, and tie back to your Goal. 
 - An agent CLI on your `PATH`: [Claude Code](https://claude.com/claude-code) (`claude`) or [Codex](https://github.com/openai/codex) (`codex`)
 - [`ttyd`](https://github.com/tsl0922/ttyd) for the terminal drawer — `brew install ttyd`. Without it the console still works, minus the drawer.
 - Python 3 (ships with macOS) for the local server
-- macOS — the scripts use `zsh` and `open`
+- macOS is where this has been tested. On Linux or Windows (WSL) the console and server should run as they are, but expect small adjustments — `bin/tutor-shell` in particular is written in `zsh`, and the tutor can adapt it to the shell it finds.
 
 ## Getting started
 
