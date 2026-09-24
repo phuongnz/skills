@@ -6,7 +6,8 @@
      tutor's drawer. Write every visible word in the teaching language, like any page;
      leave the name="…" and value="…" attributes as they are — they are the schema.
      The Pace section shows only when preferences.js has hoursPerWeek or targetDate
-     (curriculum mode sets them at setup). -->
+     (curriculum mode sets them at setup). Each theme value names a file in
+     assets/themes/; the swatch colours are a picture of that file. -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -103,6 +104,22 @@
         </fieldset>
       </section>
 
+      <h2>Appearance</h2>
+      <fieldset class="pref">
+        <legend>Colours</legend>
+        <div class="choice-row">
+          <label class="choice"><input type="radio" name="theme" value="paper">
+            <span><span class="swatch" aria-hidden="true" style="--s1:#fbf9f5;--s2:#7a5a2e;--s3:#161412"></span><strong>Paper</strong><small>Warm ochre.</small></span></label>
+          <label class="choice"><input type="radio" name="theme" value="slate">
+            <span><span class="swatch" aria-hidden="true" style="--s1:#f5f7f9;--s2:#2f5d8a;--s3:#121519"></span><strong>Slate</strong><small>Cool grey-blue.</small></span></label>
+          <label class="choice"><input type="radio" name="theme" value="sage">
+            <span><span class="swatch" aria-hidden="true" style="--s1:#f6f8f3;--s2:#3f6b45;--s3:#131612"></span><strong>Sage</strong><small>Soft green.</small></span></label>
+          <label class="choice"><input type="radio" name="theme" value="night">
+            <span><span class="swatch" aria-hidden="true" style="--s1:#161412;--s2:#d6ab6a;--s3:#1f1c19"></span><strong>Night</strong><small>Always dark.</small></span></label>
+        </div>
+        <p class="hint">Paper, Slate and Sage go light or dark with your system. A pick shows on this page at once; Save puts it on every page. Your tutor is not told — the colours change nothing in how you are taught.</p>
+      </fieldset>
+
       <div class="submit">
         <button type="submit" id="save" disabled>Save</button>
         <span class="submit-note" id="save-note"></span>
@@ -117,7 +134,10 @@
     (function () {
       /* The skill's own behaviour; a workspace with no preferences.js behaves exactly so. */
       var DEFAULTS = { review: "daily", reviewCap: 6, practice: "checks-and-summary",
-        lessonLength: "standard", opener: "recap", feedback: "few-lessons", language: "English" };
+        lessonLength: "standard", opener: "recap", feedback: "few-lessons", language: "English",
+        theme: "paper" };
+      /* The console's look: saved like the rest, but never typed into the drawer. */
+      var QUIET = ["theme"];
       var saved = window.PREFS && typeof window.PREFS === "object" ? window.PREFS : {};
       var form = document.getElementById("prefs");
       var save = document.getElementById("save"), note = document.getElementById("save-note");
@@ -125,8 +145,10 @@
       var MSG = {
         none: "Nothing changed yet.",
         some: function (n) { return n + (n === 1 ? " change" : " changes") + " — Save tells your tutor."; },
+        look: "Save to put these colours on every page.",
         sending: "Saving…",
         sent: "Saved — your tutor has it.",
+        saved: "Saved.",
         unsent: "Saved. The drawer could not take the note, so tell your tutor you changed your preferences.",
         same: "Saved — nothing had changed.",
         failed: "Could not save — is bin/study still running? Tell your tutor the line below.",
@@ -204,9 +226,31 @@
         });
         var values = read();
         if (!values) { save.disabled = true; note.textContent = MSG.bad; return; }
-        var n = Object.keys(changes(values)).length;
+        var diff = Object.keys(changes(values)), n = diff.length;
+        var quiet = diff.every(function (k) { return QUIET.indexOf(k) >= 0; });
         save.disabled = !n;
-        note.textContent = n ? MSG.some(n) : MSG.none;
+        note.textContent = !n ? MSG.none : quiet ? MSG.look : MSG.some(n);
+      }
+
+      /* A theme pick shows on this page at once. The saved theme comes in through
+         style.css's import of theme.css: switch that import off, then load the pick
+         on top. Off disk the browser forbids the first step, so the pick loads over
+         the saved theme — fine for every theme but Paper, whose file is empty. */
+      var previewLink = null;
+      function preview(name) {
+        try {
+          Array.prototype.forEach.call(document.styleSheets, function (sheet) {
+            Array.prototype.forEach.call(sheet.cssRules, function (rule) {
+              if (rule.href && /(^|\/)theme\.css$/.test(rule.href)) rule.media.mediaText = "not all";
+            });
+          });
+        } catch (err) {}
+        if (!previewLink) {
+          previewLink = document.createElement("link");
+          previewLink.rel = "stylesheet";
+          document.head.appendChild(previewLink);
+        }
+        previewLink.href = "assets/themes/" + name + ".css";
       }
 
       function report(text) {
@@ -214,7 +258,10 @@
         document.getElementById("report").hidden = false;
       }
 
-      form.addEventListener("change", refresh);
+      form.addEventListener("change", function (e) {
+        if (e.target.name === "theme") preview(e.target.value);
+        refresh();
+      });
       form.addEventListener("input", refresh);
       form.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -234,7 +281,8 @@
             var host = window.parent && window.parent !== window ? window.parent : null;
             /* Redraw the console's review panel now; the badge skips this write. */
             try { if (host && host.refreshSidebar) host.refreshSidebar(); } catch (err) {}
-            if (!res.line) { note.textContent = MSG.same; return; }
+            try { if ("theme" in diff && host && host.refreshTheme) host.refreshTheme(); } catch (err) {}
+            if (!res.line) { note.textContent = res.changed && res.changed.length ? MSG.saved : MSG.same; return; }
             var send = host && host.tutorSend;
             return Promise.resolve(send ? send(res.line) : false).then(function (ok) {
               note.textContent = ok ? MSG.sent : MSG.unsent;

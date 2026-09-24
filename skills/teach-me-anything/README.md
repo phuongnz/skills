@@ -10,7 +10,7 @@ A folder that grows as you learn. You open one page in it — the **console** �
 
 - a menu of lessons, reference cards and foundation pages down the side, with a progress meter
 - a **Due for review** panel: at most six things a day by default, the shakiest first, drawn from a spaced-review queue the tutor keeps
-- a **Preferences** page, where you decide how you are taught: review every session, only when you ask, or not at all; how many a day; whether a lesson ends with your own summary; five- or ten-minute lessons; how a session starts
+- a **Preferences** page, where you decide how you are taught: review every session, only when you ask, or not at all; how many a day; whether a lesson ends with your own summary; five- or ten-minute lessons; how a session starts; and the colours
 - the current lesson in the middle — short, one idea, a few quick checks, and a mini challenge where you summarise it in your own words
 - the tutor in a **terminal drawer** along the bottom, the same conversation every day
 

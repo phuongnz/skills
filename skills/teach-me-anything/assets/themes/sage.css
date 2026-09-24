@@ -1,0 +1,25 @@
+/* Sage — soft green, light or dark as the system says. Copied to theme.css when
+   picked on preferences.html; html:root outranks style.css's :root. */
+html:root {
+  --ink: #1b1f1b;
+  --ink-soft: #4f574f;
+  --paper: #f6f8f3;
+  --panel: #ffffff;
+  --line: #dfe5d8;
+  --accent: #3f6b45;
+  --accent-soft: #e4eedf;
+  --ok: #2f7a4b;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:root {
+    --ink: #e5eae2;
+    --ink-soft: #9ea89a;
+    --paper: #131612;
+    --panel: #1b1f1a;
+    --line: #2c3329;
+    --accent: #9cc49a;
+    --accent-soft: #1f2a1e;
+    --ok: #8cc59a;
+  }
+}

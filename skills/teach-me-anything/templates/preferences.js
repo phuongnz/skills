@@ -8,5 +8,6 @@ window.PREFS = {
   "lessonLength": "standard",
   "opener": "recap",
   "feedback": "few-lessons",
-  "language": "English"
+  "language": "English",
+  "theme": "paper"
 };

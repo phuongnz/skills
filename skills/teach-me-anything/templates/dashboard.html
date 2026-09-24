@@ -308,10 +308,24 @@
         setActive(active || loaded.menu.current);
       };
 
+      /* The look: style.css imports theme.css, which Save on preferences.html rewrites.
+         Load the stylesheet again at a fresh address, and drop the old one only once
+         the new one is in, so nothing flashes unstyled. Pages the stage opens later
+         import the new theme.css on their own. */
+      window.refreshTheme = function () {
+        const old = document.querySelector('link[rel="stylesheet"][href^="assets/style.css"]');
+        if (!old) return;
+        const fresh = old.cloneNode();
+        fresh.href = "assets/style.css?t=" + Date.now();
+        fresh.onload = function () { old.remove(); };
+        old.after(fresh);
+      };
+
       /* What the new-content badge calls: re-read this file and reviews.js, redraw the
          sidebar from the fresh MENU, and bring the stage to whatever `current` now
          points at — reloading it if that is the page already showing. */
       window.refreshConsole = async function () {
+        window.refreshTheme();
         loaded = await reload();
         const menu = loaded.menu;
         render(menu, loaded.review, loaded.prefs);

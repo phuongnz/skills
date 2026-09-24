@@ -1,0 +1,15 @@
+/* Night — the default look's dark colours, whatever the system says. Copied to
+   theme.css when picked on preferences.html; html:root outranks style.css's :root. */
+html:root {
+  color-scheme: dark;
+  --ink: #ece7df;
+  --ink-soft: #a49d92;
+  --paper: #161412;
+  --panel: #1f1c19;
+  --line: #322d27;
+  --accent: #d6ab6a;
+  --accent-soft: #2a231a;
+  --ok: #7fb489;
+  --alert: #e0532b;
+  --alert-bright: #ff7a4f;
+}

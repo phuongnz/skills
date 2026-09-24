@@ -2,7 +2,15 @@
    One file for every page: console, lessons, foundation docs, reference cards.
    Clean, typographic, print-friendly. Light and dark aware. */
 
+/* The learner's theme, picked on preferences.html: bin/study copies the chosen
+   assets/themes/<name>.css to theme.css in the workspace folder. An import blocks
+   rendering, so no page shows the default colours first. A theme sets the colour
+   tokens below on html:root, which outranks :root here in both modes. No theme.css
+   means the defaults. */
+@import url("../theme.css");
+
 :root {
+  color-scheme: light dark;
   --ink: #1c1a17;
   --ink-soft: #55504a;
   --paper: #fbf9f5;
@@ -11,6 +19,7 @@
   --accent: #7a5a2e;
   --accent-soft: #f0e7d8;
   --ok: #3f7a4b;
+  --wrong: #b4553f;
   --alert: #c93a1c;        /* signal: the new-content badge, nothing else */
   --alert-bright: #ef5a2f;
   --measure: 50rem;
@@ -24,7 +33,6 @@
   :root {
     --ink: #ece7df;
     --ink-soft: #a49d92;
-    --paper: #17151200;
     --paper: #161412;
     --panel: #1f1c19;
     --line: #322d27;
@@ -174,7 +182,7 @@ figure.diagram figcaption { font-size: .82rem; color: var(--ink-soft); text-alig
 .quiz button.right { border-color: var(--ok); background: var(--accent-soft); }
 /* Green check next to the correct option once it's chosen */
 .quiz button.right::after { content: "✓"; color: var(--ok); font-weight: 700; font-size: 1.05em; }
-.quiz button.wrong { border-color: #b4553f; opacity: .7; }
+.quiz button.wrong { border-color: var(--wrong); opacity: .7; }
 .quiz .feedback { margin-top: .75rem; min-height: 1.4rem; color: var(--ink-soft); }
 
 /* Console (index.html) layout */
@@ -351,7 +359,7 @@ body.has-drawer { height: 100vh; display: flex; flex-direction: column; overflow
 }
 
 /* Preferences page (preferences.html): one panel per setting, choices as cards. */
-.pref { border: 1px solid var(--line); background: var(--panel); border-radius: var(--radius); padding: 1rem 1.4rem 1.2rem; margin: 1rem 0; min-width: 0; color-scheme: light dark; }
+.pref { border: 1px solid var(--line); background: var(--panel); border-radius: var(--radius); padding: 1rem 1.4rem 1.2rem; margin: 1rem 0; min-width: 0; }
 .pref legend { font-weight: 600; padding: 0 .35rem; margin-left: -.35rem; }
 .pref .hint { font-size: .85rem; color: var(--ink-soft); margin: .6rem 0 0; }
 .choice { display: flex; gap: .7rem; align-items: flex-start; padding: .55rem .8rem; margin: .45rem 0; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); cursor: pointer; }
@@ -361,6 +369,8 @@ body.has-drawer { height: 100vh; display: flex; flex-direction: column; overflow
 .choice small { display: block; color: var(--ink-soft); font-size: .85rem; line-height: 1.5; }
 .choice-row { display: flex; gap: .5rem; flex-wrap: wrap; }
 .choice-row .choice { flex: 1 1 9rem; margin: .45rem 0 0; }
+.swatch { display: block; width: 4.5rem; height: 1.1rem; margin: .3rem 0 .4rem; border: 1px solid var(--line); border-radius: 5px;
+  background: linear-gradient(90deg, var(--s1) 0 50%, var(--s2) 50% 72%, var(--s3) 72%); }
 .pref .field { display: flex; flex-wrap: wrap; gap: .3rem 1rem; align-items: center; margin: .6rem 0 0; }
 .pref .field label { min-width: 8rem; }
 .pref input[type="text"], .pref input[type="number"], .pref input[type="date"] { font: inherit; color: inherit; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: .45rem .65rem; }

@@ -38,6 +38,14 @@ PREFS_HEAD = """/* Learner preferences — the choices on preferences.html. Sche
    setting does: formats/preferences.md. Everything after "window.PREFS =" is
    strict JSON: the server rewrites this file when the learner presses Save. */
 window.PREFS = """
+# The theme: style.css imports theme.css from the workspace folder, and a Save that
+# picks one copies assets/themes/<name>.css there. Only a name with a file behind it.
+THEME_FILE = "theme.css"
+THEMES_DIR = os.path.join("assets", "themes")
+THEME_NAME = re.compile(r"^[a-z][a-z0-9-]{0,31}$")
+# Settings the tutor has nothing to act on (the console's look): saved, but left
+# out of the line typed into the drawer.
+PREFS_QUIET = ("theme",)
 CHUNK = 65536
 
 # What the console renders, and so what counts as "new content" landing.
@@ -118,6 +126,8 @@ class StudyHandler(http.server.SimpleHTTPRequestHandler):
             return self.relay()
         if self.path.split("?", 1)[0] == CHANGES_PATH:
             return self.changes()
+        if self._no_theme():
+            return self.empty_theme()
         return super().do_GET()
 
     # ---- new content -----------------------------------------------------
@@ -151,7 +161,22 @@ class StudyHandler(http.server.SimpleHTTPRequestHandler):
     def do_HEAD(self):
         if self._is_terminal():
             return self.relay()
+        if self._no_theme():
+            return self.empty_theme()
         return super().do_HEAD()
+
+    # ---- the theme -------------------------------------------------------
+    def _no_theme(self):
+        return self.path.split("?", 1)[0] == "/" + THEME_FILE and \
+            not os.path.exists(os.path.join(self.directory, THEME_FILE))
+
+    def empty_theme(self):
+        """Every page imports theme.css; until a theme is picked there is none.
+        An empty stylesheet means the defaults, and no 404 line in the terminal."""
+        self.send_response(200)
+        self.send_header("Content-Type", "text/css; charset=utf-8")
+        self.send_header("Content-Length", "0")
+        self.end_headers()
 
     def do_POST(self):
         # ttyd asks for a token over POST; the others are a page's answers and
@@ -276,6 +301,14 @@ class StudyHandler(http.server.SimpleHTTPRequestHandler):
                 if not isinstance(value, str) or len(value) > 200 \
                         or any(ord(c) < 32 for c in value):
                     raise ValueError("value")
+            theme_src = None
+            if "theme" in incoming:
+                name = incoming["theme"]
+                if not isinstance(name, str) or not THEME_NAME.match(name):
+                    raise ValueError("theme")
+                theme_src = os.path.join(self.directory, THEMES_DIR, name + ".css")
+                if not os.path.isfile(theme_src):
+                    raise ValueError("theme")
         except (ValueError, TypeError, UnicodeDecodeError):
             self.send_error(400, "bad preferences")
             return
@@ -296,18 +329,28 @@ class StudyHandler(http.server.SimpleHTTPRequestHandler):
         new = dict(old)
         new.update(incoming)
         shown = lambda v: v if isinstance(v, str) and v else json.dumps(v, ensure_ascii=False)
-        changed = ["%s %s → %s" % (k, shown(old[k]) if k in old else "(unset)", shown(v))
+        changed = [(k, "%s %s → %s" % (k, shown(old[k]) if k in old else "(unset)", shown(v)))
                    for k, v in incoming.items() if k not in old or old[k] != v]
+        told = [text for k, text in changed if k not in PREFS_QUIET]
         with open(path, "w", encoding="utf-8") as f:
             f.write(PREFS_HEAD + json.dumps(new, indent=2, ensure_ascii=False) + ";\n")
         try:
             StudyHandler.self_written[path] = os.stat(path).st_mtime_ns
         except OSError:
             pass
+        if theme_src:
+            theme = os.path.join(self.directory, THEME_FILE)
+            with open(theme_src, "rb") as src, open(theme, "wb") as dst:
+                dst.write(src.read())
+            try:
+                StudyHandler.self_written[theme] = os.stat(theme).st_mtime_ns
+            except OSError:
+                pass
 
-        line = ("[console] I saved my preferences: %s. Now in %s." % (", ".join(changed), PREFS_FILE)
-                if changed else None)
-        body = json.dumps({"path": PREFS_FILE, "line": line, "changed": changed},
+        line = ("[console] I saved my preferences: %s. Now in %s." % (", ".join(told), PREFS_FILE)
+                if told else None)
+        body = json.dumps({"path": PREFS_FILE, "line": line,
+                           "changed": [text for k, text in changed]},
                           ensure_ascii=False).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -449,11 +492,11 @@ class StudyHandler(http.server.SimpleHTTPRequestHandler):
         # get a short TTL on purpose: a no-store stylesheet has to be re-fetched
         # on every page load, so a restart of this server at the wrong moment
         # leaves a lesson rendering unstyled with no cached copy to fall back on.
-        # reviews.js and preferences.js are data that gets rewritten, not assets:
-        # never cached either.
+        # reviews.js, preferences.js and theme.css are data that gets rewritten,
+        # not assets: never cached either.
         tail = self.path.split("?", 1)[0].rsplit("/", 1)[-1]
         is_page = tail == "" or tail.endswith(".html") or "." not in tail \
-            or tail in ("reviews.js", PREFS_FILE)
+            or tail in ("reviews.js", PREFS_FILE, THEME_FILE)
         self.send_header("Cache-Control", "no-store" if is_page else "max-age=60")
         super().end_headers()
 

@@ -1,6 +1,6 @@
 # Preferences format
 
-`preferences.js` holds the choices the learner makes on `preferences.html`: how review runs, how lessons are shaped, how a session opens. It is the one place these settings live. The console reads it to draw the review panel, you read it at the start of every session, and the page rewrites it when the learner presses **Save**.
+`preferences.js` holds the choices the learner makes on `preferences.html`: how review runs, how lessons are shaped, how a session opens, which colours the pages wear. It is the one place these settings live. The console reads it to draw the review panel, you read it at the start of every session, and the page rewrites it when the learner presses **Save**.
 
 Every default is the skill's own behaviour, so a page nobody has touched changes nothing. Nuance that no setting captures — tone, formats they love or hate, a bad day — still goes to `NOTES.md` under **Learner preferences**.
 
@@ -14,7 +14,8 @@ window.PREFS = {
   "lessonLength": "standard",
   "opener": "recap",
   "feedback": "few-lessons",
-  "language": "English"
+  "language": "English",
+  "theme": "paper"
 };
 ```
 
@@ -33,6 +34,7 @@ In curriculum mode, add `"hoursPerWeek"` (a number) and `"targetDate"` (`YYYY-MM
 | `opener` | `recap`, `straight` | — | `recap`: open each session with two lines, where they are and what today holds. `straight`: the first thing you say is the first thing to do. |
 | `feedback` | `few-lessons`, `every-lesson`, `when-asked` | — | `few-lessons`: the [feedback conversation](../SKILL.md#the-feedback-conversation) on its usual rhythm. `every-lesson`: one line at the end of each lesson. `when-asked`: no scheduled check-ins at all. |
 | `language` | from the diagnostic | — | Every new page in it, labels included. Pages already written stay as they are unless the learner asks for them translated. Keep `NOTES.md`'s **Teaching language** in step. |
+| `theme` | `paper`, `slate`, `sage`, `night` | Every page's colours: `bin/study` copies `assets/themes/<name>.css` to `theme.css`, which `style.css` imports. `paper` is the default look; `night` is always dark; the others follow the system's light or dark. | Nothing — it is left out of the Save line. When the learner asks you for one, set it here and copy the file to `theme.css` yourself. |
 | `hoursPerWeek`, `targetDate` | curriculum mode only | — | Recompute the `Budget:` and `Lessons left:` lines in `NOTES.md` in the same session ([pace](../SKILL.md#two-modes-open-and-curriculum)). |
 
 ## Review dates are kept in every mode
@@ -48,9 +50,11 @@ Served, the page types one line into your drawer:
 
 `[console] I saved my preferences: review daily → optional, reviewCap 6 → 3. Now in preferences.js.`
 
+A save that changed only the `theme` types nothing: it asks nothing of you.
+
 The console's review panel has already changed by then. Answer in one or two lines: what changes and from when — a lesson-shape change starts with the next lesson. Record it in `NOTES.md` under **Learner preferences** with the date, and write a `preference` [checkpoint](./checkpoint.md) when it is not obvious (review turned off, say). The page itself states the cost of turning review off, so do not argue it again.
 
-Off disk there is no server: the page shows the learner a line to pass on, and you write `preferences.js` from it.
+Off disk there is no server: the page shows the learner a line to pass on, and you write `preferences.js` from it — for a `theme`, copy `assets/themes/<name>.css` to `theme.css` as well.
 
 ## Rules
 
