@@ -38,6 +38,7 @@ The workspace has two layers, deliberately kept apart.
 - `glossary.html` — the workspace's shared vocabulary. Built from [templates/doc.html](./templates/doc.html); follows [formats/glossary.md](./formats/glossary.md).
 - `sources.html` — the trusted material teaching is drawn from. Built from [templates/doc.html](./templates/doc.html); follows [formats/sources.md](./formats/sources.md).
 - `curriculum.html` — **curriculum mode only**: the external syllabus, as milestones and topics with the state each is in. Built from [templates/doc.html](./templates/doc.html); follows [formats/curriculum.md](./formats/curriculum.md). See [Two modes](#two-modes-open-and-curriculum).
+- `preferences.html` — the learner's **settings**: how review runs, how a lesson ends and how long it runs, how a session opens, the teaching language, and in curriculum mode their hours and date. They change it whenever they like; **Save** rewrites `preferences.js` and tells you what changed. Built from [templates/preferences.html](./templates/preferences.html) — see [Preferences](#preferences).
 - `lessons/*.html` — the lessons. A **lesson** is one self-contained page teaching a single small thing tied to the Goal. The main thing you make. Built from [templates/lesson.html](./templates/lesson.html), named `0001-<dash-case-name>.html`, the number rising each time.
 - `assessments/*.html` — **curriculum mode only**: the pre- and post-assessment that open and close each milestone, `m1-pre.html` / `m1-post.html`. Built from [templates/assessment.html](./templates/assessment.html) — see [Milestones and assessments](#milestones-and-assessments).
 - `reference/*.html` — **reference cards**: the distilled residue of lessons (cheat sheets, syntax tables, sequences, formulae). Clean documents that print well and are meant to be returned to. Built from [templates/reference.html](./templates/reference.html).
@@ -46,6 +47,7 @@ The workspace has two layers, deliberately kept apart.
 
 - `checkpoints/*.md` — **checkpoints**: short Markdown records of what the learner has actually taken on board, and any non-obvious insight worth revisiting. Roughly the learning equivalent of an engineering decision log. This is how you locate the learning edge next session. Named `0001-<dash-case-name>.md`, incrementing. Use [formats/checkpoint.md](./formats/checkpoint.md).
 - `reviews.js` — the **retention queue**: one entry per idea or micro-skill worth keeping, each carrying the date it next comes due. You maintain it; the console reads it to show what is due today. Schema and scheduling in [formats/reviews.md](./formats/reviews.md).
+- `preferences.js` — the values behind `preferences.html`, plain JS data like `reviews.js`. The console reads it to shape the Due panel; you read it every session. Schema, and what each setting makes you do: [formats/preferences.md](./formats/preferences.md).
 - `submissions/*.md` — what the learner answered on a page, written by `bin/study-server.py` when they press **Send to tutor**: every quick check, short answer and mini-challenge summary, with the model answer beside it. See [Submissions](#submissions).
 - `NOTES.md` — the workspace's running notebook: the **course outline** at the top, then progress, decisions made, and how this learner likes to be taught. See [`NOTES.md`](#notesmd).
 - `curriculum/` — curriculum mode only, and only when the learner handed you the syllabus as a file: the file itself, kept as given.
@@ -80,12 +82,12 @@ The first time you land in an empty workspace (no `index.html`), stand it up bef
 
 ## How a session goes
 
-Once a workspace exists, every session runs the same shape:
+Once a workspace exists, every session runs the same shape. Read `preferences.js` first: the learner's settings adjust each step ([Preferences](#preferences)).
 
-1. **Clear what's due.** Run the [retention ritual](#the-retention-engine) first — old material retrieved before new material taught, always.
+1. **Open, then clear what's due.** With `opener` on `recap` (the default), start with two lines: where they are, and what today holds. Then, with `review` on `daily` (the default), run the [retention ritual](#the-retention-engine) — old material retrieved before new material taught, always. On `optional` it waits until they ask; on `off` there is none.
 2. **Find the edge.** Read the `checkpoints/` and the Goal, and pick the most relevant thing sitting just past what the learner can already do (the [learning edge](./principles.md#the-learning-edge)). In curriculum mode the edge sits inside the **active milestone** — the one the learner started: the next `open` topic in `curriculum.html` that builds on what they hold. If nothing is active, there is no edge to find: point at the **Start** buttons in the menu, suggest which one you would take first and why, and let them press it. Glance at the pace in `NOTES.md`, and say so if they are behind.
 3. **Teach one lesson** at that edge (see [Lessons](#lessons)), ending in practice that makes the learner *produce*.
-4. **Propose and update.** Offer 1–3 review items from the lesson; add to `reviews.js` the ones the learner confirms, and any they add. Mark progress and update the console.
+4. **Propose and update.** Offer 1–3 review items from the lesson (none when `review` is `off`); add to `reviews.js` the ones the learner confirms, and any they add. Mark progress and update the console.
 
 ### Submissions
 
@@ -103,9 +105,11 @@ If the drawer could not take the line (it was not open, or the console was opene
 
 The menu's **Start** buttons speak the same way: `[console] Start milestone m6 — Automation and Programmability.` There is no file behind that one; it is the learner choosing what to open next — see [Two modes](#two-modes-open-and-curriculum).
 
+So does **Save** on the Preferences page: `[console] I saved my preferences: review daily → optional, reviewCap 6 → 3. Now in preferences.js.` The file is the record — see [Preferences](#preferences).
+
 ## The Console
 
-The console is the learner's home. Its side menu, progress meter, default page, and **Due-for-review** panel are all driven by data inside the workspace — the `MENU` object in `index.html`, and the retention queue in `reviews.js`. Never hand-edit the rendered markup.
+The console is the learner's home. Its side menu, progress meter, default page, and **Due-for-review** panel are all driven by data inside the workspace — the `MENU` object in `index.html`, the retention queue in `reviews.js`, and the learner's settings in `preferences.js`. Never hand-edit the rendered markup.
 
 After you create or finish anything, update the data:
 
@@ -119,7 +123,7 @@ After you create or finish anything, update the data:
 
 Adding an entry is one line. The workspace grows as learning does, and the learner always lands on what they should do next.
 
-The **Due** panel shows at most **six** items a day — the shakiest first — however long the queue is; the rest wait unseen, because a wall of twenty prompts reads as a verdict, and six reads as today's work. The prompts sit in a collapsible peek — open by default, because seeing what is due is the point — with a **Review** button above them. The learner can fold it away, and the console remembers, so the menu below never gets pushed off the screen. Prompts are shown as **plain text** (the console escapes them), so write them as text, never HTML.
+The **Due** panel shows at most **six** items a day — or the learner's `reviewCap` — the shakiest first, however long the queue is; the rest wait unseen, because a wall of twenty prompts reads as a verdict, and six reads as today's work. The prompts sit in a collapsible peek — open by default, because seeing what is due is the point — with a **Review** button above them. The learner can fold it away, and the console remembers, so the menu below never gets pushed off the screen. Prompts are shown as **plain text** (the console escapes them), so write them as text, never HTML. With `review` on `optional` the panel shrinks to a quiet **Review** button with no count and no list; on `off` it is gone.
 
 ## The Retention Engine
 
@@ -127,11 +131,11 @@ The **Due** panel shows at most **six** items a day — the shakiest first — h
 
 The queue lives in `reviews.js` — back of house, but the console reads it to show a **Due** panel, so the moment the learner opens the workspace they see exactly what to revisit today. Each item is tiny and self-contained: a prompt, what to recall, which **box** (interval stage) it sits in, and the date it next comes due. The full schema and the scheduling rules are in [formats/reviews.md](./formats/reviews.md).
 
-**Where items come from.** You never write the queue as a separate chore — it falls out of teaching, but it is **proposed, not imposed**. At the end of every lesson you offer 1–3 candidates — the learner's own summary from the mini challenge, plus any idea a quick check caught them out on — and the learner confirms, edits, drops, or adds their own (see [Lessons](#lessons) and [formats/reviews.md](./formats/reviews.md#adding-items--propose-then-let-the-learner-decide)). A queue the learner agreed to is one they will clear; one that fills itself is one they stop opening. The one exception is a post-assessment miss, which is a proven gap and goes in without asking.
+**Where items come from.** You never write the queue as a separate chore — it falls out of teaching, but it is **proposed, not imposed**. At the end of every lesson you offer 1–3 candidates (none when `review` is `off`) — the learner's own summary from the mini challenge, plus any idea a quick check caught them out on — and the learner confirms, edits, drops, or adds their own (see [Lessons](#lessons) and [formats/reviews.md](./formats/reviews.md#adding-items--propose-then-let-the-learner-decide)). A queue the learner agreed to is one they will clear; one that fills itself is one they stop opening. The one exception is a post-assessment miss, which is a proven gap and goes in without asking.
 
-**The session ritual — do this every session, before new material:**
+**The session ritual — do this every session, before new material** (with `review` on `daily`, the default; `optional` and `off` are in [Preferences](#preferences)):
 
-1. Load `reviews.js` and compute what is **due** against today's date. The console shows the learner at most six — the shakiest first. If far more than that has piled up, **triage** it out loud before anything else: merge, retire, and spread the rest over the coming weeks ([backlog triage](./formats/reviews.md#backlog-triage)). Never march them through twenty.
+1. Load `reviews.js` and compute what is **due** against today's date. The console shows the learner at most `reviewCap` — six unless they chose otherwise — the shakiest first. If far more than that has piled up, **triage** it out loud before anything else: merge, retire, and spread the rest over the coming weeks ([backlog triage](./formats/reviews.md#backlog-triage)). Never march them through twenty.
 2. **Clear the day's items first.** Old material retrieved before new material taught — always. Run each as a genuine retrieval attempt: pose the prompt, let the learner answer *from memory*, then reveal the recall.
 3. **Grade each** `weak` / `good` / `strong` and move its box per [formats/reviews.md](./formats/reviews.md#reviewing-the-session-ritual). A weak answer gets asked *when* it should come back — tomorrow, a few days, a week — never *whether*. A good or strong one moves on silently; a strong one from a high box retires, and you say so.
 4. **Rewrite `reviews.js`** with the new boxes and dates. Log a checkpoint only for surprises — a stubborn item that keeps lapsing, or one clearly mastered and worth retiring.
@@ -159,11 +163,11 @@ Styling comes from the shared `assets/style.css`, so write only content — ever
 
 Keep a lesson **short and quickly finished**. Working memory is tiny, and you have to stay inside it — but each lesson must hand over one concrete win to build on. Tie it straight to the Goal, and sit it on the [learning edge](./principles.md#the-learning-edge).
 
-Show an honest time-to-finish near the title (the template has a slot for it). Estimate it from reading length plus the hands-on task, and treat it as a check on "keep it short": if a lesson reads as more than ~10 minutes, it is doing too much — split it.
+Show an honest time-to-finish near the title (the template has a slot for it). Estimate it from reading length plus the hands-on task, and treat it as a check on "keep it short": if a lesson reads as more than ~10 minutes — ~5 when the learner chose short lessons — it is doing too much: split it.
 
 **Read the verb.** In curriculum mode every topic comes with the syllabus's own verb, and the verb says what the lesson's practice has to be. *Describe*, *explain*, *compare* are met by understanding plus the summary. *Configure and verify*, *calculate*, *identify from output*, *troubleshoot* are not: those are things done, and the lesson has to make the learner **do** them — a lab task on real or emulated gear, a self-checking drill page in `lessons/` (subnetting problems, output-to-cause pairs, prefix-to-type), or an outside drill with a number attached (*"fifty subnet problems under a minute each; tell me the run"*), checked next session. The summary still closes the lesson; the doing sits beside it, never instead of it. A ten-minute lesson cannot carry a doing topic and a second topic too: **never bundle a doing topic with another** — subnetting gets its own lesson and, usually, a drill of its own. And ship a **reference card** with the exam-fact tables a doing topic rests on (standards and lengths, counter → cause, prefix → type, well-known ports), because a card is what gets reopened.
 
-**How to teach inside a lesson** is the pedagogy in [principles.md](./principles.md): teach the [understanding first, with friction low](./principles.md#understanding-first-difficulty-last), then build [capability through effortful practice](./principles.md#capability-through-effort) — 3–4 diagnostic quick-checks and the mini challenge, which is always the same task: *ask about anything unclear first, then summarise the lesson in your own words*. The template ships self-marking quiz blocks (each correct pick gets a green ✓) and the mini-challenge block with a reveal-and-compare model answer; keep its prompt as it is and write only the model answer. Quick checks are lower stakes than an assessment, but the same tell applies — run `bin/check-quiz` on the lesson too, and rewrite any it flags.
+**How to teach inside a lesson** is the pedagogy in [principles.md](./principles.md): teach the [understanding first, with friction low](./principles.md#understanding-first-difficulty-last), then build [capability through effortful practice](./principles.md#capability-through-effort) — 3–4 diagnostic quick-checks and the mini challenge, which is always the same task: *ask about anything unclear first, then summarise the lesson in your own words*. The template ships self-marking quiz blocks (each correct pick gets a green ✓) and the mini-challenge block with a reveal-and-compare model answer; keep its prompt as it is and write only the model answer — or, when `practice` is `checks-only` in their preferences, delete the block. Quick checks are lower stakes than an assessment, but the same tell applies — run `bin/check-quiz` on the lesson too, and rewrite any it flags.
 
 **Show a diagram whenever there's a process.** If a lesson touches a workflow, stages, phases, a sequence, or anything ordered, include a diagram — a visual lands faster than prose and keeps the page vivid; text alone is flat. The template has a diagram slot (a flow of boxes joined by arrows, styled to work offline); use inline `<svg>` for anything branching.
 
@@ -202,12 +206,21 @@ The **glossary** (`glossary.html`) is the card that matters most: once it exists
 
 If the learner asks for the post-assessment **before the lessons are done**, write it — it is theirs to ask for — but keep it out of the flow it would distort: leave `MENU.current` on the next lesson, not on the page; note in `NOTES.md` under Decisions that it exists and which angle each question takes, so the lessons you write afterwards do not reuse them as quick checks; and say once that a post taken before the teaching reads what they walked in with, so the reading that counts is the one after the last lesson. Then close the gaps:
 
-- Each missed topic goes to `shaky` in `curriculum.html`, and gets a review item straight into `reviews.js` as `source: "assessment"` — the one kind of item you add without asking, because a miss here is a proven gap.
+- Each missed topic goes to `shaky` in `curriculum.html`, and gets a review item straight into `reviews.js` as `source: "assessment"` — the one kind of item you add without asking, because a miss here is a proven gap. With `review` on `off` add nothing; the re-take covers it.
 - If a miss looks like a real gap rather than a slip, teach one short targeted lesson for it.
 - Then re-take **only the missed topics** — a smaller page, `m1-post-2.html`, or in the terminal if it is a topic or two. Never the whole milestone again.
 - The milestone is `passed` when you and the learner agree the gaps are closed. It is a judgment, not a score threshold.
 
 Log an `assessment` checkpoint after each one ([formats/checkpoint.md](./formats/checkpoint.md)), update the milestone's status in `MENU`, and update the pace in `NOTES.md`.
+
+## Preferences
+
+The learner shapes how they are taught on `preferences.html`, under **Foundations** in the menu. Every setting defaults to what this manual describes, so a learner who never opens the page gets exactly that: `review` (`daily` / `optional` / `off`), `reviewCap` (6 / 3 / 10), `practice` (`checks-and-summary` / `checks-only`), `lessonLength` (`standard` / `short`), `opener` (`recap` / `straight`), `feedback` (`few-lessons` / `every-lesson` / `when-asked`), `language`, and in curriculum mode `hoursPerWeek` and `targetDate`. What each value makes you do is in [formats/preferences.md](./formats/preferences.md).
+
+- **Read `preferences.js` at the start of every session.** Where this manual says *every session* or *always* about review, the summary, lesson length or check-ins, it describes the default. The learner's setting wins.
+- **A setting changes how review is offered, never what the queue records.** Dates are kept in every mode, and an item nobody reviewed keeps its due date.
+- **When they save**, the review panel has already changed. Say in a line what else changes and from when — a lesson-shape change starts with the next lesson — and record it in `NOTES.md`.
+- **Keep the page true.** A preference stated in conversation that one of the settings captures goes into `preferences.js` too, and you say so; nuance no setting captures goes to `NOTES.md` under **Learner preferences**. Never change a setting on your own judgment — suggest it, and let them tick it or tell you.
 
 ## The feedback conversation
 
@@ -220,12 +233,14 @@ Ask plainly, one thing at a time, and take the answers as given:
 - **Language** — is the teaching language right, and the register (plain, technical, formal)?
 - **Content** — too much theory, too little, or is the tie to the Goal getting lost?
 - **The quick checks** — useful, or a chore?
-- **Review** — how the daily six feel, whether the items proposed are the right ones, whether they are adding their own.
+- **Review** — how the daily round feels, whether the items proposed are the right ones, whether they are adding their own. How often and how many is theirs to set on the Preferences page; point them there.
 - **The pages** — anything about the console, the lessons, or the drawer that gets in the way.
 
-Record what you learn in `NOTES.md` under **Learner preferences**, and under **Decisions** if it changes direction — with a `preference` checkpoint for anything non-obvious. Then **act on it in the very next lesson**, and say what you changed: feedback that visibly changes something is feedback the learner keeps giving.
+Record what you learn in `NOTES.md` under **Learner preferences** — and, when one of the [settings](#preferences) captures it, in `preferences.js` too, so the page shows it — and under **Decisions** if it changes direction — with a `preference` checkpoint for anything non-obvious. Then **act on it in the very next lesson**, and say what you changed: feedback that visibly changes something is feedback the learner keeps giving.
 
 After that, keep the door open cheaply: at the end of every later milestone (or every few lessons in open mode), one line — *anything you'd like changed about how this is going?* — is enough. Pace trouble tends to show in the third milestone, not the first.
+
+That rhythm is the `feedback` setting's default, `few-lessons`. On `every-lesson`, ask the one line at the end of each lesson as well; on `when-asked`, hold no scheduled check-ins at all — they will tell you.
 
 ## `NOTES.md`
 
@@ -234,10 +249,10 @@ The workspace's running notebook — the important things to keep in hand betwee
 At the **top**, hold the course outline under the heading **"Course Outline (flexible — revise as we learn)"** — the arc of lessons you expect to teach toward the Goal. It is a plan, not a contract: as you read the learner and the Goal moves, revise it. In curriculum mode the coverage lives in `curriculum.html` instead; the outline here shrinks to the milestone order and why you chose it. Then, below the outline, keep the running notes:
 
 - **Mode** — `open` or `curriculum` ([Two modes](#two-modes-open-and-curriculum)). Settled at the first diagnostic.
-- **Teaching language** — the language every page and conversation is written in. Settled at the first diagnostic, never assumed; kept here so every session inherits it.
+- **Teaching language** — the language every page and conversation is written in. Settled at the first diagnostic, never assumed; kept here so every session inherits it, and in step with `language` in `preferences.js`, where the learner can change it.
 - **Progress** — where the learner is along the outline, what's done, what's next. In curriculum mode, also the **pace**: the `Budget:` and `Lessons left:` lines in the fixed shape from [Two modes](#two-modes-open-and-curriculum), plus milestones left against weeks to the deadline, updated after every pre-assessment and as milestones close.
 - **Decisions** — important calls made about direction, scope, or approach, and why.
-- **Learner preferences** — pace, tone, formats they like or hate, constraints to remember. Fed by the [feedback conversation](#the-feedback-conversation) as much as by what you observe.
+- **Learner preferences** — the reasons behind the settings in `preferences.js`, and everything no setting captures: pace, tone, formats they like or hate, constraints to remember. Fed by the [feedback conversation](#the-feedback-conversation) as much as by what you observe.
 - Anything else worth not forgetting.
 
 Keep it lean — signal for future-you, not a transcript. Deeper per-session records of what landed and what didn't live in `checkpoints/`; `NOTES.md` is the at-a-glance state of the whole course.

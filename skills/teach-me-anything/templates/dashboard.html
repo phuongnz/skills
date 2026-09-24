@@ -1,7 +1,8 @@
 <!doctype html>
 <!-- teach-me-anything console. Copy to index.html. The sidebar, progress meter, and
      default page are driven by the MENU object below; the Due panel is driven by the
-     retention queue in reviews.js. Edit only MENU here; edit reviews.js for the queue.
+     retention queue in reviews.js, shaped by the learner's choices in preferences.js.
+     Edit only MENU here; edit reviews.js for the queue.
      The tutor-terminal drawer at the bottom talks to bin/study (copied from
      templates/bin/); opened straight off disk, the console still works without it. -->
 <html lang="en">
@@ -60,6 +61,9 @@
 
   <!-- Retention queue: window.REVIEW = [ … ] -->
   <script src="reviews.js"></script>
+  <!-- The learner's choices from preferences.html: window.PREFS = { … }. Missing is fine:
+       the defaults below are the skill's own behaviour. -->
+  <script src="preferences.js"></script>
   <script>
     /* ── The single source of truth for the sidebar. ──────────────────────
        Update this as learning grows:
@@ -69,7 +73,8 @@
          new card      → push to MENU.cards
          goal changed  → update MENU.goalLine
          milestone     → set its status: "todo" | "active" | "known" | "passed"
-       (The review queue lives in reviews.js, not here.)                      */
+       (The review queue lives in reviews.js and the learner's settings in
+       preferences.js, not here.)                                              */
     const MENU = {
       topic: "<topic>",
       goalLine: "<one-line goal>",
@@ -79,6 +84,7 @@
         { href: "glossary.html", title: "Glossary" },
         { href: "sources.html", title: "Sources" },
         // curriculum mode: { href: "curriculum.html", title: "Curriculum" },
+        { href: "preferences.html", title: "Preferences" },
       ],
       // Curriculum mode only — leave empty for an open workspace. Every milestone shows in
       // the menu from day one with its status, so the learner sees what is done and what is
@@ -106,11 +112,12 @@
         navLinks.forEach(a => a.classList.toggle("active", a.dataset.href === href));
       }
 
-      /* Everything the sidebar shows, drawn from MENU and the review queue. Run once
-         on load, and again by the new-content badge with a freshly fetched MENU, so
-         the console updates in place — a page reload would restart the drawer's
-         terminal, cutting the tutor off mid-answer. */
-      function render(MENU, REVIEW) {
+      /* Everything the sidebar shows, drawn from MENU, the review queue and the
+         learner's preferences. Run once on load, and again with freshly fetched data
+         by the new-content badge or a Save on preferences.html, so the console
+         updates in place — a page reload would restart the drawer's terminal,
+         cutting the tutor off mid-answer. */
+      function render(MENU, REVIEW, PREFS) {
         $("topic").textContent = MENU.topic;
         $("goalline").textContent = MENU.goalLine;
 
@@ -180,8 +187,15 @@
         /* ── Due-for-review panel, computed from reviews.js against today. ──
            Only DUE_CAP items are shown, shakiest first (lowest box, then most
            overdue). The rest wait unseen: a long backlog is the tutor's to
-           spread out, never a number the learner has to face. */
-        const DUE_CAP = 6;
+           spread out, never a number the learner has to face. How it shows is
+           the learner's call (preferences.js, formats/preferences.md):
+             review "daily"    → count, list and Review button (the default)
+             review "optional" → a quiet Review button, no count, no list
+             review "off"      → nothing
+           and reviewCap sets DUE_CAP. */
+        const prefs = PREFS && typeof PREFS === "object" ? PREFS : {};
+        const mode = prefs.review === "optional" || prefs.review === "off" ? prefs.review : "daily";
+        const DUE_CAP = Math.min(Math.max(parseInt(prefs.reviewCap, 10) || 6, 1), 20);
         const now = new Date();
         const today = now.getFullYear() + "-" +
           String(now.getMonth() + 1).padStart(2, "0") + "-" +
@@ -196,7 +210,14 @@
         const esc = t => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;")
                                   .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
-        if (due.length) {
+        if (mode === "off") {
+          $("due").innerHTML = "";
+        } else if (mode === "optional" && due.length) {
+          $("due").innerHTML = '<div class="due"><div class="group">Review</div>' +
+            '<p class="due-clear">Ready when you want it.</p>' +
+            '<button class="due-start" id="due-start">Review</button></div>';
+          $("due-start").addEventListener("click", () => runReview(due));
+        } else if (due.length) {
           let peekOpen = true;
           try { peekOpen = localStorage.getItem("duePeek") !== "closed"; } catch (e) {}
           const n = due.length + (due.length === 1 ? " question" : " questions");
@@ -242,36 +263,58 @@
         overlay.hidden = false;
       }
 
-      render(MENU, window.REVIEW);
+      render(MENU, window.REVIEW, window.PREFS);
       go(MENU.current);
       setActive(MENU.current);
+      const activeHref = () => {
+        const a = document.querySelector("#menu a.active");
+        return a ? a.dataset.href : null;
+      };
 
       /* The Due panel is "due ≤ today", and today changes. A tab left open overnight
          would keep yesterday's panel, so redraw the sidebar from what is already loaded
          when the date rolls over — no fetch, the stage untouched, works off disk too. */
-      let loaded = { menu: MENU, review: window.REVIEW };
+      let loaded = { menu: MENU, review: window.REVIEW, prefs: window.PREFS };
       const dayOf = () => new Date().toDateString();
       let day = dayOf();
       setInterval(() => {
         if (dayOf() === day) return;
         day = dayOf();
-        const active = document.querySelector("#nav a.active");
-        render(loaded.menu, loaded.review);
-        setActive(active ? active.dataset.href : loaded.menu.current);
+        const active = activeHref();
+        render(loaded.menu, loaded.review, loaded.prefs);
+        setActive(active || loaded.menu.current);
       }, 60000);
+
+      /* Re-read the three data files. A missing or half-written preferences.js
+         keeps what was loaded rather than breaking the redraw. */
+      async function reload() {
+        const text = url => fetch(url, { cache: "no-store" }).then(r => r.ok ? r.text() : "");
+        const [html, js, pjs] = await Promise.all([text("index.html"), text("reviews.js"), text("preferences.js")]);
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const src = Array.from(doc.scripts).map(s => s.textContent).find(t => /const MENU\s*=/.test(t));
+        const menu = new Function(src + "\nreturn MENU;")();
+        const review = new Function(js + "\nreturn window.REVIEW;")();
+        let prefs = loaded.prefs;
+        try { if (pjs) prefs = new Function(pjs + "\nreturn window.PREFS;")(); } catch (e) {}
+        return { menu, review, prefs };
+      }
+
+      /* What preferences.html calls after a Save: redraw the sidebar and leave the
+         stage alone, so the learner stays on the page they just saved. */
+      window.refreshSidebar = async function () {
+        const active = activeHref();
+        loaded = await reload();
+        render(loaded.menu, loaded.review, loaded.prefs);
+        setActive(active || loaded.menu.current);
+      };
 
       /* What the new-content badge calls: re-read this file and reviews.js, redraw the
          sidebar from the fresh MENU, and bring the stage to whatever `current` now
          points at — reloading it if that is the page already showing. */
       window.refreshConsole = async function () {
-        const text = url => fetch(url, { cache: "no-store" }).then(r => r.text());
-        const [html, js] = await Promise.all([text("index.html"), text("reviews.js")]);
-        const doc = new DOMParser().parseFromString(html, "text/html");
-        const src = Array.from(doc.scripts).map(s => s.textContent).find(t => /const MENU\s*=/.test(t));
-        const menu = new Function(src + "\nreturn MENU;")();
-        const review = new Function(js + "\nreturn window.REVIEW;")();
-        loaded = { menu, review };
-        render(menu, review);
+        loaded = await reload();
+        const menu = loaded.menu;
+        render(menu, loaded.review, loaded.prefs);
         const target = new URL(menu.current, location.href).href;
         let showing = "";
         try { showing = stage.contentWindow.location.href; } catch (e) {}

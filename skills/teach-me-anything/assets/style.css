@@ -349,3 +349,23 @@ body.has-drawer { height: 100vh; display: flex; flex-direction: column; overflow
   a { color: #000; text-decoration: underline; }
   pre, .card, .quiz, .flow .node { border-color: #999; }
 }
+
+/* Preferences page (preferences.html): one panel per setting, choices as cards. */
+.pref { border: 1px solid var(--line); background: var(--panel); border-radius: var(--radius); padding: 1rem 1.4rem 1.2rem; margin: 1rem 0; min-width: 0; color-scheme: light dark; }
+.pref legend { font-weight: 600; padding: 0 .35rem; margin-left: -.35rem; }
+.pref .hint { font-size: .85rem; color: var(--ink-soft); margin: .6rem 0 0; }
+.choice { display: flex; gap: .7rem; align-items: flex-start; padding: .55rem .8rem; margin: .45rem 0; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); cursor: pointer; }
+.choice:hover { border-color: var(--accent); }
+.choice:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.choice input { margin: .4rem 0 0; accent-color: var(--accent); flex: none; }
+.choice small { display: block; color: var(--ink-soft); font-size: .85rem; line-height: 1.5; }
+.choice-row { display: flex; gap: .5rem; flex-wrap: wrap; }
+.choice-row .choice { flex: 1 1 9rem; margin: .45rem 0 0; }
+.pref .field { display: flex; flex-wrap: wrap; gap: .3rem 1rem; align-items: center; margin: .6rem 0 0; }
+.pref .field label { min-width: 8rem; }
+.pref input[type="text"], .pref input[type="number"], .pref input[type="date"] { font: inherit; color: inherit; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: .45rem .65rem; }
+.pref input[type="text"] { width: min(100%, 20rem); }
+.pref input[type="number"] { width: 7rem; }
+.prefs .submit { margin-top: 2rem; }
+.prefs .report { font-size: .9rem; color: var(--ink-soft); }
+.prefs .report code { user-select: all; }

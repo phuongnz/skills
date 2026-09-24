@@ -40,22 +40,22 @@ Each item sits in a **box**. The box sets how long until it comes due again — 
 
 Items are never added silently. At the end of a lesson you **propose** the candidates and the learner **confirms, edits, drops, or adds** — a queue the learner agreed to is one they will clear; one that fills itself is one they stop opening.
 
-- **Propose 1–3 items per lesson, no more.** The first is always the learner's own summary from the [mini challenge](../principles.md#capability-through-effort); the others are only the ideas a quick check actually caught them out on. An idea they got right first time is not a candidate.
+- **Propose 1–3 items per lesson, no more** — and none when `review` is `off` in [preferences](./preferences.md). The first is always the learner's own summary from the [mini challenge](../principles.md#capability-through-effort); the others are only the ideas a quick check actually caught them out on. An idea they got right first time is not a candidate.
 - **Argue, then yield.** If they drop an item you think will fade — "this feels easy now; it is exactly the kind that slips" — say so once. Then respect the answer.
 - **Take what they add.** Anything the learner wants to keep goes in as `source: "learner"`, in their words. Help them make it atomic.
 - New items: `box: 1`, `due:` = today **+ 1 day**, `added:` = today.
 - Keep `prompt`/`recall` atomic — one idea, answerable in a breath. Split anything bigger into several items.
 - Write `prompt`/`recall` as **plain text**, not HTML. The console escapes them, so a prompt may safely contain quotes, `<placeholders>` or code — and any markup would show up literally.
 
-**Assessment misses are the one exception.** A topic a post-assessment shows did not hold is a proven gap, and goes in without asking, as `source: "assessment"` (see [Milestones and assessments](../SKILL.md#milestones-and-assessments)).
+**Assessment misses are the one exception.** A topic a post-assessment shows did not hold is a proven gap, and goes in without asking, as `source: "assessment"` (see [Milestones and assessments](../SKILL.md#milestones-and-assessments)) — unless `review` is `off`, when nothing goes in.
 
 ## The daily cap
 
-The console shows at most **six** due items a day, shakiest first (lowest box, then most overdue). Whatever else is due waits, unseen. Twenty prompts on screen reads as a verdict on the learner; six reads as today's work. Mirror this in the terminal: run the six the console shows, not the whole backlog.
+The console shows at most **six** due items a day — or the learner's `reviewCap`, 3 or 10, from their [preferences](./preferences.md) — shakiest first (lowest box, then most overdue). Whatever else is due waits, unseen. Twenty prompts on screen reads as a verdict on the learner; six reads as today's work. Mirror this in the terminal: run what the console shows, not the whole backlog.
 
 ## Reviewing (the session ritual)
 
-At the start of every session, compute **due** items (`due` ≤ today) and clear the day's share *before* teaching anything new. Run each as a real retrieval attempt — pose the `prompt`, let the learner answer from memory, then reveal `recall`. Grade in three steps, then move the box and reset `due`:
+At the start of every session — with `review` on `daily`, the default; see [preferences](./preferences.md) for `optional` and `off` — compute **due** items (`due` ≤ today) and clear the day's share *before* teaching anything new. Run each as a real retrieval attempt — pose the `prompt`, let the learner answer from memory, then reveal `recall`. Grade in three steps, then move the box and reset `due`:
 
 | Grade | Meaning | Box change | New `due` |
 |-------|---------|-----------|-----------|
@@ -81,4 +81,4 @@ Retire an item when it is graded `strong` from box 5 or 6, or when the learner c
 - **Proposed, not imposed.** The learner has the last word on what enters the queue, except assessment misses.
 - **Reschedule from today.** Never from the stored due date.
 - **Seed from practice, not prose.** Prefer items the learner had to *generate*, not passively read.
-- **Keep it lean.** 1–3 items a lesson; six a day on screen. A queue of hundreds is a signal you are keeping trivia — retain what serves the Goal, let the rest go.
+- **Keep it lean.** 1–3 items a lesson; the daily cap on screen. A queue of hundreds is a signal you are keeping trivia — retain what serves the Goal, let the rest go.

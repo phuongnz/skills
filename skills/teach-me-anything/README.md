@@ -9,7 +9,8 @@ This file is for you, the learner. `SKILL.md` and the files beside it are the tu
 A folder that grows as you learn. You open one page in it — the **console** — and work from there:
 
 - a menu of lessons, reference cards and foundation pages down the side, with a progress meter
-- a **Due for review** panel: at most six things a day, the shakiest first, drawn from a spaced-review queue the tutor keeps
+- a **Due for review** panel: at most six things a day by default, the shakiest first, drawn from a spaced-review queue the tutor keeps
+- a **Preferences** page, where you decide how you are taught: review every session, only when you ask, or not at all; how many a day; whether a lesson ends with your own summary; five- or ten-minute lessons; how a session starts
 - the current lesson in the middle — short, one idea, a few quick checks, and a mini challenge where you summarise it in your own words
 - the tutor in a **terminal drawer** along the bottom, the same conversation every day
 
@@ -52,9 +53,10 @@ From the next day on, `bin/study` is the whole routine.
 
 ## Day to day
 
-- **Clear what's due first.** The panel shows today's items; the tutor runs them with you in the drawer and reschedules each one by how it went. (The **Review** button on the page is an ungraded flip-through — handy, but only the tutor moves the dates.)
+- **Clear what's due first** — unless you set review to *only when I ask* or *off*. The panel shows today's items; the tutor runs them with you in the drawer and reschedules each one by how it went. (The **Review** button on the page is an ungraded flip-through — handy, but only the tutor moves the dates.)
 - **Then one lesson.** The tutor writes it, the page shows a blinking **new content** badge, you click it and the lesson appears — the drawer stays as it was.
 - **Send to tutor.** Quick checks, short answers, your summary and assessments end in a button that hands your answers to the drawer. The tutor reads them and reacts.
+- **Preferences.** Under Foundations in the menu. Change anything any time; **Save** updates the review panel at once and tells the tutor, who adapts from the next lesson.
 - **Start buttons.** In curriculum mode you choose which milestone to open next; the tutor's suggested order is advice.
 - Ask anything in the drawer, any time. Quit the tutor and you have a plain shell in the workspace for hands-on practice.
 
@@ -70,7 +72,7 @@ bin/check-quiz lessons/0001-*.html  # what the tutor runs to keep quiz options f
 
 ## What is in the folder
 
-Yours: `index.html` (the console), `lessons/`, `reference/`, `goal.html`, `glossary.html`, `sources.html`, `curriculum.html` and `assessments/` in curriculum mode.
+Yours: `index.html` (the console), `lessons/`, `reference/`, `goal.html`, `glossary.html`, `sources.html`, `preferences.html` (saved to `preferences.js`), `curriculum.html` and `assessments/` in curriculum mode.
 
 The tutor's — plain text, read them if you are curious, but they are its working memory: `NOTES.md` (course outline, pace, decisions), `checkpoints/` (what it believes you hold), `reviews.js` (the review queue), `submissions/` (what you sent). `AGENTS.md` / `CLAUDE.md` tell any agent that starts cold here that it is the tutor.
 

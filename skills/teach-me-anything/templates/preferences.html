@@ -1,0 +1,256 @@
+<!doctype html>
+<!-- Preferences page. Copy to preferences.html in the workspace root, next to
+     preferences.js, which holds the values (schema: formats/preferences.md). The
+     page reads that file, lets the learner change it, and Save hands the changes to
+     bin/study-server.py, which rewrites the file and returns the line typed into the
+     tutor's drawer. Write every visible word in the teaching language, like any page;
+     leave the name="…" and value="…" attributes as they are — they are the schema.
+     The Pace section shows only when preferences.js has hoursPerWeek or targetDate
+     (curriculum mode sets them at setup). -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Preferences</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <div class="wrap prefs">
+    <p class="eyebrow">Foundation<span class="dot">·</span><span>Preferences</span></p>
+    <h1>How you want to learn</h1>
+    <p class="lead">Pick what suits you and press Save. The review panel changes at once;
+      your tutor gets a note of what changed and adapts from the next lesson. Change
+      anything, any time.</p>
+
+    <form id="prefs" novalidate autocomplete="off">
+      <h2>Review</h2>
+      <fieldset class="pref">
+        <legend>Going back over what you have learned</legend>
+        <label class="choice"><input type="radio" name="review" value="daily">
+          <span><strong>Every session, first</strong>
+          <small>Your tutor opens each session with what is due, before anything new. The console shows what is due today.</small></span></label>
+        <label class="choice"><input type="radio" name="review" value="optional">
+          <span><strong>Only when I ask</strong>
+          <small>The console shows a quiet Review button and no count. Your tutor never opens with it; say "test me" when you want a round.</small></span></label>
+        <label class="choice"><input type="radio" name="review" value="off">
+          <span><strong>Off</strong>
+          <small>No review panel and no review questions. Without review, most of what a lesson teaches fades within a few weeks. What you have collected is kept, so you can turn it back on.</small></span></label>
+      </fieldset>
+      <fieldset class="pref" data-unless="review=off">
+        <legend>At most this many review questions a day</legend>
+        <div class="choice-row">
+          <label class="choice"><input type="radio" name="reviewCap" value="3" data-type="number"><span><strong>3</strong></span></label>
+          <label class="choice"><input type="radio" name="reviewCap" value="6" data-type="number"><span><strong>6</strong></span></label>
+          <label class="choice"><input type="radio" name="reviewCap" value="10" data-type="number"><span><strong>10</strong></span></label>
+        </div>
+        <p class="hint">Whatever else is due waits for another day. Your tutor spreads a backlog out rather than piling it up.</p>
+      </fieldset>
+
+      <h2>Lessons</h2>
+      <fieldset class="pref">
+        <legend>How a lesson ends</legend>
+        <label class="choice"><input type="radio" name="practice" value="checks-and-summary">
+          <span><strong>Quick checks, then my own summary</strong>
+          <small>You can only summarise what you understood, so the summary shows what landed — and it is the first thing offered for review.</small></span></label>
+        <label class="choice"><input type="radio" name="practice" value="checks-only">
+          <span><strong>Quick checks only</strong>
+          <small>No summary to write at the end.</small></span></label>
+      </fieldset>
+      <fieldset class="pref">
+        <legend>How long a lesson runs</legend>
+        <div class="choice-row">
+          <label class="choice"><input type="radio" name="lessonLength" value="standard">
+            <span><strong>About 10 minutes</strong></span></label>
+          <label class="choice"><input type="radio" name="lessonLength" value="short">
+            <span><strong>About 5 minutes</strong><small>One idea at a time.</small></span></label>
+        </div>
+      </fieldset>
+
+      <h2>Sessions</h2>
+      <fieldset class="pref">
+        <legend>How a session starts</legend>
+        <div class="choice-row">
+          <label class="choice"><input type="radio" name="opener" value="recap">
+            <span><strong>A two-line recap</strong><small>Where you are, and what today holds.</small></span></label>
+          <label class="choice"><input type="radio" name="opener" value="straight">
+            <span><strong>Straight in</strong><small>The first thing said is the first thing to do.</small></span></label>
+        </div>
+      </fieldset>
+      <fieldset class="pref">
+        <legend>How often your tutor asks how the teaching suits you</legend>
+        <label class="choice"><input type="radio" name="feedback" value="few-lessons">
+          <span><strong>Every few lessons</strong></span></label>
+        <label class="choice"><input type="radio" name="feedback" value="every-lesson">
+          <span><strong>After every lesson</strong><small>One line, at the end.</small></span></label>
+        <label class="choice"><input type="radio" name="feedback" value="when-asked">
+          <span><strong>Only when I bring it up</strong></span></label>
+      </fieldset>
+      <fieldset class="pref">
+        <legend>Teaching language</legend>
+        <div class="field"><input type="text" name="language" maxlength="40" autocomplete="off" aria-label="Teaching language"></div>
+        <p class="hint">New pages come in this language. Pages already written stay as they are unless you ask your tutor to translate them.</p>
+      </fieldset>
+
+      <section id="pace" hidden>
+        <h2>Pace</h2>
+        <fieldset class="pref">
+          <legend>Your time and your date</legend>
+          <div class="field"><label for="hours">Hours a week</label>
+            <input id="hours" type="number" name="hoursPerWeek" min="0" max="80" step="0.5" data-type="number"></div>
+          <div class="field"><label for="date">Target date</label>
+            <input id="date" type="date" name="targetDate"></div>
+          <p class="hint">Your tutor works out again whether the date is realistic and tells you the same session.</p>
+        </fieldset>
+      </section>
+
+      <div class="submit">
+        <button type="submit" id="save" disabled>Save</button>
+        <span class="submit-note" id="save-note"></span>
+      </div>
+      <p class="report" id="report" hidden>Tell your tutor: <code id="report-line"></code></p>
+    </form>
+  </div>
+
+  <!-- The saved values: window.PREFS = { … } -->
+  <script src="preferences.js"></script>
+  <script>
+    (function () {
+      /* The skill's own behaviour; a workspace with no preferences.js behaves exactly so. */
+      var DEFAULTS = { review: "daily", reviewCap: 6, practice: "checks-and-summary",
+        lessonLength: "standard", opener: "recap", feedback: "few-lessons", language: "English" };
+      var saved = window.PREFS && typeof window.PREFS === "object" ? window.PREFS : {};
+      var form = document.getElementById("prefs");
+      var save = document.getElementById("save"), note = document.getElementById("save-note");
+      var served = location.protocol === "http:" || location.protocol === "https:";
+      var MSG = {
+        none: "Nothing changed yet.",
+        some: function (n) { return n + (n === 1 ? " change" : " changes") + " — Save tells your tutor."; },
+        sending: "Saving…",
+        sent: "Saved — your tutor has it.",
+        unsent: "Saved. The drawer could not take the note, so tell your tutor you changed your preferences.",
+        same: "Saved — nothing had changed.",
+        failed: "Could not save — is bin/study still running? Tell your tutor the line below.",
+        offline: "Opened straight off disk, so nothing can be saved from here. Tell your tutor the line below.",
+        bad: "Hours a week has to be a number from 0 to 80."
+      };
+
+      /* Every setting the page offers is a named control; the name is the key. The
+         Pace section counts only when it is shown. (autocomplete="off" on the form
+         stops the browser restoring stale choices over these values on reload.) */
+      var pace = document.getElementById("pace");
+      pace.hidden = !("hoursPerWeek" in saved || "targetDate" in saved);
+      var keys = [];
+      Array.prototype.forEach.call(form.elements, function (el) {
+        if (el.name && keys.indexOf(el.name) < 0 && !(pace.hidden && pace.contains(el))) keys.push(el.name);
+      });
+
+      var current = {};
+      keys.forEach(function (k) { current[k] = k in saved ? saved[k] : DEFAULTS[k]; });
+
+      function controls(k) { return form.querySelectorAll('[name="' + k + '"]'); }
+      function show(values) {
+        keys.forEach(function (k) {
+          var v = values[k];
+          Array.prototype.forEach.call(controls(k), function (el) {
+            if (el.type === "radio") el.checked = v !== undefined && String(v) === el.value;
+            else el.value = v === undefined || v === null ? "" : String(v);   // .value, never markup
+          });
+        });
+      }
+      function read() {
+        var out = {}, bad = false;
+        keys.forEach(function (k) {
+          var els = controls(k), el = els[0], raw;
+          if (el.type === "radio") {
+            var on = form.querySelector('[name="' + k + '"]:checked');
+            if (!on) return;
+            raw = on.value;
+          } else {
+            raw = el.value.trim();
+            if (k === "language" && !raw) return;          // an empty box keeps what was there
+          }
+          if (el.dataset.type === "number") {
+            if (raw === "") { if (el.type !== "radio") out[k] = null; return; }
+            var n = Number(raw);
+            if (!isFinite(n) || n < 0 || n > 80) { bad = true; return; }
+            raw = n;
+          }
+          out[k] = raw;
+        });
+        return bad ? null : out;
+      }
+      function changes(values) {
+        var diff = {};
+        Object.keys(values).forEach(function (k) {
+          var v = values[k], was = current[k];
+          if (was === undefined && (v === "" || v === null)) return;   // never set, still empty
+          if (v !== was) diff[k] = v;
+        });
+        return diff;
+      }
+      function line(diff) {
+        var shown = function (v) { return typeof v === "string" && v ? v : JSON.stringify(v); };
+        return "I changed my preferences: " + Object.keys(diff).map(function (k) {
+          return k + " " + (current[k] === undefined ? "(unset)" : shown(current[k])) + " → " + shown(diff[k]);
+        }).join(", ") + ".";
+      }
+
+      /* Dependent settings: the daily cap means nothing with review off. */
+      function refresh() {
+        form.querySelectorAll("[data-unless]").forEach(function (el) {
+          var rule = el.dataset.unless.split("=");
+          var on = form.querySelector('[name="' + rule[0] + '"]:checked');
+          el.hidden = !!on && on.value === rule[1];
+        });
+        var values = read();
+        if (!values) { save.disabled = true; note.textContent = MSG.bad; return; }
+        var n = Object.keys(changes(values)).length;
+        save.disabled = !n;
+        note.textContent = n ? MSG.some(n) : MSG.none;
+      }
+
+      function report(text) {
+        document.getElementById("report-line").textContent = text;
+        document.getElementById("report").hidden = false;
+      }
+
+      form.addEventListener("change", refresh);
+      form.addEventListener("input", refresh);
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var values = read();
+        if (!values) return;
+        var diff = changes(values);
+        if (!Object.keys(diff).length) return;
+        if (!served) { note.textContent = MSG.offline; report(line(diff)); return; }
+
+        save.disabled = true;
+        note.textContent = MSG.sending;
+        fetch("/preferences", { method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(diff) })
+          .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+          .then(function (res) {
+            Object.keys(diff).forEach(function (k) { current[k] = diff[k]; });
+            var host = window.parent && window.parent !== window ? window.parent : null;
+            /* Redraw the console's review panel now; the badge skips this write. */
+            try { if (host && host.refreshSidebar) host.refreshSidebar(); } catch (err) {}
+            if (!res.line) { note.textContent = MSG.same; return; }
+            var send = host && host.tutorSend;
+            return Promise.resolve(send ? send(res.line) : false).then(function (ok) {
+              note.textContent = ok ? MSG.sent : MSG.unsent;
+              document.getElementById("report").hidden = true;
+            });
+          })
+          .catch(function () {
+            note.textContent = MSG.failed;
+            report(line(diff));
+            save.disabled = false;
+          });
+      });
+
+      show(current);
+      refresh();
+    })();
+  </script>
+</body>
+</html>

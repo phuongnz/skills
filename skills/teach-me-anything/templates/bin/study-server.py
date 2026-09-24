@@ -29,6 +29,15 @@ TERMINAL_PREFIX = "/terminal"
 CHANGES_PATH = "/changes"
 SUBMIT_PATH = "/submit"
 SUBMIT_MAX = 256 * 1024
+PREFS_PATH = "/preferences"
+PREFS_FILE = "preferences.js"
+PREFS_MAX = 16 * 1024
+PREFS_KEY = re.compile(r"^[A-Za-z][A-Za-z0-9]{0,31}$")
+# Kept word for word in step with templates/preferences.js.
+PREFS_HEAD = """/* Learner preferences — the choices on preferences.html. Schema and what each
+   setting does: formats/preferences.md. Everything after "window.PREFS =" is
+   strict JSON: the server rewrites this file when the learner presses Save. */
+window.PREFS = """
 CHUNK = 65536
 
 # What the console renders, and so what counts as "new content" landing.
@@ -94,6 +103,9 @@ class StudyHandler(http.server.SimpleHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
     socket_path = None
     allowed_origins = ()
+    # Files this server wrote itself, path → mtime. The page that caused the write
+    # has already redrawn the console, so they are not "new content" for the badge.
+    self_written = {}
 
     # ---- routing ---------------------------------------------------------
     def _is_terminal(self):
@@ -119,9 +131,12 @@ class StudyHandler(http.server.SimpleHTTPRequestHandler):
             for name in files:
                 if not name.endswith(CONTENT_EXT):
                     continue
+                full = os.path.join(base, name)
                 try:
-                    mtime = os.stat(os.path.join(base, name)).st_mtime_ns
+                    mtime = os.stat(full).st_mtime_ns
                 except OSError:
+                    continue
+                if self.self_written.get(full) == mtime:
                     continue
                 if mtime > stamp:
                     stamp = mtime
@@ -139,11 +154,14 @@ class StudyHandler(http.server.SimpleHTTPRequestHandler):
         return super().do_HEAD()
 
     def do_POST(self):
-        # ttyd asks for a token over POST; the only other POST is a page's answers.
+        # ttyd asks for a token over POST; the others are a page's answers and
+        # the preferences page's Save.
         if self._is_terminal():
             return self.relay()
         if self.path.split("?", 1)[0] == SUBMIT_PATH:
             return self.submit()
+        if self.path.split("?", 1)[0] == PREFS_PATH:
+            return self.preferences()
         self.send_error(405, "nothing here accepts POST")
 
     # ---- submissions -----------------------------------------------------
@@ -225,6 +243,74 @@ class StudyHandler(http.server.SimpleHTTPRequestHandler):
         body = json.dumps({"path": rel, "line": line}).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    # ---- preferences -----------------------------------------------------
+    def preferences(self):
+        """preferences.html's Save → preferences.js, merged onto what is there,
+        and the one-line note naming what changed. The file is loaded as a script
+        by the console, so only flat keys and plain values get in — never markup
+        or code, whatever the request carries."""
+        origin = self.headers.get("Origin", "")
+        if origin and origin not in self.allowed_origins:
+            self.send_error(403, "wrong origin")
+            return
+        try:
+            length = int(self.headers.get("Content-Length", "0"))
+            if not 0 < length <= PREFS_MAX:
+                raise ValueError("size")
+            incoming = json.loads(self.rfile.read(length).decode("utf-8"))
+            if not isinstance(incoming, dict) or len(incoming) > 40:
+                raise ValueError("shape")
+            for key, value in incoming.items():
+                if not PREFS_KEY.match(key):
+                    raise ValueError("key")
+                if isinstance(value, bool) or value is None:
+                    continue
+                if isinstance(value, (int, float)):
+                    if value != value or abs(value) > 1e6:
+                        raise ValueError("number")
+                    continue
+                if not isinstance(value, str) or len(value) > 200 \
+                        or any(ord(c) < 32 for c in value):
+                    raise ValueError("value")
+        except (ValueError, TypeError, UnicodeDecodeError):
+            self.send_error(400, "bad preferences")
+            return
+
+        path = os.path.join(self.directory, PREFS_FILE)
+        old = {}
+        try:
+            with open(path, encoding="utf-8") as f:
+                text = f.read()
+            # Anchored to a line start: the header comment names "window.PREFS =" too.
+            start = re.search(r"^window\.PREFS\s*=", text, re.M)
+            old = json.loads(text[start.end():].strip().rstrip(";").strip())
+            if not isinstance(old, dict):
+                old = {}
+        except (OSError, AttributeError, ValueError):
+            old = {}   # missing, or hand-edited past JSON: the save still lands
+
+        new = dict(old)
+        new.update(incoming)
+        shown = lambda v: v if isinstance(v, str) and v else json.dumps(v, ensure_ascii=False)
+        changed = ["%s %s → %s" % (k, shown(old[k]) if k in old else "(unset)", shown(v))
+                   for k, v in incoming.items() if k not in old or old[k] != v]
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(PREFS_HEAD + json.dumps(new, indent=2, ensure_ascii=False) + ";\n")
+        try:
+            StudyHandler.self_written[path] = os.stat(path).st_mtime_ns
+        except OSError:
+            pass
+
+        line = ("[console] I saved my preferences: %s. Now in %s." % (", ".join(changed), PREFS_FILE)
+                if changed else None)
+        body = json.dumps({"path": PREFS_FILE, "line": line, "changed": changed},
+                          ensure_ascii=False).encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -363,10 +449,11 @@ class StudyHandler(http.server.SimpleHTTPRequestHandler):
         # get a short TTL on purpose: a no-store stylesheet has to be re-fetched
         # on every page load, so a restart of this server at the wrong moment
         # leaves a lesson rendering unstyled with no cached copy to fall back on.
-        # reviews.js is data the tutor rewrites, not an asset: never cached either.
+        # reviews.js and preferences.js are data that gets rewritten, not assets:
+        # never cached either.
         tail = self.path.split("?", 1)[0].rsplit("/", 1)[-1]
         is_page = tail == "" or tail.endswith(".html") or "." not in tail \
-            or tail == "reviews.js"
+            or tail in ("reviews.js", PREFS_FILE)
         self.send_header("Cache-Control", "no-store" if is_page else "max-age=60")
         super().end_headers()
 
