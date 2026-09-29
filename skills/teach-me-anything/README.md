@@ -54,7 +54,7 @@ From the next day on, `bin/study` is the whole routine.
 ## Day to day
 
 - **Clear what's due first** — unless you set review to *only when I ask* or *off*. The panel shows today's items; the tutor runs them with you in the drawer and reschedules each one by how it went. (The **Review** button on the page is an ungraded flip-through — handy, but only the tutor moves the dates.)
-- **Then one lesson.** The tutor writes it, the page shows a blinking **new content** badge, you click it and the lesson appears — the drawer stays as it was.
+- **Then one lesson.** The tutor writes it, and once the tutor is done the lesson appears on its own — the drawer stays as it was. If you were busy on a page (a question answered, something typed), a blinking **new content** badge waits for your click instead, so nothing half-done is lost.
 - **Send to tutor.** Quick checks, short answers, your summary and assessments end in a button that hands your answers to the drawer. The tutor reads them and reacts.
 - **Preferences.** Under Foundations in the menu. Change anything any time; **Save** updates the review panel at once and tells the tutor, who adapts from the next lesson.
 - **Start buttons.** In curriculum mode you choose which milestone to open next; the tutor's suggested order is advice.

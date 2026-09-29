@@ -23,7 +23,8 @@
       <div id="menu"></div>
     </nav>
     <main class="stage">
-      <!-- Shown when the tutor writes or changes a page; click refreshes the console in place. -->
+      <!-- Shown when the tutor has written or changed pages while the learner was busy
+           on this one; click refreshes the console in place. -->
       <button id="fresh" type="button" hidden>New content — refresh</button>
       <iframe id="stage" title="lesson"></iframe>
     </main>
@@ -321,17 +322,27 @@
         old.after(fresh);
       };
 
-      /* What the new-content badge calls: re-read this file and reviews.js, redraw the
+      /* What brings new content in: re-read this file and reviews.js, redraw the
          sidebar from the fresh MENU, and bring the stage to whatever `current` now
-         points at — reloading it if that is the page already showing. */
-      window.refreshConsole = async function () {
+         points at — reloading it if that is the page already showing. The badge
+         calls it bare. Called on its own, it is handed the pages that changed and
+         moves the learner only if `current` did; otherwise they stay on their page,
+         reloaded only if it is one of those. */
+      window.refreshConsole = async function (changed) {
         window.refreshTheme();
+        const before = loaded.menu.current;
+        const active = activeHref();
         loaded = await reload();
         const menu = loaded.menu;
         render(menu, loaded.review, loaded.prefs);
-        const target = new URL(menu.current, location.href).href;
         let showing = "";
-        try { showing = stage.contentWindow.location.href; } catch (e) {}
+        try { showing = stage.contentWindow.location.href.split(/[?#]/)[0]; } catch (e) {}
+        if (changed && menu.current === before) {
+          if (changed.some(f => new URL(f, location.href).href === showing)) stage.contentWindow.location.reload();
+          setActive(active || menu.current);
+          return;
+        }
+        const target = new URL(menu.current, location.href).href;
         if (showing === target) stage.contentWindow.location.reload(); else go(menu.current);
         setActive(menu.current);
       };
@@ -467,23 +478,60 @@
     })();
   </script>
   <script>
-    /* ── New-content badge ──────────────────────────────────────────────
+    /* ── New content ────────────────────────────────────────────────────
        The tutor writes pages straight into the workspace; nothing pushes them
        here. So, when served, ask bin/study-server.py every few seconds for the
-       newest page and show a badge once something lands. A click redraws the
-       console in place (window.refreshConsole, above) rather than reloading the
-       page, which would restart the drawer's terminal mid-answer. It is a badge
-       and not an auto-refresh so a half-answered quiz is never wiped. */
+       newest page and whether the tutor is still at work (its screen in the
+       drawer still moving). While it is, wait: a lesson lands as several files,
+       and the first of them is not new content yet. Once it is done:
+         · the stage page untouched since it loaded, and the Review overlay
+           closed → bring it in unasked;
+         · otherwise → the badge, and the learner clicks when ready, so a
+           half-answered quiz or an unsaved form is never wiped.
+       Both redraw the console in place (window.refreshConsole, above) rather than
+       reloading the page, which would restart the drawer's terminal mid-answer.
+       With no drawer open there is no telling when the tutor is done: then only
+       the badge, once the files have been still for a while. */
     (function () {
       if (location.protocol !== "http:" && location.protocol !== "https:") return;
       var badge = document.getElementById("fresh");
-      var seen = null, newest = 0;
+      var stage = document.getElementById("stage");
+      var seen = null, newest = 0, touched = false;
+      var SETTLE = 10;   // seconds of still files before the badge, with no drawer to ask
+
+      /* A click or keystroke on the stage page since it loaded: it may now hold
+         something of the learner's, and only they decide to replace it. Handing
+         it to the tutor ("Send to tutor", a Save) leaves nothing to lose again. */
+      stage.addEventListener("load", function () {
+        touched = false;
+        try {
+          ["click", "input"].forEach(function (t) {
+            stage.contentDocument.addEventListener(t, function () { touched = true; }, true);
+          });
+        } catch (e) { touched = true; }
+      });
+      var send = window.tutorSend;
+      if (send) window.tutorSend = function (line) {
+        var fromStage = document.activeElement === stage;
+        return send(line).then(function (ok) { if (ok && fromStage) touched = false; return ok; });
+      };
+      function calm() { return !touched && document.getElementById("sr").hidden; }
+
       function poll() {
-        fetch("/changes", { cache: "no-store" }).then(function (r) { return r.json(); })
+        fetch("/changes" + (seen === null ? "" : "?since=" + seen), { cache: "no-store" })
+          .then(function (r) { return r.json(); })
           .then(function (c) {
             newest = c.stamp;
             if (seen === null) { seen = c.stamp; return; }
-            if (c.stamp > seen) { badge.title = c.latest; badge.hidden = false; }
+            if (c.stamp <= seen) return;
+            badge.title = c.latest;
+            if (!badge.hidden || c.tutor === "busy") return;
+            if (c.tutor === "idle" && calm()) {
+              seen = c.stamp;
+              window.refreshConsole(c.files).catch(function () { badge.hidden = false; });
+            } else if (c.tutor === "idle" || c.still >= SETTLE) {
+              badge.hidden = false;
+            }
           })
           .catch(function () {});
       }

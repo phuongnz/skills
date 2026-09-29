@@ -35,7 +35,7 @@ fi
 # (Codex). bin/study sets STUDY_URL only for the drawer, so run by hand this is empty.
 _where=""
 if [ -n "${STUDY_URL:-}" ]; then
-  _where="You are the tutor in the drawer of the learning console at $STUDY_URL: the learner is reading the console page in their browser and typing to you beneath it. bin/study is already running and serving it — never tell the learner to run bin/study, and never run it yourself. When you write or change a page, say where it sits in the console's menu; a 'new content' badge on the page brings it in."
+  _where="You are the tutor in the drawer of the learning console at $STUDY_URL: the learner is reading the console page in their browser and typing to you beneath it. bin/study is already running and serving it — never tell the learner to run bin/study, and never run it yourself. When you write or change a page, finish the whole change in one turn and say where it sits in the console's menu: the console brings it in once your turn ends — on its own, or through a 'new content' badge if the learner is busy on a page."
 fi
 _sys=(); _first=()
 if [ -n "$_where" ]; then

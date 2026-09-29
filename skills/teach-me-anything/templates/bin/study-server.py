@@ -24,6 +24,7 @@ import re
 import socket
 import sys
 import threading
+import time
 
 TERMINAL_PREFIX = "/terminal"
 CHANGES_PATH = "/changes"
@@ -51,6 +52,11 @@ CHUNK = 65536
 # What the console renders, and so what counts as "new content" landing.
 CONTENT_EXT = (".html", ".js", ".css")
 SKIP_DIRS = {"bin", "node_modules"}
+CHANGED_MAX = 200
+# The tutor is at work while its screen in the drawer moves: an agent's spinner
+# redraws many times a second for the whole of its turn, and waiting for the
+# learner the screen is still. Quiet this long, it has finished.
+TUTOR_QUIET = 3.0
 
 DOWN_PAGE = """<!doctype html>
 <meta charset="utf-8">
@@ -89,13 +95,16 @@ def _pump_reader(src, dst):
             pass
 
 
-def _pump_socket(src, dst):
-    """Relay a socket (the ttyd side) into another socket."""
+def _pump_socket(src, dst, watch=None):
+    """Relay a socket (the ttyd side) into another socket, showing each chunk
+    to `watch` on the way through."""
     try:
         while True:
             chunk = src.recv(CHUNK)
             if not chunk:
                 break
+            if watch:
+                watch(chunk)
             dst.sendall(chunk)
     except OSError:
         pass
@@ -106,6 +115,49 @@ def _pump_socket(src, dst):
             pass
 
 
+class _ScreenWatch:
+    """Reads ttyd's side of the terminal WebSocket just far enough to tell the
+    screen changing from the keep-alive pings ttyd sends when nothing else moves.
+    A server's frames are unmasked, so each header gives the opcode and the
+    payload length, and the payload itself is skipped unread."""
+
+    def __init__(self):
+        self.pending = b""    # an unfinished frame header, or the HTTP head before it
+        self.upgraded = False
+        self.skip = 0         # payload bytes of the current frame still to come
+
+    def feed(self, chunk):
+        """True when the chunk starts a data frame: screen output."""
+        buf, self.pending = self.pending + chunk, b""
+        if not self.upgraded:
+            end = buf.find(b"\r\n\r\n")
+            if end < 0:
+                self.pending = buf[-3:]
+                return False
+            buf, self.upgraded = buf[end + 4:], True
+        moved, i = False, 0
+        while i < len(buf):
+            if self.skip:
+                step = min(self.skip, len(buf) - i)
+                i, self.skip = i + step, self.skip - step
+                continue
+            if len(buf) - i < 2:
+                break
+            op, n = buf[i] & 0x0F, buf[i + 1] & 0x7F
+            head = 2 + {126: 2, 127: 8}.get(n, 0) + (4 if buf[i + 1] & 0x80 else 0)
+            if len(buf) - i < head:
+                break
+            if n == 126:
+                n = int.from_bytes(buf[i + 2:i + 4], "big")
+            elif n == 127:
+                n = int.from_bytes(buf[i + 2:i + 10], "big")
+            # 0 continuation, 1 text, 2 binary; 8 and up are close, ping, pong.
+            moved = moved or op < 0x8
+            i, self.skip = i + head, n
+        self.pending = buf[i:]
+        return moved
+
+
 class StudyHandler(http.server.SimpleHTTPRequestHandler):
     # HTTP/1.1 is required: a WebSocket upgrade cannot happen over HTTP/1.0.
     protocol_version = "HTTP/1.1"
@@ -114,6 +166,10 @@ class StudyHandler(http.server.SimpleHTTPRequestHandler):
     # Files this server wrote itself, path → mtime. The page that caused the write
     # has already redrawn the console, so they are not "new content" for the badge.
     self_written = {}
+    # Open drawer terminals, and when any of their screens last moved.
+    terminals = 0
+    screen_at = 0.0
+    lock = threading.Lock()
 
     # ---- routing ---------------------------------------------------------
     def _is_terminal(self):
@@ -132,13 +188,18 @@ class StudyHandler(http.server.SimpleHTTPRequestHandler):
 
     # ---- new content -----------------------------------------------------
     def changes(self):
-        """The newest page in the workspace, so the console can show a badge
-        when the tutor writes one. Polled; the workspace is small enough that
-        a walk per poll costs nothing worth an inotify dependency."""
-        stamp, latest = 0, ""
-        for base, dirs, files in os.walk(self.directory):
+        """The newest page in the workspace (its time in microseconds, which a
+        JavaScript number holds exactly) and whether the tutor is still at work,
+        so the console knows when new content has landed and is finished. With
+        ?since=<stamp>, also every page written after it. Polled; the workspace
+        is small enough that a walk per poll costs nothing worth an inotify
+        dependency."""
+        m = re.search(r"[?&]since=(\d+)", self.path)
+        since = int(m.group(1)) if m else None
+        stamp, latest, files = 0, "", []
+        for base, dirs, names in os.walk(self.directory):
             dirs[:] = [d for d in dirs if d not in SKIP_DIRS and not d.startswith(".")]
-            for name in files:
+            for name in names:
                 if not name.endswith(CONTENT_EXT):
                     continue
                 full = os.path.join(base, name)
@@ -148,15 +209,30 @@ class StudyHandler(http.server.SimpleHTTPRequestHandler):
                     continue
                 if self.self_written.get(full) == mtime:
                     continue
+                mtime //= 1000
+                rel = os.path.relpath(full, self.directory).replace(os.sep, "/")
+                if since is not None and mtime > since and len(files) < CHANGED_MAX:
+                    files.append(rel)
                 if mtime > stamp:
-                    stamp = mtime
-                    latest = os.path.relpath(os.path.join(base, name), self.directory)
-        body = json.dumps({"stamp": stamp, "latest": latest}).encode("utf-8")
+                    stamp, latest = mtime, rel
+        state = {"stamp": stamp, "latest": latest, "tutor": self.tutor_state(),
+                 "still": round(time.time() - stamp / 1e6, 1) if stamp else None}
+        if since is not None:
+            state["files"] = files
+        body = json.dumps(state).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+    @classmethod
+    def tutor_state(cls):
+        """What the tutor is doing: "none" with no drawer open, else "busy" or
+        "idle" by whether its screen has moved lately."""
+        if cls.terminals == 0:
+            return "none"
+        return "busy" if time.monotonic() - cls.screen_at < TUTOR_QUIET else "idle"
 
     def do_HEAD(self):
         if self._is_terminal():
@@ -410,13 +486,29 @@ class StudyHandler(http.server.SimpleHTTPRequestHandler):
 
     def tunnel(self, upstream):
         """A WebSocket: after the 101 the connection is ttyd's for good, so bytes
-        are pumped both ways until either side hangs up."""
-        down = threading.Thread(
-            target=_pump_socket, args=(upstream, self.connection), daemon=True
-        )
-        down.start()
-        _pump_reader(self.rfile, upstream)
-        down.join(timeout=5)
+        are pumped both ways until either side hangs up. ttyd's side is watched
+        on the way through: the screen moving is the tutor still at work."""
+        screen = _ScreenWatch()
+
+        def watch(chunk):
+            try:
+                if screen.feed(chunk):
+                    StudyHandler.screen_at = time.monotonic()
+            except Exception:
+                pass    # a misread frame must never cost the learner the terminal
+
+        with StudyHandler.lock:
+            StudyHandler.terminals += 1
+        try:
+            down = threading.Thread(
+                target=_pump_socket, args=(upstream, self.connection, watch), daemon=True
+            )
+            down.start()
+            _pump_reader(self.rfile, upstream)
+            down.join(timeout=5)
+        finally:
+            with StudyHandler.lock:
+                StudyHandler.terminals -= 1
 
     def forward_one_response(self, upstream):
         """A plain request: relay exactly ONE response, then hang up.
