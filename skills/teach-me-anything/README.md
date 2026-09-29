@@ -21,7 +21,9 @@ Lessons are written from trusted sources, cite them, and tie back to your Goal. 
 - An agent CLI on your `PATH`: [Claude Code](https://claude.com/claude-code) (`claude`) or [Codex](https://github.com/openai/codex) (`codex`)
 - [`ttyd`](https://github.com/tsl0922/ttyd) for the terminal drawer — `brew install ttyd`. Without it the console still works, minus the drawer.
 - Python 3 (ships with macOS) for the local server
-- macOS is where this has been tested. On Linux or Windows (WSL) the console and server should run as they are, but expect small adjustments — `bin/tutor-shell` in particular is written in `zsh`, and the tutor can adapt it to the shell it finds.
+- [Node.js](https://nodejs.org) for `npx`, which installs the skill (step 1 below)
+- macOS is where this has been tested. On Linux the console and server should run as they are, but expect small adjustments — `bin/tutor-shell` in particular is written in `zsh`, and the tutor can adapt it to the shell it finds.
+- On Windows, use **WSL2** (untested): install everything above — the agent, `ttyd`, Node — plus `zsh` and `lsof` inside Linux, and keep the topic folder there too. If the browser does not open by itself, paste the address `bin/study` prints into your Windows browser. Plain Windows, without WSL, gets only part of it: the tutor teaches from its own terminal and you open `index.html` straight from disk — no drawer, no **Send to tutor**, no **Save** on Preferences, and a new page needs a reload.
 
 ## Getting started
 
