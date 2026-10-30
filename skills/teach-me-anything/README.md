@@ -22,7 +22,7 @@ Lessons are written from trusted sources, cite them, and tie back to your Goal. 
 - [`ttyd`](https://github.com/tsl0922/ttyd) for the terminal drawer — `brew install ttyd`. Without it the console still works, minus the drawer.
 - Python 3 (ships with macOS) for the local server
 - [Node.js](https://nodejs.org) for `npx`, which installs the skill (step 1 below)
-- macOS is where this has been tested. On Linux the console and server should run as they are, but expect small adjustments — `bin/tutor-shell` in particular is written in `zsh`, and the tutor can adapt it to the shell it finds.
+- macOS is where this has been tested, with both Claude Code and Codex as the tutor. On Linux the console and server should run as they are, but expect small adjustments — `bin/tutor-shell` in particular is written in `zsh`, and the tutor can adapt it to the shell it finds.
 - On Windows, use **WSL2** (untested): install everything above — the agent, `ttyd`, Node — plus `zsh` and `lsof` inside Linux, and keep the topic folder there too. If the browser does not open by itself, paste the address `bin/study` prints into your Windows browser. Plain Windows, without WSL, gets only part of it: the tutor teaches from its own terminal and you open `index.html` straight from disk — no drawer, no **Send to tutor**, no **Save** on Preferences, and a new page needs a reload.
 
 ## Getting started
@@ -41,7 +41,14 @@ Lessons are written from trusted sources, cite them, and tie back to your Goal. 
    > /teach-me-anything Spanish, enough to hold a conversation on a trip next spring
    ```
 
-   The tutor asks a few questions — teaching language, your Goal, whether there is a syllabus, what you already know — and builds the workspace.
+   or, with Codex:
+
+   ```
+   codex
+   > $teach-me-anything Spanish, enough to hold a conversation on a trip next spring
+   ```
+
+   The tutor asks a few questions — teaching language, your Goal, whether there is a syllabus, what you already know — and builds the workspace. Claude Code asks them through a form; Codex asks them as numbered questions you answer in the chat.
 
 3. When it tells you to, run **in your own terminal** (not the agent's):
 
@@ -50,6 +57,8 @@ Lessons are written from trusted sources, cite them, and tie back to your Goal. 
    ```
 
    It prints an address, opens the console in your browser, and puts the tutor in the drawer — resuming the conversation you just had. Ctrl-C ends the session; nothing is left running.
+
+   The drawer takes the first agent it finds, `claude` before `codex`, whoever built the workspace. If you have both and want Codex, say so each time: `STUDY_AGENT=codex bin/study`.
 
 From the next day on, `bin/study` is the whole routine.
 
@@ -66,7 +75,7 @@ From the next day on, `bin/study` is the whole routine.
 
 ```bash
 STUDY_PORT=9000 bin/study     # pick the port (default: one derived from the folder's path)
-STUDY_AGENT=codex bin/study   # which agent tutors in the drawer (default: claude, then codex)
+STUDY_AGENT=codex bin/study   # which agent tutors in the drawer (default: claude if installed, else codex)
 STUDY_AGENT="gemini -r" bin/study   # any command line
 bin/study status              # prints the address if this workspace is already being served
 bin/check-quiz lessons/0001-*.html  # what the tutor runs to keep quiz options from giving the answer away
